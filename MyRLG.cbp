@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="MyRLG" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/MyRLG" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add option="-D__LINUX__" />
+				</Compiler>
+				<Linker>
+					<Add library="SDL" />
+					<Add library="GL" />
+					<Add library="GLU" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/MyRLG" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="obj/Release/" />
+				<Option type="5" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="SDL" />
+					<Add library="GL" />
+					<Add library="GLU" />
+				</Linker>
+			</Target>
+			<Target title="Windows - Debug">
+				<Option output="bin/DebugWin/MyRLG" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/DebugWin/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add library="opengl32" />
+					<Add library="glu32" />
+					<Add library="SDL" />
+					<Add library="gdi32" />
+				</Linker>
+			</Target>
+			<Target title="Windows - Release">
+				<Option output="bin/ReleaseWin/MyRLG" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="obj/ReleaseWin/" />
+				<Option type="5" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="opengl32" />
+					<Add library="glu32" />
+					<Add library="SDL" />
+					<Add library="gdi32" />
+				</Linker>
+			</Target>
+		</Build>
+		<Unit filename="creature.h" />
+		<Unit filename="dungeon_map.cpp" />
+		<Unit filename="dungeon_map.h" />
+		<Unit filename="game.cpp" />
+		<Unit filename="game.h" />
+		<Unit filename="items.h" />
+		<Unit filename="main.cpp" />
+		<Unit filename="myogl/animation.cpp" />
+		<Unit filename="myogl/animation.h" />
+		<Unit filename="myogl/bitmap_font.cpp" />
+		<Unit filename="myogl/bitmap_font.h" />
+		<Unit filename="myogl/camera.cpp" />
+		<Unit filename="myogl/camera.h" />
+		<Unit filename="myogl/config.h" />
+		<Unit filename="myogl/entity.cpp" />
+		<Unit filename="myogl/entity.h" />
+		<Unit filename="myogl/events.cpp" />
+		<Unit filename="myogl/events.h" />
+		<Unit filename="myogl/log.cpp" />
+		<Unit filename="myogl/log.h" />
+		<Unit filename="myogl/material.cpp" />
+		<Unit filename="myogl/material.h" />
+		<Unit filename="myogl/myogl.cpp" />
+		<Unit filename="myogl/myogl.h" />
+		<Unit filename="myogl/render.cpp" />
+		<Unit filename="myogl/render.h" />
+		<Unit filename="myogl/sprites.cpp" />
+		<Unit filename="myogl/sprites.h" />
+		<Unit filename="myogl/texture.cpp" />
+		<Unit filename="myogl/texture.h" />
+		<Unit filename="myogl/vector_types.h" />
+		<Unit filename="tileset.cpp" />
+		<Unit filename="tileset.h" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
