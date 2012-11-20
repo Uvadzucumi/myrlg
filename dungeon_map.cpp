@@ -509,7 +509,7 @@ void CDungeonLevel::CalculateLOS(int x_pos, int y_pos, int distance){
             }
         }
         // end post processing fixes
-    Log->puts("Calculate los from %d,%d coords\n",x,y);
+    Log->puts("Calculate los from %d,%d coords\n",x_pos,y_pos);
 }
 
 // set global light to ViewPort,TODO: add normal light calculation
