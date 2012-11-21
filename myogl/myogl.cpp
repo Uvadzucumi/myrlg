@@ -1,10 +1,32 @@
-
 #include "myogl.h"
 #include "log.h"
+
+/* For detect user directory */
+//#ifdef __LINUX__
+//    #include <unistd.h> // getuid()
+//    #include <pwd.h>    // getpwuid()
+//#endif
 
 using namespace MyOGL;
 
 bool CApplication::Init(int width, int height, int bpp, bool full_screen, const char *title){
+
+// set user home folder
+#ifdef __LINUX__
+//    printf("User Directory: %s\n", getenv("HOME"));
+//    struct passwd *user = NULL;
+//    uid_t user_id = getuid();
+//    user = getpwuid(user_id);
+//    printf("home dir: %s\n", user->pw_dir);
+    user_home_dir=new char[strlen(getenv("HOME")+1)];
+    strcpy(user_home_dir,getenv("HOME"));
+#else
+    // Win: %HOMEPATH%, %USERPROFILE%
+    user_home_dir=new char[strlen(getenv("USERPROFILE")+1)];
+    strcpy(user_home_dir,getenv("USERPROFILE"));
+#endif
+    printf("user home dir: %s\n",user_home_dir);
+
     Log=new CLog();
     Log->Init("log.txt");
     // init keys state array

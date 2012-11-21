@@ -13,9 +13,11 @@ int CDungeonLevel::GetRoomIdByCoords(unsigned int x, unsigned int y){
 void CDungeonLevel::AddMapTile(eTileTypes TileType, unsigned int x, unsigned int y){
     int tmp;
     void *data;
+    // default values
     m_Map[x][y].tile_type=TileType;
     m_Map[x][y].layer[1]=255;
     m_Map[x][y].layer[2]=255;
+    m_Map[x][y].p_tile_data=NULL;
     switch(TileType){
         case ttDoor: // create door tile
             // create door data
@@ -24,7 +26,7 @@ void CDungeonLevel::AddMapTile(eTileTypes TileType, unsigned int x, unsigned int
             m_Map[x][y].can_move=true;
             //((sTileDataDoor *)data)->hidden=true;
             //(sTileDataDoor)(*p)->locked=100;
-//            p->strength=rand()%100;
+            ((sTileDataDoor *)data)->strength=rand()%100;   // for broken and found (if hidden)
             tmp=rand()%100;
             if(tmp<=20){
                 ((sTileDataDoor *)data)->locked=true;
@@ -56,7 +58,7 @@ void CDungeonLevel::AddMapTile(eTileTypes TileType, unsigned int x, unsigned int
                     m_Map[x][y].layer[1]=tnDoorClosedDungeon;
                 }
             }
-            //delete ((sTileDataDoor *)data);
+            m_Map[x][y].p_tile_data=data;
             break;
         case ttFire: // create fire tile
             m_Map[x][y].layer[0]=tnFloorDungeonRoom;

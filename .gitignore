@@ -1,0 +1,6 @@
+*.o
+*.exe
+MyRLG.depend
+MyRLG.layout
+MyRLG-Win.depend
+MyRLG-Win.layout

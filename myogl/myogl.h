@@ -17,8 +17,14 @@ namespace MyOGL{
             void Events(SDL_Event *Event,  double DeltaTime);  // parse application events
             bool Running;
             bool KEYS[322];  // 322 is the number of SDLK_DOWN events
+            char *user_home_dir;
         public:
-            CApplication(){ FPS=-1; Running=false; OnRender=NULL; OnLoop=NULL; OnEvent=NULL; };
+            CApplication(){ FPS=-1; Running=false; OnRender=NULL; OnLoop=NULL; OnEvent=NULL; user_home_dir=NULL;};
+            ~CApplication(){
+                if(user_home_dir){
+                    delete user_home_dir;
+                }
+            }
             // create window and render context
             bool Init(int width=800, int height=600, int bpp=32, bool full_screen=false, const char *title=NULL);
             int Run(void); // Start Application

@@ -11,25 +11,13 @@
 //#include <locale.h>
 
 #include "game.h"
+#include "myogl/config_file.h"
 
 CHudSprite *herro_sprite;
 
 void OnRender(double dt){
-    /*
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity();
 
-    glBegin(GL_QUADS);
-        glColor3f(1, 0, 0); glVertex3f(0, 0, 0);
-        glColor3f(1, 1, 0); glVertex3f(100, 0, 0);
-        glColor3f(1, 0, 1); glVertex3f(100, 100, 0);
-        glColor3f(1, 1, 1); glVertex3f(0, 100, 0);
-    glEnd();
-
-    SDL_GL_SwapBuffers();
-*/
     static unsigned int savedTime=0;
-
 
     MyOGL::Vector4f font_color;
     static char tmp[400];
@@ -64,7 +52,7 @@ void OnRender(double dt){
     font_color.g=1;
     sprintf(tmp,"FPS: %d",(int)App->GetFPS());
 
-    sprintf(tmp,"Herro Coords: [%d,%d]",herro->GetPosX(), herro->GetPosY());
+    sprintf(tmp,"Координаты героя: [%d,%d]",herro->GetPosX(), herro->GetPosY());
     font_color.r=1; font_color.g=0,font_color.b=0;
     font->PrintAt(0,14,tmp,font_color);
 
@@ -80,28 +68,39 @@ void OnRender(double dt){
         }
     }
 
-
 }
 
 // Update objects
 void OnLoop(double DeltaTime){
 //    float speed=100;
-/*
-    if(App->IsKeyPressed(SDLK_LEFT)){
-        //if(dungeon->GetViewportLeft()>0) dungeon->SetViewportPosition(dungeon->GetViewportLeft()-1,dungeon->GetViewportTop());
-        dungeon->ChangeViewportPosition(-1,0);
+    if(App->IsKeyPressed(SDLK_LEFT) || App->IsKeyPressed(SDLK_KP4)){
+        herro->Move(-1,0, dungeon);
+        //dungeon->ChangeViewportPosition(-1,0);
     }
-    if(App->IsKeyPressed(SDLK_RIGHT)){
-        //if(dungeon->GetViewportLeft()<(dungeon->GetWidth()-dungeon->GetViewportWidth())) dungeon->SetViewportPosition(dungeon->GetViewportLeft()+1,dungeon->GetViewportTop());
-        dungeon->ChangeViewportPosition(1,0);
+    if(App->IsKeyPressed(SDLK_RIGHT)|| App->IsKeyPressed(SDLK_KP6)){
+        herro->Move(1,0, dungeon);
+        //dungeon->ChangeViewportPosition(1,0);
     }
-    if(App->IsKeyPressed(SDLK_UP)){
-        dungeon->ChangeViewportPosition(0,-1);
+    if(App->IsKeyPressed(SDLK_UP)|| App->IsKeyPressed(SDLK_KP8)){
+        herro->Move(0,-1, dungeon);
+        //dungeon->ChangeViewportPosition(0,-1);
     }
-    if(App->IsKeyPressed(SDLK_DOWN)){
-        dungeon->ChangeViewportPosition(0,1);;
+    if(App->IsKeyPressed(SDLK_DOWN)|| App->IsKeyPressed(SDLK_KP2)){
+        herro->Move(0,1, dungeon);
+        //dungeon->ChangeViewportPosition(0,1);;
     }
-    */
+    if(App->IsKeyPressed(SDLK_KP7)){
+        herro->Move(-1,-1, dungeon);
+    }
+    if(App->IsKeyPressed(SDLK_KP9)){
+        herro->Move(1,-1, dungeon);
+    }
+    if(App->IsKeyPressed(SDLK_KP1)){
+        herro->Move(-1,1, dungeon);
+    }
+    if(App->IsKeyPressed(SDLK_KP3)){
+        herro->Move(1,1, dungeon);
+    }
 }
 
 void OnEvent(SDL_Event *Event, double DeltaTime){
@@ -120,66 +119,39 @@ void OnEvent(SDL_Event *Event, double DeltaTime){
                     }
                     Log->puts("Current Global Light: %d\n",dungeon->GetGlobalLight());
                     break;
+                case SDLK_o:
+                    herro->OpenDoor(dungeon);
+                    break;
+/*
                 case SDLK_UP:
                 case SDLK_KP8:
-                    if(dungeon->Map()[herro->GetPosX()][herro->GetPosY()-1].can_move){
-                        herro->SetPosition(herro->GetPosX(),herro->GetPosY()-1);
-                        dungeon->SetViewportToTarget(herro->GetPosX(),herro->GetPosY());
-                        dungeon->CalculateLOS(herro->GetPosX(),herro->GetPosY());
-                    }
+                    herro->Move(0,-1,dungeon);
                     break;
                 case SDLK_DOWN:
                 case SDLK_KP2:
-                    if(dungeon->Map()[herro->GetPosX()][herro->GetPosY()+1].can_move){
-                        herro->SetPosition(herro->GetPosX(),herro->GetPosY()+1);
-                        dungeon->SetViewportToTarget(herro->GetPosX(),herro->GetPosY());
-                        dungeon->CalculateLOS(herro->GetPosX(),herro->GetPosY());
-                    }
+                    herro->Move(0,1,dungeon);
                     break;
                 case SDLK_RIGHT:
                 case SDLK_KP6:
-                    if(dungeon->Map()[herro->GetPosX()+1][herro->GetPosY()].can_move){
-                        herro->SetPosition(herro->GetPosX()+1,herro->GetPosY());
-                        dungeon->SetViewportToTarget(herro->GetPosX(),herro->GetPosY());
-                        dungeon->CalculateLOS(herro->GetPosX(),herro->GetPosY());
-                    }
+                    herro->Move(1,0,dungeon);
                     break;
                 case SDLK_LEFT:
                 case SDLK_KP4:
-                    if(dungeon->Map()[herro->GetPosX()-1][herro->GetPosY()].can_move){
-                        herro->SetPosition(herro->GetPosX()-1,herro->GetPosY());
-                        dungeon->SetViewportToTarget(herro->GetPosX(),herro->GetPosY());
-                        dungeon->CalculateLOS(herro->GetPosX(),herro->GetPosY());
-                    }
+                    herro->Move(-1,0,dungeon);
                     break;
                 case SDLK_KP7:
-                    if(dungeon->Map()[herro->GetPosX()-1][herro->GetPosY()-1].can_move){
-                        herro->SetPosition(herro->GetPosX()-1,herro->GetPosY()-1);
-                        dungeon->SetViewportToTarget(herro->GetPosX(),herro->GetPosY());
-                        dungeon->CalculateLOS(herro->GetPosX(),herro->GetPosY());
-                    }
+                    herro->Move(-1,-1,dungeon);
                     break;
                 case SDLK_KP9:
-                    if(dungeon->Map()[herro->GetPosX()+1][herro->GetPosY()-1].can_move){
-                        herro->SetPosition(herro->GetPosX()+1,herro->GetPosY()-1);
-                        dungeon->SetViewportToTarget(herro->GetPosX(),herro->GetPosY());
-                        dungeon->CalculateLOS(herro->GetPosX(),herro->GetPosY());
-                    }
+                    herro->Move(1,-1,dungeon);
                     break;
                 case SDLK_KP1:
-                    if(dungeon->Map()[herro->GetPosX()-1][herro->GetPosY()+1].can_move){
-                        herro->SetPosition(herro->GetPosX()-1,herro->GetPosY()+1);
-                        dungeon->SetViewportToTarget(herro->GetPosX(),herro->GetPosY());
-                        dungeon->CalculateLOS(herro->GetPosX(),herro->GetPosY());
-                    }
+                    herro->Move(-1,1,dungeon);
                     break;
                 case SDLK_KP3:
-                    if(dungeon->Map()[herro->GetPosX()+1][herro->GetPosY()+1].can_move){
-                        herro->SetPosition(herro->GetPosX()+1,herro->GetPosY()+1);
-                        dungeon->SetViewportToTarget(herro->GetPosX(),herro->GetPosY());
-                        dungeon->CalculateLOS(herro->GetPosX(),herro->GetPosY());
-                    }
+                    herro->Move(1,1,dungeon);
                     break;
+*/
                 default:
                     printf("Pressed key: %d\n",Event->key.keysym.sym);
                     break;
@@ -202,26 +174,22 @@ int main(int argc, char **argv){
     }
 #endif
     // get user directory
-#ifdef __LINUX__
-//printf("User Directory: %s\n", getenv("HOME"));
-    struct passwd *user = NULL;
-    uid_t user_id = getuid();
-    user = getpwuid(user_id);
-    printf("home dir: %s\n", user->pw_dir);
-#else
-    // Win: %HOMEPATH%, %USERPROFILE%
-    printf("User Directory: %s\nUser Profile Dir: %s\n",getenv("HOMEPATH"),getenv("USERPROFILE"));
-#endif
-
+    cfg_file = new CConfigFile("myrlg.conf");
     App = new MyOGL::CApplication();
 
-    if(!App->Init(800,600,32,false,"Моя RLG")){
+    if(!App->Init(
+                    cfg_file->GetParamValue("screen_width",800),
+                    cfg_file->GetParamValue("screen_height",600),
+                    cfg_file->GetParamValue("screen_bpp",32),
+                    (bool)cfg_file->GetParamValue("full_screen",0),
+                    "Моя RLG"
+      //  800,600,32,false,"Моя RLG"
+    )){
         delete App;
         return -1;
     };
 
     App->SetWinIcon("data/ico.bmp");
-
     // set callback functions
     App->OnRender=OnRender;
     App->OnLoop=OnLoop;
@@ -256,7 +224,8 @@ int main(int argc, char **argv){
 
     // create herro
     sroom FirstRoom=dungeon->GetRoom(0);
-    herro=new CCreature();
+    herro=new CHerro();
+    herro->movement_delay=cfg_file->GetParamValue("movement_delay",50);
     herro->SetPosition(rand()%FirstRoom.width+FirstRoom.left,rand()%FirstRoom.height+FirstRoom.top);
     herro_sprite=new CHudSprite(tiles_texture);
     herro_sprite->SetUVPixelCoords(0,128,32,32);

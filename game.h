@@ -9,6 +9,7 @@
 
 #include "dungeon_map.h"  // dungeon map generation/render
 #include "creature.h"       // for player
+#include "myogl/config_file.h"  // for read confin
 
 extern MyOGL::CMaterial LightMaterials[10];  // materials for light sources
 
@@ -19,8 +20,10 @@ extern MyOGL::CFont *font; // need delete
 extern MyOGL::CText *text; // need delete
 
 extern CTileset *Tileset;
-extern CCreature *herro;
+extern CHerro *herro;
 
 extern CDungeonLevel *dungeon;
+
+extern CConfigFile *cfg_file;
 
 #endif // GAME_H_INCLUDED

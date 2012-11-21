@@ -13,11 +13,11 @@
 // if defined - used vbo for render text, else - display list
 #define MYOGL_VBO_TEXT
 
-// camera window widt, height
+// window widt, height
 #define WWIDTH 800
 #define WHEIGHT 600
 
 // if defined - engine save log file in user directory
-// #define ENABLE_LOG_FILE
+//#define ENABLE_LOG_FILE
 
 #endif // CONFIG_H_INCLUDED

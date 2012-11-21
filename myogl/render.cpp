@@ -1,5 +1,6 @@
 
 #include "render.h"
+#include "texture.h"
 
 using namespace MyOGL;
 
@@ -47,7 +48,7 @@ bool CRender::Init(int width, int height, int bpp, bool full_screen, const char 
         Log->puts("CRender::Init SDL_Init(): false\n");
         return false;
     }
-/*
+#ifdef __WIN32__
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE,            8);
     SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE,          8);
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE,           8);
@@ -63,7 +64,7 @@ bool CRender::Init(int width, int height, int bpp, bool full_screen, const char 
 
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS,  1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES,  2);
-*/
+#endif
     window_flags = SDL_HWSURFACE | SDL_OPENGL;
     #ifdef MYOGL_DOUBLE_BUFFER
         window_flags |= SDL_GL_DOUBLEBUFFER;
@@ -91,12 +92,19 @@ bool CRender::Init(int width, int height, int bpp, bool full_screen, const char 
     Log->puts("OpenGL Vendor: %s\n",gl_vendor);
     gl_version = (char *) glGetString(GL_VERSION);
     Log->puts("OpenGL Version: %s\n",gl_version);
-    gl_extensions = (char *) glGetString(GL_EXTENSIONS);
-    Log->puts("OpenGL Extensions:\n");
-    for(int i=0;gl_extensions[i]!=0;i++){
-        if(gl_extensions[i]==32) { gl_extensions[i]=10; }
+    if(!strcmp(gl_vendor,"Microsoft Corporation")){
+       Log->puts("Need install Video Driver!\n");
+//        return false;
+    }else{
+
+        gl_extensions = (char *) glGetString(GL_EXTENSIONS);
+        Log->puts("OpenGL Extensions:\n");
+        for(int i=0;gl_extensions[i]!=0;i++){
+            if(gl_extensions[i]==32) { gl_extensions[i]=10; }
+        }
+        Log->puts(gl_extensions);
     }
-    Log->puts(gl_extensions);
+
     // Init OpenGL
     //SetClearColor(0,0,1);
     //SetColor(1,0,0);
@@ -159,7 +167,7 @@ bool CRender::Init(int width, int height, int bpp, bool full_screen, const char 
 
     glLoadIdentity();
 
-    Set2D(true);    // Set2D projection
+//    Set2D(true);    // Set2D projection
     GL.GetCurrentStates();
     GL.Debug();
 */
@@ -216,10 +224,11 @@ bool CRender::SetWinIcon(const char *file_name){
     return true;
 }
 
-void CRender::BindTexture(GLuint TextureID){
-    if(GL.CurrentTexure!=TextureID){
+void CRender::BindTexture(GLuint TextureID, bool force){
+    if(GL.CurrentTexure!=TextureID || force){
 	// Bind the texture object
         glBindTexture( GL_TEXTURE_2D, TextureID );
+        GL.CurrentTexure=TextureID;
     }
 }
 
@@ -245,12 +254,28 @@ void CRender::SetBlendMode(MyGlBlendMode mode){
 }
 
 bool CRender::OnResize(int width, int height){
+#ifdef __WIN32__
+    Log->puts("Not supported Windoew resize in Windows\n");
+#else
     SDL_Surface *old_context;
     old_context=Context;
     if((Context = SDL_SetVideoMode(width, height, bpp, window_flags)) == NULL) {
         Log->puts("CRender::Init SDL_SetVideoMode(): false\n");
         Context=old_context;
         return false;
+    }else{
+        #ifdef __WIN32__
+        Log->puts("for Windows need recreate texture!\n");
+        for(unsigned int i=0;i<TexturesList.size();i++){
+            // free old from video memory
+            //GLuint texture_id=TexturesList[i]->GetID();
+            //glDeleteTextures(1,&texture_id);
+            // create new in video memory
+            TexturesList[i]->CreateFromMemory();
+            Log->puts("texture %d recreated. ", TexturesList[i]->GetID());
+            Log->puts("file: %s\n", TexturesList[i]->GetFileName());
+        }
+        #endif
     }
     this->width=width;
     this->height=height;
@@ -265,9 +290,8 @@ bool CRender::OnResize(int width, int height){
         Set2D(true);
     }
 
-    // new
-    //ResetViewport();
     printf("window resized to %dx%d\n", width, height);
+#endif
     return true;
 }
 

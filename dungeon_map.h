@@ -98,7 +98,14 @@ class CDungeonLevel{
             for (unsigned int i = 0; i < m_width; i++){
                 for(unsigned int j=0; j < m_height; j++){
                     if(m_Map[i][j].p_tile_data!=NULL){
-                        printf("WARNING! not implementd delete *p_tile_data!\n");
+                        switch(m_Map[i][j].tile_type){
+                            case ttDoor:
+                                delete ((sTileDataDoor *)m_Map[i][j].p_tile_data);
+                                break;
+                            default:
+                                printf("WARNING! not implementd delete *p_tile_data for tile_type %d!\n",m_Map[i][j].tile_type);
+                                break;
+                        }
                     }
                 }
                 delete m_Map[i];

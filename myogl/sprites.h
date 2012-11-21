@@ -13,7 +13,6 @@ namespace MyOGL{
             //int TextureWidth, TextureHeight;
             CTexture *m_texture;
             CMaterial *m_material;
-            GLuint TextureID;
             Vector2f TextCoords[2];
             // sprite position
             int m_left, m_top;
@@ -42,7 +41,6 @@ namespace MyOGL{
                 }else{
                     BlendMode=blNone;
                 }
-                TextureID=texture->GetID();
                 //Log->puts("Created HudSprite\n");
             };
             ~CHudSprite(){

@@ -91,7 +91,7 @@ namespace MyOGL{
         // resize window
             bool OnResize(int width, int height);
         // Textures
-            void BindTexture(GLuint TextureID);
+            void BindTexture(GLuint TextureID, bool force=false);
             void SetBlendMode(MyGlBlendMode mode);
         // DrawColor
             void SetColor(float r, float g, float b, float a=1.0);

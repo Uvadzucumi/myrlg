@@ -47,7 +47,6 @@ class CTileset{
     public:
         CTileset(CTexture *texture, int tile_x_size=32, int tile_y_size=32);
         ~CTileset();
-
         // get current tile sprite
         CHudSprite *Tile(unsigned int tile_num){
             if(tile_num<TilesList.size()){
@@ -57,14 +56,8 @@ class CTileset{
                 return TilesList[0];
             }
         };
-
-        // render sprite in special coords
-        void RenderAt(int x, int y, int tile_id, CMaterial *material=NULL){
-            glTranslatef(x,y,0);
-            //TilesList[tile_id]->SetMaterial(material);
-            TilesList[tile_id]->Render(material);
-            glTranslatef(-x,-y,0);
-        };
+        void RenderAt(int x, int y, int tile_id, CMaterial *material=NULL);
+        void Render(int tile_id, CMaterial *material=NULL);
 };
 
 #endif // TILES_LANDSCAPE_H_INCLUDED

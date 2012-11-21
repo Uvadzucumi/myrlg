@@ -13,6 +13,9 @@ MyOGL::CText *text; // need delete
 CTileset *Tileset;
 
 // Player
-CCreature *herro;
+CHerro *herro;
 // Dungeon level
 CDungeonLevel *dungeon;
+
+// config file class
+CConfigFile *cfg_file;

@@ -27,3 +27,14 @@ CTileset::~CTileset(){
     TilesList.clear();
 };
 
+// render sprite in special coords
+void CTileset::RenderAt(int x, int y, int tile_id, CMaterial *material){
+    glTranslatef(x,y,0);
+    //TilesList[tile_id]->SetMaterial(material);
+    Render(tile_id, material);
+    glTranslatef(-x,-y,0);
+};
+
+void CTileset::Render(int tile_id, CMaterial *material){
+    TilesList[tile_id]->Render(material);
+};
