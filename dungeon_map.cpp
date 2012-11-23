@@ -3,6 +3,8 @@
 #include <math.h>
 #include "game.h"
 
+#include<SDL/SDL.h>
+
 int CDungeonLevel::GetRoomIdByCoords(unsigned int x, unsigned int y){
     // get grid x and y
     int grid_x=(int)(x/(m_width/m_grid_w));
@@ -321,7 +323,6 @@ void CDungeonLevel::AddLightSource(unsigned int x, unsigned int y, unsigned char
 
 // Bresenhams line algo
 bool CDungeonLevel::LineOfSight(int x1, int y1, int x2, int y2){
-
     int i, deltax, deltay, numtiles;
     int d, dinc1, dinc2;
     int x, xinc1, xinc2;
@@ -383,7 +384,9 @@ bool CDungeonLevel::LineOfSight(int x1, int y1, int x2, int y2){
 }
 
 void CDungeonLevel::CalculateLOS(int x_pos, int y_pos, int distance){
-    //
+    unsigned int start=SDL_GetTicks();
+    Log->puts("calc LOS ");
+
     int i,j;
     //unsigned int map_x, map_y;   // los array to map array coords
     // clear LOS data
@@ -420,10 +423,12 @@ void CDungeonLevel::CalculateLOS(int x_pos, int y_pos, int distance){
         }
         int x,y;
         // post processing
+
         for(i=m_ViewPort.left;i<(int)(m_ViewPort.left+m_ViewPort.width);i++){
             for(j=m_ViewPort.top;j<(int)(m_ViewPort.top+m_ViewPort.height);j++){
                 //
                 if(!m_Map[i][j].skip_light && !m_Map[i][j].visible){ // invisible block light tile
+                    // north
                     x = i;
                     y = j - 1;
                     if(x>0 && x<(int)m_width){
@@ -434,6 +439,7 @@ void CDungeonLevel::CalculateLOS(int x_pos, int y_pos, int distance){
                             }
                         }
                     }
+                    // south
                     x = i;
                     y = j + 1;
                     if(x>0 && x<(int)m_width){
@@ -444,7 +450,7 @@ void CDungeonLevel::CalculateLOS(int x_pos, int y_pos, int distance){
                             }
                         }
                     }
-
+                    // west
                     x = i - 1;
                     y = j;
                     if(x>0 && x<(int)m_width){
@@ -455,7 +461,7 @@ void CDungeonLevel::CalculateLOS(int x_pos, int y_pos, int distance){
                             }
                         }
                     }
-
+                    // east
                     x = i + 1;
                     y = j;
                     if(x>0 && x<(int)m_width){
@@ -466,42 +472,51 @@ void CDungeonLevel::CalculateLOS(int x_pos, int y_pos, int distance){
                             }
                         }
                     }
-//
+
+                    // nort-west
                     x = i - 1;
                     y = j - 1;
                     if(x>0 && x<(int)m_width){
                         if(y>0 && y<(int)m_height){
-                            if(m_Map[x][y].skip_light && m_Map[x][y].visible){  // if near viewed floor
+                            if(m_Map[x][y].skip_light && m_Map[x][y].visible &&         // if near viewed floor
+                                !m_Map[x][j].skip_light && !m_Map[i][y].skip_light){    // and 2 block
                                 m_Map[i][j].visible=true;
                                 m_Map[i][j].viewed=true;
                             }
                         }
                     }
+                    // north-east
                     x = i + 1;
                     y = j - 1;
                     if(x>0 && x<(int)m_width){
                         if(y>0 && y<(int)m_height){
-                            if(m_Map[x][y].skip_light && m_Map[x][y].visible){  // if near viewed floor
+                            if(m_Map[x][y].skip_light && m_Map[x][y].visible  &&         // if near viewed floor
+                                !m_Map[x][j].skip_light && !m_Map[i][y].skip_light){    // and 2 block
                                 m_Map[i][j].visible=true;
                                 m_Map[i][j].viewed=true;
                             }
                         }
                     }
+                    // south-east
                     x = i + 1;
                     y = j + 1;
                     if(x>0 && x<(int)m_width){
                         if(y>0 && y<(int)m_height){
-                            if(m_Map[x][y].skip_light && m_Map[x][y].visible){  // if near viewed floor
+                            if(m_Map[x][y].skip_light && m_Map[x][y].visible &&         // if near viewed floor
+                                !m_Map[x][j].skip_light && !m_Map[i][y].skip_light){    // and 2 block
                                 m_Map[i][j].visible=true;
                                 m_Map[i][j].viewed=true;
                             }
                         }
                     }
+
+                    //south-west
                     x = i - 1;
                     y = j + 1;
                     if(x>0 && x<(int)m_width){
                         if(y>0 && y<(int)m_height){
-                            if(m_Map[x][y].skip_light && m_Map[x][y].visible){  // if near viewed floor
+                            if(m_Map[x][y].skip_light && m_Map[x][y].visible &&         // if near viewed floor
+                                !m_Map[x][j].skip_light && !m_Map[i][y].skip_light){    // and near 2 block
                                 m_Map[i][j].visible=true;
                                 m_Map[i][j].viewed=true;
                             }
@@ -511,7 +526,9 @@ void CDungeonLevel::CalculateLOS(int x_pos, int y_pos, int distance){
             }
         }
         // end post processing fixes
-    Log->puts("Calculate los from %d,%d coords\n",x_pos,y_pos);
+
+
+    Log->puts("%d ticks\n",SDL_GetTicks()-start);
 }
 
 // set global light to ViewPort,TODO: add normal light calculation
