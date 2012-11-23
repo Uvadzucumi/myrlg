@@ -18,6 +18,9 @@ namespace MyOGL{
             CTexture *m_texture;
             std::vector <Glyph> m_chars;
             int m_font_height;
+            Vector3i ColorFromCode(const char *code);   // return color created from 6 char symbols
+            Vector3i last_color;
+            bool color_changed;
         public:
             CFont(){m_font_height=-1;}
             ~CFont();
@@ -26,7 +29,10 @@ namespace MyOGL{
             void debug(void);
             int PrintAt(int x, int y, const char *string, Vector4f color);
             int GetGlyphId(unsigned int code);
-            int RenderText(const char *string);
+            int RenderText(const char *string, int max_width=0);
+            CTexture *GetTexture(){ return m_texture;};
+            bool IsColorChanged(){ return color_changed;};  // true if color changed in rendering time (with special color codes in text)
+            Vector3i GetLatsColor(){ return last_color;};   // return last rendered color
     };
 
     class CText{
@@ -34,10 +40,13 @@ namespace MyOGL{
             CFont *m_font;
             char *m_text;
             int m_width;
+            // chave color changes for set in GL state cashe
+            bool color_changed;
+            Vector3i last_color;
         public:
             CText(CFont *font, const char *text=NULL);
             ~CText();
-            void SetText(const char *text);
+            void SetText(const char *text, int max_width=0);
             int PrintAt(int x, int y, Vector4f color);
             void Free(void);
     };

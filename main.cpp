@@ -6,6 +6,7 @@
     #include <pwd.h>    // getpwuid()
 #endif
 #include <stdlib.h>
+#include <time.h>   // for inicialize rand seed
 
 //#include <wchar.h>
 //#include <locale.h>
@@ -17,7 +18,7 @@ CHudSprite *herro_sprite;
 
 void OnRender(double dt){
 
-    static unsigned int savedTime=0;
+//    static unsigned int savedTime=0;
 
     MyOGL::Vector4f font_color;
     static char tmp[400];
@@ -43,19 +44,22 @@ void OnRender(double dt){
     font_color.r=0;font_color.g=0;font_color.b=0;font_color.a=1;
     font->PrintAt(301,11,"Мама мыла раму!\nРама блистела!",font_color);
     font_color.g=1;
-    font->PrintAt(300,10,"Мама мыла раму!\nРама блистела!",font_color);
+    font->PrintAt(300,10,"Мама мыла раму!\n^ffff00Рама блистела!",font_color);
 */
-    font_color.r=0;font_color.g=0;font_color.b=0;font_color.a=1;
-    sprintf(tmp,"FPS: %d",(int)App->GetFPS());
-    font_color.r=1; font_color.g=0,font_color.b=0;
-    font->PrintAt(1,1,tmp,font_color);
-    font_color.g=1;
-    sprintf(tmp,"FPS: %d",(int)App->GetFPS());
+    font_color.r=0;font_color.g=1;font_color.b=0;font_color.a=1;
+    text->PrintAt(300,10,font_color);
 
-    sprintf(tmp,"Координаты героя: [%d,%d]",herro->GetPosX(), herro->GetPosY());
+
+    //font_color.r=0;font_color.g=0;font_color.b=0;font_color.a=1;
+    font_color.r=0; font_color.g=1,font_color.b=0;
+    sprintf(tmp,"FPS: ^ffff00%d",(int)App->GetFPS());
+    font->PrintAt(1,1,tmp,font_color);
+
+    sprintf(tmp,"Координаты героя: [^ffffff%d,%d^ff0000]",herro->GetPosX(), herro->GetPosY());
     font_color.r=1; font_color.g=0,font_color.b=0;
     font->PrintAt(0,14,tmp,font_color);
 
+/*
     // Display FPS evry 5 seconds
 
     if(savedTime==0){
@@ -67,7 +71,7 @@ void OnRender(double dt){
             printf("FPS: %f\n",App->GetFPS());
         }
     }
-
+*/
 }
 
 // Update objects
@@ -173,6 +177,9 @@ int main(int argc, char **argv){
         printf("\t%d. %s\n",i,argv[i]);
     }
 #endif
+
+    srand(time(NULL));
+
     // get user directory
     cfg_file = new CConfigFile("myrlg.conf");
     App = new MyOGL::CApplication();
@@ -203,7 +210,7 @@ int main(int argc, char **argv){
     font->LoadGlyphData("data/myfont.fnt",font_texture);
     // display list text
     text=new MyOGL::CText(font);
-    text->SetText("Мама мыла раму!\nРама блистела!");
+    text->SetText("Мама мыла раму!\n^ffff00Рама блистела!");
 
     // CreateLightMaterails
     for(unsigned int i=0;i<10;i++){
@@ -231,6 +238,8 @@ int main(int argc, char **argv){
     herro_sprite->SetUVPixelCoords(0,128,32,32);
     herro_sprite->SetSize(32,32);
     herro->SetSprite(herro_sprite);
+
+    Log->puts("Minimum map tile size: %d Bytes\n",sizeof(sMapField));
 
     dungeon->SetViewportToTarget(herro->GetPosX(),herro->GetPosY());
     dungeon->CalculateLOS(herro->GetPosX(),herro->GetPosY());
