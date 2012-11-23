@@ -275,6 +275,7 @@ void CDungeonLevel::NewLevel(){
     for(y=0;y<m_height;y++){
         for(x=0;x<m_width;x++){
             AddMapTile(ttWall,x,y);
+            m_Map[x][y].viewed=false;
         }
     }
 

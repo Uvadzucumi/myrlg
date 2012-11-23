@@ -43,13 +43,17 @@ namespace MyOGL{
             // chave color changes for set in GL state cashe
             bool color_changed;
             Vector3i last_color;
+            int m_max_width;
         public:
             CText(CFont *font, const char *text=NULL);
             ~CText();
             void SetText(const char *text, int max_width=0);
             int PrintAt(int x, int y, Vector4f color);
             void Free(void);
+            bool CreateDisplayList();   // create display list for text rendering
     };
+
+    extern std::vector <CText*> TextsList;
 
 }
 

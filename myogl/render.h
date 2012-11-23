@@ -70,6 +70,7 @@ namespace MyOGL{
             char *gl_extensions;
        //     CWindow *win;
             float zNearPlane, zFarPlane;
+            void InitGL();  // set start OpenGL states, save states to GL object
         public:
             CRender(); //{width=0; height=0; bpp=0; full_screen=false;Context=NULL;};
             ~CRender();
@@ -94,7 +95,8 @@ namespace MyOGL{
             void BindTexture(GLuint TextureID, bool force=false);
             void SetBlendMode(MyGlBlendMode mode);
         // DrawColor
-            void SetColor(float r, float g, float b, float a=1.0);
+            void SetColor(float r, float g, float b, float a=1.0, bool force=false);
+            void SetColor(Vector3i color, bool force=false);
             void SetClearColor(float r, float g, float b, float a=1.0);
     };
 

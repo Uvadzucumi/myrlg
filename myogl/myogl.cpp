@@ -1,6 +1,8 @@
 #include "myogl.h"
 #include "log.h"
 
+#include <unistd.h> // for sleep
+
 /* For detect user directory */
 //#ifdef __LINUX__
 //    #include <unistd.h> // getuid()
@@ -93,6 +95,7 @@ int CApplication::Run(void){
         }
 
         Render->SwapBuffers();
+        usleep(10);
         frames++;
     }
     Free();    // FreeMemory

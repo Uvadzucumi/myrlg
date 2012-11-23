@@ -4,6 +4,8 @@
 
 using namespace MyOGL;
 
+std::vector <CText*> MyOGL::TextsList;
+
 // Clear font class data
 CFont::~CFont(){
     // clear glyphs
@@ -131,6 +133,10 @@ Vector3i CFont::ColorFromCode(const char *code){
             h_c=code[i]-87; //(-97+10);
         }else{ // wrong color code
             Log->puts("Wrong color code[%d]: %c",i*2,code[i*2]);
+            color.r=255;
+            color.g=255;
+            color.b=255;
+            break;
         }
         h_c <<= 4;
         if(code[i+1]>47 && code [i+1]<58){
@@ -234,6 +240,7 @@ CText::CText(CFont *font, const char *text){
     if(text){
         SetText(text);
     }
+    TextsList.push_back(this);  // add to list
 }
 
 void CText::Free(void){
@@ -257,16 +264,23 @@ void CText::SetText(const char *text, int max_width){
     m_text=(char *)malloc(strlen(text)+1);
     strcpy(m_text,text);
     // generate display list
+    m_max_width=max_width;
+    CreateDisplayList();
+}
+
+// create display list for text rendering
+bool CText::CreateDisplayList(){
     m_list_id=glGenLists(1);
     Log->puts("Generate display list %d\n",m_list_id);
     glNewList(m_list_id,GL_COMPILE);
-    m_width=m_font->RenderText(text, max_width);
+    m_width=m_font->RenderText(m_text, m_max_width);
     // render text
     glEndList();
     if(m_font->IsColorChanged()){
         color_changed=true;
         last_color=m_font->GetLatsColor();
     }
+    return true;
 }
 
 int CText::PrintAt(int x, int y, Vector4f color){
@@ -292,4 +306,10 @@ int CText::PrintAt(int x, int y, Vector4f color){
 
 CText::~CText(){
     Free();
+    for(unsigned int i=0;i<TextsList.size();i++){
+        if(TextsList[i]==this){
+            TextsList.erase(TextsList.begin()+i);
+        }
+    }
+    Log->puts("deleted CText object\n");
 }

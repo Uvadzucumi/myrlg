@@ -5,8 +5,9 @@
 #define MYOGL_MINOR_VERSION 1
 
 // if defined - used double buffering
-//#define MYOGL_DOUBLE_BUFFER
-
+#ifdef __WIN32__
+    #define MYOGL_DOUBLE_BUFFER
+#endif
 // if defined - created resizable application window
 #define MYOGL_RESIZABLE_WINDOW
 

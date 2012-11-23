@@ -1,6 +1,8 @@
 
 #include "render.h"
+
 #include "texture.h"
+#include "bitmap_font.h"
 
 using namespace MyOGL;
 
@@ -35,6 +37,27 @@ void CRender::Free(){
         SDL_FreeSurface(Context);
         Context=NULL;
     }
+}
+
+// set start OpenGL states
+void CRender::InitGL(){
+    glColor3f(1,0,0);
+    glClearColor(0,0,0,1);
+    glClearDepth(1.0f);
+    glViewport(0, 0, this->width, this->height);
+    glEnable(GL_TEXTURE_2D);
+    glDepthFunc(GL_LEQUAL);
+    glEnable(GL_DEPTH_TEST);
+    //
+    glColorMaterial(GL_FRONT, GL_DIFFUSE);
+    glEnable(GL_COLOR_MATERIAL);
+    glDisable(GL_LIGHTING);
+    glDisable(GL_BLEND);
+    //glBlendEquation(GL_FUNC_ADD);
+
+    Set2D(true);    // Set2D projection
+    GL.GetCurrentStates();
+    GL.Debug();
 }
 
 // Render class realisation
@@ -108,23 +131,7 @@ bool CRender::Init(int width, int height, int bpp, bool full_screen, const char 
     // Init OpenGL
     //SetClearColor(0,0,1);
     //SetColor(1,0,0);
-    glColor3f(1,0,0);
-    glClearColor(0,0,0,1);
-    glClearDepth(1.0f);
-    glViewport(0, 0, this->width, this->height);
-    glEnable(GL_TEXTURE_2D);
-    glDepthFunc(GL_LEQUAL);
-    glEnable(GL_DEPTH_TEST);
-    //
-    glColorMaterial(GL_FRONT, GL_DIFFUSE);
-    glEnable(GL_COLOR_MATERIAL);
-    glDisable(GL_LIGHTING);
-    glDisable(GL_BLEND);
-    //glBlendEquation(GL_FUNC_ADD);
-
-    Set2D(true);    // Set2D projection
-    GL.GetCurrentStates();
-    GL.Debug();
+    InitGL();
 
 /*
     if(SDL_Init(SDL_INIT_EVERYTHING) < 0) {
@@ -254,55 +261,62 @@ void CRender::SetBlendMode(MyGlBlendMode mode){
 }
 
 bool CRender::OnResize(int width, int height){
-#ifdef __WIN32__
-    Log->puts("Not supported Windoew resize in Windows\n");
-#else
+//#ifdef __WIN32__
+//    Log->puts("Not supported Windoew resize in Windows\n");
+//#else
     SDL_Surface *old_context;
     old_context=Context;
     if((Context = SDL_SetVideoMode(width, height, bpp, window_flags)) == NULL) {
         Log->puts("CRender::Init SDL_SetVideoMode(): false\n");
         Context=old_context;
         return false;
-    }else{
-        #ifdef __WIN32__
-        Log->puts("for Windows need recreate texture!\n");
-        for(unsigned int i=0;i<TexturesList.size();i++){
-            // free old from video memory
-            //GLuint texture_id=TexturesList[i]->GetID();
-            //glDeleteTextures(1,&texture_id);
-            // create new in video memory
-            TexturesList[i]->CreateFromMemory();
-            Log->puts("texture %d recreated. ", TexturesList[i]->GetID());
-            Log->puts("file: %s\n", TexturesList[i]->GetFileName());
-        }
-        #endif
     }
+
     this->width=width;
     this->height=height;
     SDL_FreeSurface(old_context);
-    // set viewport
-
+#ifdef __WIN32__
+    Log->puts("for Windows need reinicialize OGL states and recreate texture!\n");
+    InitGL();
+    // recreate textures
+    for(unsigned int i=0;i<TexturesList.size();i++){
+        // free old from video memory
+        //GLuint texture_id=TexturesList[i]->GetID();
+        //glDeleteTextures(1,&texture_id);
+        // create new in video memory
+        TexturesList[i]->CreateFromMemory();
+        Log->puts("texture %d recreated. ", TexturesList[i]->GetID());
+        Log->puts("file: %s\n", TexturesList[i]->GetFileName());
+    }
+    // recreate text display lists
+    for(unsigned int i=0;i<TextsList.size();i++){
+        TextsList[i]->CreateDisplayList();
+        Log->puts("CText object display list recreated\n");
+    }
+#else
+    // in normal OS need only resize Viewport
     glViewport(0,0,this->width,this->height);
-    // set projection - force reset viewport
+        // set projection - force reset viewport
     if(GL.mode3d){
         Set3D(true);
     }else{
         Set2D(true);
     }
-
-    printf("window resized to %dx%d\n", width, height);
 #endif
+    printf("window resized to %dx%d\n", width, height);
     return true;
 }
 
 // Set Inc color
-void CRender::SetColor(float r, float g, float b, float a){
-    if(GL.Color.r==r && GL.Color.g==g && GL.Color.b == b && GL.Color.a==a){
-        // nop
-    }else{
+void CRender::SetColor(float r, float g, float b, float a, bool force){
+    if(GL.Color.r!=r || GL.Color.g!=g || GL.Color.b != b || GL.Color.a!=a || force){
         GL.Color.r=r; GL.Color.g=g; GL.Color.b=b; GL.Color.a=a;
         glColor4f(r,g,b,a);
     }
+}
+// Set Inc color
+void CRender::SetColor(Vector3i color, bool force){
+    this->SetColor(((float)color.r)/255,((float)color.g)/255,((float)color.b)/255,1.0, force);
 }
 // Set Paper color
 void CRender::SetClearColor(float r, float g, float b, float a){
