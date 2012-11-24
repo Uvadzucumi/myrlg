@@ -61,8 +61,8 @@ namespace MyOGL{
 
 
     class CRender{
-            int width, height, bpp;
-            bool full_screen;
+            int m_width, m_height, m_bpp;
+            bool m_full_screen;
             SDL_Surface *Context;
             Uint32 window_flags;
             char *gl_vendor;
@@ -87,8 +87,8 @@ namespace MyOGL{
             void SetWinCaption(const char *title);
             bool SetWinIcon(const char *file_name);
         // get context size
-            int GetWidth(void){ return width;}
-            int GetHeight(void){ return width;}
+            int GetWidth(void){ return m_width;}
+            int GetHeight(void){ return m_height;}
         // resize window
             bool OnResize(int width, int height);
         // Textures

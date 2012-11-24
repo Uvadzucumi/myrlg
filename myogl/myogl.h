@@ -19,7 +19,15 @@ namespace MyOGL{
             bool KEYS[322];  // 322 is the number of SDLK_DOWN events
             char *user_home_dir;
         public:
-            CApplication(){ FPS=-1; Running=false; OnRender=NULL; OnLoop=NULL; OnEvent=NULL; user_home_dir=NULL;};
+            CApplication(){
+                FPS=-1;
+                Running=false;
+                OnRender=NULL;
+                OnLoop=NULL;
+                OnEvent=NULL;
+                OnWindowResize=NULL;
+                user_home_dir=NULL;
+            };
             ~CApplication(){
                 if(user_home_dir){
                     delete user_home_dir;
@@ -37,6 +45,7 @@ namespace MyOGL{
             void( *OnLoop)(double dt);
             //void( *OnEvent)(SDL_Event *OnEvent);
             void( *OnEvent)(SDL_Event *Event, double DeltaTime);
+            void( *OnWindowResize)(unsigned int width, unsigned int height);
 
             //void OnEvent(SDL_Event* Event);
             void OnExit() { Running = false; }

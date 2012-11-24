@@ -46,9 +46,9 @@ void OnRender(double dt){
     sprintf(tmp,"FPS: ^ffff00%d",(int)App->GetFPS());
     font->PrintAt(1,1,tmp,font_color);
 
-    sprintf(tmp,"Координаты героя: [^ffffff%d,%d^ff0000]",herro->GetPosX(), herro->GetPosY());
+    sprintf(tmp,"Координаты героя: [^ffffff%d^ff0000,^ffffff%d^ff0000]",herro->GetPosX(), herro->GetPosY());
     font_color.r=1; font_color.g=0,font_color.b=0;
-    font->PrintAt(0,14,tmp,font_color);
+    font->PrintAt(1,14,tmp,font_color);
 
 /*
     // Display FPS evry 5 seconds
@@ -119,41 +119,21 @@ void OnEvent(SDL_Event *Event, double DeltaTime){
                 case SDLK_o:
                     herro->OpenDoor(dungeon);
                     break;
-/*
-                case SDLK_UP:
-                case SDLK_KP8:
-                    herro->Move(0,-1,dungeon);
-                    break;
-                case SDLK_DOWN:
-                case SDLK_KP2:
-                    herro->Move(0,1,dungeon);
-                    break;
-                case SDLK_RIGHT:
-                case SDLK_KP6:
-                    herro->Move(1,0,dungeon);
-                    break;
-                case SDLK_LEFT:
-                case SDLK_KP4:
-                    herro->Move(-1,0,dungeon);
-                    break;
-                case SDLK_KP7:
-                    herro->Move(-1,-1,dungeon);
-                    break;
-                case SDLK_KP9:
-                    herro->Move(1,-1,dungeon);
-                    break;
-                case SDLK_KP1:
-                    herro->Move(-1,1,dungeon);
-                    break;
-                case SDLK_KP3:
-                    herro->Move(1,1,dungeon);
-                    break;
-*/
                 default:
 //                    printf("Pressed key: %d\n",Event->key.keysym.sym);
                     break;
            }
     }
+}
+
+void OnWindowResize(unsigned int Width, unsigned int Height){
+    // resize dungeon Viewport
+//    printf("w: %d h: %d\n",Width, Height);
+    int new_vp_h=(Height - Height % 32)/32;
+    dungeon->SetViewportSize(new_vp_h, new_vp_h);
+    dungeon->SetViewportToTarget(herro->GetPosX(), herro->GetPosY());
+    dungeon->CalculateLOS(herro->GetPosX(), herro->GetPosY());
+//    printf("New Dungeon Viewport Size=%dx%d\n",new_vp_h,new_vp_h);
 }
 
 
@@ -194,6 +174,7 @@ int main(int argc, char **argv){
     App->OnRender=OnRender;
     App->OnLoop=OnLoop;
     App->OnEvent=OnEvent;
+    App->OnWindowResize=OnWindowResize;
 
     // load font textures
     font_texture = new MyOGL::CTexture();
@@ -218,7 +199,7 @@ int main(int argc, char **argv){
     Tileset=new CTileset(tiles_texture);
 
     // create dungeon
-    dungeon=new CDungeonLevel(200,200,20,20,50);
+    dungeon=new CDungeonLevel(200,200,20,20,150);
     dungeon->SetTileset(Tileset);
     dungeon->NewLevel();
 

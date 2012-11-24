@@ -105,10 +105,11 @@ int CApplication::Run(void){
 // parse all SDL events
 void CApplication::Events(SDL_Event *Event, double DeltaTime){
     switch(Event->type) {
-        case SDL_VIDEORESIZE: {     // window resize
-                Render->OnResize(Event->resize.w,Event->resize.h);
+        case SDL_VIDEORESIZE:     // window resize
+                if(Render->OnResize(Event->resize.w,Event->resize.h) && OnWindowResize){
+                    OnWindowResize(Render->GetWidth(),Render->GetHeight());
+                }
             break;
-        }
         case SDL_KEYDOWN:
                 KEYS[Event->key.keysym.sym] = true;
                 //Log->puts("Key %d pressed\n",Event->key.keysym.sym);

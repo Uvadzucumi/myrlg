@@ -15,10 +15,10 @@ CRender::CRender(){
     // Check OpenGL?
     // nit variables
     // Window parameters
-    width=0;
-    height=0;
-    bpp=0;
-    full_screen=false;
+    m_width=0;
+    m_height=0;
+    m_bpp=0;
+    m_full_screen=false;
     // render context
     Context=NULL;
     zNearPlane=0.1;
@@ -44,7 +44,7 @@ void CRender::InitGL(){
     glColor3f(1,0,0);
     glClearColor(0,0,0,1);
     glClearDepth(1.0f);
-    glViewport(0, 0, this->width, this->height);
+    glViewport(0, 0, this->m_width, this->m_height);
     glEnable(GL_TEXTURE_2D);
     glDepthFunc(GL_LEQUAL);
     glEnable(GL_DEPTH_TEST);
@@ -62,10 +62,10 @@ void CRender::InitGL(){
 
 // Render class realisation
 bool CRender::Init(int width, int height, int bpp, bool full_screen, const char *title){
-    this->width=width;
-    this->height=height;
-    this->bpp=bpp;
-    this->full_screen=full_screen;
+    this->m_width=width;
+    this->m_height=height;
+    this->m_bpp=bpp;
+    this->m_full_screen=full_screen;
 
     if(SDL_Init(SDL_INIT_EVERYTHING) < 0) {
         Log->puts("CRender::Init SDL_Init(): false\n");
@@ -100,7 +100,7 @@ bool CRender::Init(int width, int height, int bpp, bool full_screen, const char 
         window_flags |= SDL_RESIZABLE;
     #endif
 
-    if(this->full_screen){
+    if(this->m_full_screen){
         window_flags |= SDL_FULLSCREEN;
     }
     // Set Caption
@@ -187,7 +187,7 @@ void CRender::Set2D(bool force){
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glOrtho(0, this->width, this->height, 0, 1, -1);
+        glOrtho(0, this->m_width, this->m_height, 0, 1, -1);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
         GL.mode3d=false;
@@ -201,7 +201,7 @@ void CRender::Set3D(bool force){
     if(force || !GL.mode3d){
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluPerspective( 45.0f, (GLfloat)this->width/(GLfloat)this->height, 0.1f, 100.0f );
+        gluPerspective( 45.0f, (GLfloat)this->m_width/(GLfloat)this->m_height, 0.1f, 100.0f );
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
         GL.mode3d=true;
@@ -271,14 +271,14 @@ bool CRender::OnResize(int width, int height){
 //#else
     SDL_Surface *old_context;
     old_context=Context;
-    if((Context = SDL_SetVideoMode(width, height, bpp, window_flags)) == NULL) {
+    if((Context = SDL_SetVideoMode(width, height, m_bpp, window_flags)) == NULL) {
         Log->puts("CRender::Init SDL_SetVideoMode(): false\n");
         Context=old_context;
         return false;
     }
 
-    this->width=width;
-    this->height=height;
+    this->m_width=width;
+    this->m_height=height;
     SDL_FreeSurface(old_context);
 #ifdef __WIN32__
     Log->puts("for Windows need reinicialize OGL states and recreate texture!\n");
@@ -300,7 +300,7 @@ bool CRender::OnResize(int width, int height){
     }
 #else
     // in normal OS need only resize Viewport
-    glViewport(0,0,this->width,this->height);
+    glViewport(0,0,this->m_width,this->m_height);
         // set projection - force reset viewport
     if(GL.mode3d){
         Set3D(true);
