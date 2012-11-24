@@ -8,21 +8,18 @@ namespace MyOGL{
     class CAnimation {
         private:
             int    CurrentFrame;
-            unsigned int     FrameInc;
+            int     FrameInc;
 
-        private:
             double    FrameRate; //in seconds
             double    OldTime;
 
         public:
-            int    MaxFrames;
+            int    FramesCount;
             bool    Oscillate;
 
-        public:
             CAnimation();
             void OnAnimate(double DeltaTime);
 
-        public:
             void SetFrameRate(double Rate);
             void SetCurrentFrame(int Frame);
             unsigned int GetCurrentFrame();

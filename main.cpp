@@ -23,8 +23,6 @@ void OnRender(double dt){
     MyOGL::Vector4f font_color;
     static char tmp[400];
 
-//    static unsigned int savedTime=0;
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
@@ -40,18 +38,11 @@ void OnRender(double dt){
 //    }
 
     glLoadIdentity();       // for hud - need set default matrix
-/*
-    font_color.r=0;font_color.g=0;font_color.b=0;font_color.a=1;
-    font->PrintAt(301,11,"Мама мыла раму!\nРама блистела!",font_color);
-    font_color.g=1;
-    font->PrintAt(300,10,"Мама мыла раму!\n^ffff00Рама блистела!",font_color);
-*/
-    font_color.r=0;font_color.g=1;font_color.b=0;font_color.a=1;
-    text->PrintAt(300,10,font_color);
 
+//    font_color.r=0;font_color.g=1;font_color.b=0;font_color.a=1;
+//    text->PrintAt(300,10,font_color);
 
-    //font_color.r=0;font_color.g=0;font_color.b=0;font_color.a=1;
-    font_color.r=0; font_color.g=1,font_color.b=0;
+    font_color.r=0; font_color.g=1,font_color.b=0, font_color.a=1;
     sprintf(tmp,"FPS: ^ffff00%d",(int)App->GetFPS());
     font->PrintAt(1,1,tmp,font_color);
 
@@ -105,6 +96,8 @@ void OnLoop(double DeltaTime){
     if(App->IsKeyPressed(SDLK_KP3)){
         herro->Move(1,1, dungeon);
     }
+    // update map
+    dungeon->Update(DeltaTime);
 }
 
 void OnEvent(SDL_Event *Event, double DeltaTime){
@@ -157,7 +150,7 @@ void OnEvent(SDL_Event *Event, double DeltaTime){
                     break;
 */
                 default:
-                    printf("Pressed key: %d\n",Event->key.keysym.sym);
+//                    printf("Pressed key: %d\n",Event->key.keysym.sym);
                     break;
            }
     }
@@ -210,7 +203,7 @@ int main(int argc, char **argv){
     font->LoadGlyphData("data/myfont.fnt",font_texture);
     // display list text
     text=new MyOGL::CText(font);
-    text->SetText("Мама мыла раму!\n^ffff00Рама блистела!");
+    text->SetText("Мама мыла раму!\n^ffff00Рама блистела!",30);
 
     // CreateLightMaterails
     for(unsigned int i=0;i<10;i++){
@@ -225,7 +218,7 @@ int main(int argc, char **argv){
     Tileset=new CTileset(tiles_texture);
 
     // create dungeon
-    dungeon=new CDungeonLevel(200,200,20,10,80);
+    dungeon=new CDungeonLevel(200,200,20,20,50);
     dungeon->SetTileset(Tileset);
     dungeon->NewLevel();
 
@@ -248,7 +241,6 @@ int main(int argc, char **argv){
 
     delete dungeon;
     delete font;
-    delete text;
     delete App; // required
     delete herro_sprite;
     delete herro;

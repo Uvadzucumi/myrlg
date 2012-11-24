@@ -211,7 +211,12 @@ void CRender::Set3D(bool force){
 
 // Swap render buffers
 void CRender::SwapBuffers(){
+#ifdef MYOGL_DOUBLE_BUFFER
     SDL_GL_SwapBuffers();
+#endif
+#ifdef __LINUX__
+    SDL_GL_SwapBuffers();
+#endif
 }
 
 // Window functions

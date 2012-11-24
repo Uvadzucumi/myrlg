@@ -3,6 +3,7 @@
 
 #include "tileset.h"
 #include "myogl/vector_types.h"
+#include "myogl/animation.h"
 
 // tiles data
 typedef struct{
@@ -36,13 +37,44 @@ typedef struct{
     bool connected; // connected to first room
 } sroom;
 
+class CMapDynamicTile{
+        CAnimation *m_animation;
+    //CTexture  *m_texture;
+    //        CMaterial *m_material;
+        std::vector<unsigned char> TileNamesList;
+ //       unsigned char layer; // graphics layer for change sprite
+    public:
+        CMapDynamicTile(){
+            m_animation=new CAnimation;
+        };
+        ~CMapDynamicTile(){
+            delete m_animation;
+            TileNamesList.clear();
+        };
+        void AddTiles(unsigned char start_sprite_id, unsigned char sprites_count=1){
+            for(unsigned char i=0; i < sprites_count; i++){
+                TileNamesList.push_back(start_sprite_id+i);
+            }
+            m_animation->FramesCount=TileNamesList.size();
+        }
+        void Update(double DeltaTime){
+            m_animation->OnAnimate(DeltaTime);
+        };
+        unsigned char GetCurrentTile(){ return TileNamesList[m_animation->GetCurrentFrame()];};
+        void SetAnimationOscillate(bool Oscillate){ m_animation->Oscillate=Oscillate; }
+        void SetAnimationRate(double Rate){ m_animation->SetFrameRate(Rate); };
+};
+
 typedef struct{
     Vector2ui position;
     unsigned char strength;
+    CMapDynamicTile *dynamic_tile;
 } sMapLightSource;
 
 // Dungeon level class
 class CDungeonLevel{
+        //TODO add dyn tiles list for use in method "Update"
+        //std::vector <CMapDynamicTile> DynamicTilesLIst
         unsigned int m_width, m_height;
         sMapField **m_Map;
         unsigned int m_grid_w, m_grid_h;
@@ -114,9 +146,14 @@ class CDungeonLevel{
             for(unsigned int i=0;i<m_grid_w;i++) delete m_grid[i];
             delete m_grid;
             delete m_rooms;
+            for(unsigned int i=0;i<LightSourcesList.size();i++){
+                delete LightSourcesList[i].dynamic_tile;
+            }
+            LightSourcesList.clear();
 //            for(unsigned int i=0;i<m_ViewPort.width;i++) delete LOS[i];
 //            delete LOS;
         };
+        void Update(double DeltaTime);  // update map animated tiles (TODO: lights and etc.)
         void SetViewportPosition(unsigned int x, unsigned int y){ m_ViewPort.left=x; m_ViewPort.top=y; m_light_changed=true;};
         void SetViewportToTarget(unsigned int x, unsigned int y){
             int new_x=(int)(x-m_ViewPort.width/2);
@@ -128,16 +165,8 @@ class CDungeonLevel{
             SetViewportPosition(new_x, new_y);
         }
         void SetViewportSize(unsigned int width, unsigned int height){
-            // delete old LOS array
-//                for(unsigned int i=0;i<m_ViewPort.width;i++) delete LOS[i];
-//                delete LOS;
-                m_ViewPort.width=width; m_ViewPort.height=height; m_light_changed=true;
-            // create new LOS
-//                LOS=new bool *[m_ViewPort.width];
-//                for(unsigned i=0;i<m_ViewPort.width;i++){
-//                    LOS[i]=new bool[m_ViewPort.height];
-//                }
-            };
+            m_ViewPort.width=width; m_ViewPort.height=height; m_light_changed=true;
+        };
         unsigned int GetViewportLeft(){ return m_ViewPort.left; };
         unsigned int GetViewportTop(){ return m_ViewPort.top; };
         unsigned int GetViewportWidth(){ return m_ViewPort.width; };

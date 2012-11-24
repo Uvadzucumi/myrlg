@@ -7,8 +7,8 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin/Debug/MyRLG" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj/Debug/" />
+				<Option output="bin\Debug\MyRLG" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Debug\" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -17,15 +17,16 @@
 					<Add option="-D__LINUX__" />
 				</Compiler>
 				<Linker>
+					<Add option="-s" />
 					<Add library="SDL" />
 					<Add library="GL" />
 					<Add library="GLU" />
 				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="bin/Release/MyRLG" prefix_auto="1" extension_auto="1" />
+				<Option output="bin\Release\MyRLG" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="" />
-				<Option object_output="obj/Release/" />
+				<Option object_output="obj\Release\" />
 				<Option type="5" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -39,8 +40,9 @@
 				</Linker>
 			</Target>
 			<Target title="Windows - Debug">
-				<Option output="bin/DebugWin/MyRLG" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj/DebugWin/" />
+				<Option platforms="Windows;" />
+				<Option output="bin\DebugWin\MyRLG" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\DebugWin\" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -56,10 +58,9 @@
 			</Target>
 			<Target title="Windows - Release">
 				<Option platforms="Windows;" />
-				<Option output="bin/ReleaseWin/MyRLG" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="" />
-				<Option object_output="obj/ReleaseWin/" />
-				<Option type="5" />
+				<Option output="bin\ReleaseWin\MyRLG" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\ReleaseWin\" />
+				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
@@ -82,32 +83,32 @@
 		<Unit filename="game.h" />
 		<Unit filename="items.h" />
 		<Unit filename="main.cpp" />
-		<Unit filename="myogl/animation.cpp" />
-		<Unit filename="myogl/animation.h" />
-		<Unit filename="myogl/bitmap_font.cpp" />
-		<Unit filename="myogl/bitmap_font.h" />
-		<Unit filename="myogl/camera.cpp" />
-		<Unit filename="myogl/camera.h" />
-		<Unit filename="myogl/config.h" />
-		<Unit filename="myogl/config_file.cpp" />
-		<Unit filename="myogl/config_file.h" />
-		<Unit filename="myogl/entity.cpp" />
-		<Unit filename="myogl/entity.h" />
-		<Unit filename="myogl/events.cpp" />
-		<Unit filename="myogl/events.h" />
-		<Unit filename="myogl/log.cpp" />
-		<Unit filename="myogl/log.h" />
-		<Unit filename="myogl/material.cpp" />
-		<Unit filename="myogl/material.h" />
-		<Unit filename="myogl/myogl.cpp" />
-		<Unit filename="myogl/myogl.h" />
-		<Unit filename="myogl/render.cpp" />
-		<Unit filename="myogl/render.h" />
-		<Unit filename="myogl/sprites.cpp" />
-		<Unit filename="myogl/sprites.h" />
-		<Unit filename="myogl/texture.cpp" />
-		<Unit filename="myogl/texture.h" />
-		<Unit filename="myogl/vector_types.h" />
+		<Unit filename="myogl\animation.cpp" />
+		<Unit filename="myogl\animation.h" />
+		<Unit filename="myogl\bitmap_font.cpp" />
+		<Unit filename="myogl\bitmap_font.h" />
+		<Unit filename="myogl\camera.cpp" />
+		<Unit filename="myogl\camera.h" />
+		<Unit filename="myogl\config.h" />
+		<Unit filename="myogl\config_file.cpp" />
+		<Unit filename="myogl\config_file.h" />
+		<Unit filename="myogl\entity.cpp" />
+		<Unit filename="myogl\entity.h" />
+		<Unit filename="myogl\events.cpp" />
+		<Unit filename="myogl\events.h" />
+		<Unit filename="myogl\log.cpp" />
+		<Unit filename="myogl\log.h" />
+		<Unit filename="myogl\material.cpp" />
+		<Unit filename="myogl\material.h" />
+		<Unit filename="myogl\myogl.cpp" />
+		<Unit filename="myogl\myogl.h" />
+		<Unit filename="myogl\render.cpp" />
+		<Unit filename="myogl\render.h" />
+		<Unit filename="myogl\sprites.cpp" />
+		<Unit filename="myogl\sprites.h" />
+		<Unit filename="myogl\texture.cpp" />
+		<Unit filename="myogl\texture.h" />
+		<Unit filename="myogl\vector_types.h" />
 		<Unit filename="tileset.cpp" />
 		<Unit filename="tileset.h" />
 		<Extensions>

@@ -318,8 +318,14 @@ void CDungeonLevel::AddLightSource(unsigned int x, unsigned int y, unsigned char
     light.position.x=x;
     light.position.y=y;
     light.strength=strength;
+    light.dynamic_tile=new CMapDynamicTile();
+    light.dynamic_tile->AddTiles(tnFire+1,4);
+    light.dynamic_tile->Update((rand()%200)/100);
+    light.dynamic_tile->SetAnimationRate(.18);
+    light.dynamic_tile->SetAnimationOscillate(true);
     LightSourcesList.push_back(light);
-    AddMapTile(ttFire,x,y);
+    //AddMapTile(ttFire,x,y);
+    m_Map[x][y].layer[1]=light.dynamic_tile->GetCurrentTile();
 };
 
 // Bresenhams line algo
@@ -385,8 +391,8 @@ bool CDungeonLevel::LineOfSight(int x1, int y1, int x2, int y2){
 }
 
 void CDungeonLevel::CalculateLOS(int x_pos, int y_pos, int distance){
-    unsigned int start=SDL_GetTicks();
-    Log->puts("calc LOS ");
+//    unsigned int start=SDL_GetTicks();
+    //Log->puts("calc LOS ");
 
     int i,j;
     //unsigned int map_x, map_y;   // los array to map array coords
@@ -408,128 +414,129 @@ void CDungeonLevel::CalculateLOS(int x_pos, int y_pos, int distance){
 
     // check all tiles in viewport
         //distance*=distance; // distance^2 - for skip sqrt calculation
-        for(i=m_ViewPort.left;i<(int)(m_ViewPort.left+m_ViewPort.width);i++){    // x
-            for(j=m_ViewPort.top;j<(int)(m_ViewPort.top+m_ViewPort.height);j++){   // y
-            // skip visible
-                if(m_Map[i][j].visible) continue;
+    for(i=m_ViewPort.left;i<(int)(m_ViewPort.left+m_ViewPort.width);i++){    // x
+        for(j=m_ViewPort.top;j<(int)(m_ViewPort.top+m_ViewPort.height);j++){   // y
+        // skip visible
+            if(m_Map[i][j].visible) continue;
             // skip far tiles
-                int distance_to_tile = sqrt(((i - x_pos) * (i - x_pos)) + ((j - y_pos) * (j - y_pos)));
+            int distance_to_tile = sqrt(((i - x_pos) * (i - x_pos)) + ((j - y_pos) * (j - y_pos)));
                 // skip far tiles
-                if(distance < distance_to_tile){ continue;}
-                if(LineOfSight(i,j,x_pos,y_pos)){
+            if(distance < distance_to_tile){ continue;}
+            if(LineOfSight(i,j,x_pos,y_pos)){
                     m_Map[i][j].visible=true;
                     m_Map[i][j].viewed=true;
-                }
             }
         }
-        int x,y;
-        // post processing
+    }
 
-        for(i=m_ViewPort.left;i<(int)(m_ViewPort.left+m_ViewPort.width);i++){
-            for(j=m_ViewPort.top;j<(int)(m_ViewPort.top+m_ViewPort.height);j++){
+    int x,y;
+    // post processing
+
+    for(i=m_ViewPort.left;i<(int)(m_ViewPort.left+m_ViewPort.width);i++){
+        for(j=m_ViewPort.top;j<(int)(m_ViewPort.top+m_ViewPort.height);j++){
                 //
-                if(!m_Map[i][j].skip_light && !m_Map[i][j].visible){ // invisible block light tile
-                    // north
-                    x = i;
-                    y = j - 1;
-                    if(x>0 && x<(int)m_width){
-                        if(y>0 && y<(int)m_height){
-                            if(m_Map[x][y].skip_light && m_Map[x][y].visible){  // if near viewed floor
-                                m_Map[i][j].visible=true;
-                                m_Map[i][j].viewed=true;
-                            }
+            if(!m_Map[i][j].skip_light && !m_Map[i][j].visible){ // invisible block light tile
+                // north
+                x = i;
+                y = j - 1;
+                if(x>0 && x<(int)m_width){
+                    if(y>0 && y<(int)m_height){
+                        if(m_Map[x][y].skip_light && m_Map[x][y].visible){  // if near viewed floor
+                            m_Map[i][j].visible=true;
+                            m_Map[i][j].viewed=true;
                         }
                     }
-                    // south
-                    x = i;
-                    y = j + 1;
-                    if(x>0 && x<(int)m_width){
-                        if(y>0 && y<(int)m_height){
-                            if(m_Map[x][y].skip_light && m_Map[x][y].visible){  // if near viewed floor
-                                m_Map[i][j].visible=true;
-                                m_Map[i][j].viewed=true;
-                            }
+                }
+                // south
+                x = i;
+                y = j + 1;
+                if(x>0 && x<(int)m_width){
+                    if(y>0 && y<(int)m_height){
+                        if(m_Map[x][y].skip_light && m_Map[x][y].visible){  // if near viewed floor
+                            m_Map[i][j].visible=true;
+                            m_Map[i][j].viewed=true;
                         }
                     }
-                    // west
-                    x = i - 1;
-                    y = j;
-                    if(x>0 && x<(int)m_width){
-                        if(y>0 && y<(int)m_height){
-                            if(m_Map[x][y].skip_light && m_Map[x][y].visible){  // if near viewed floor
-                                m_Map[i][j].visible=true;
-                                m_Map[i][j].viewed=true;
-                            }
+                }
+                // west
+                x = i - 1;
+                y = j;
+                if(x>0 && x<(int)m_width){
+                    if(y>0 && y<(int)m_height){
+                        if(m_Map[x][y].skip_light && m_Map[x][y].visible){  // if near viewed floor
+                            m_Map[i][j].visible=true;
+                            m_Map[i][j].viewed=true;
                         }
                     }
-                    // east
-                    x = i + 1;
-                    y = j;
-                    if(x>0 && x<(int)m_width){
-                        if(y>0 && y<(int)m_height){
-                            if(m_Map[x][y].skip_light && m_Map[x][y].visible){  // if near viewed floor
-                                m_Map[i][j].visible=true;
-                                m_Map[i][j].viewed=true;
-                            }
+                }
+                // east
+                x = i + 1;
+                y = j;
+                if(x>0 && x<(int)m_width){
+                    if(y>0 && y<(int)m_height){
+                        if(m_Map[x][y].skip_light && m_Map[x][y].visible){  // if near viewed floor
+                            m_Map[i][j].visible=true;
+                            m_Map[i][j].viewed=true;
                         }
                     }
+                }
 
-                    // nort-west
-                    x = i - 1;
-                    y = j - 1;
-                    if(x>0 && x<(int)m_width){
-                        if(y>0 && y<(int)m_height){
-                            if(m_Map[x][y].skip_light && m_Map[x][y].visible &&         // if near viewed floor
-                                !m_Map[x][j].skip_light && !m_Map[i][y].skip_light){    // and 2 block
-                                m_Map[i][j].visible=true;
-                                m_Map[i][j].viewed=true;
-                            }
+                // nort-west
+                x = i - 1;
+                y = j - 1;
+                if(x>0 && x<(int)m_width){
+                    if(y>0 && y<(int)m_height){
+                        if(m_Map[x][y].skip_light && m_Map[x][y].visible &&         // if near viewed floor
+                            !m_Map[x][j].skip_light && !m_Map[i][y].skip_light){    // and 2 block
+                            m_Map[i][j].visible=true;
+                            m_Map[i][j].viewed=true;
                         }
                     }
-                    // north-east
-                    x = i + 1;
-                    y = j - 1;
-                    if(x>0 && x<(int)m_width){
-                        if(y>0 && y<(int)m_height){
-                            if(m_Map[x][y].skip_light && m_Map[x][y].visible  &&         // if near viewed floor
-                                !m_Map[x][j].skip_light && !m_Map[i][y].skip_light){    // and 2 block
-                                m_Map[i][j].visible=true;
-                                m_Map[i][j].viewed=true;
-                            }
+                }
+                // north-east
+                x = i + 1;
+                y = j - 1;
+                if(x>0 && x<(int)m_width){
+                    if(y>0 && y<(int)m_height){
+                        if(m_Map[x][y].skip_light && m_Map[x][y].visible  &&         // if near viewed floor
+                            !m_Map[x][j].skip_light && !m_Map[i][y].skip_light){    // and 2 block
+                            m_Map[i][j].visible=true;
+                            m_Map[i][j].viewed=true;
                         }
                     }
-                    // south-east
-                    x = i + 1;
-                    y = j + 1;
-                    if(x>0 && x<(int)m_width){
-                        if(y>0 && y<(int)m_height){
-                            if(m_Map[x][y].skip_light && m_Map[x][y].visible &&         // if near viewed floor
-                                !m_Map[x][j].skip_light && !m_Map[i][y].skip_light){    // and 2 block
-                                m_Map[i][j].visible=true;
-                                m_Map[i][j].viewed=true;
-                            }
+                }
+                // south-east
+                x = i + 1;
+                y = j + 1;
+                if(x>0 && x<(int)m_width){
+                    if(y>0 && y<(int)m_height){
+                        if(m_Map[x][y].skip_light && m_Map[x][y].visible &&         // if near viewed floor
+                            !m_Map[x][j].skip_light && !m_Map[i][y].skip_light){    // and 2 block
+                            m_Map[i][j].visible=true;
+                            m_Map[i][j].viewed=true;
                         }
                     }
+                }
 
-                    //south-west
-                    x = i - 1;
-                    y = j + 1;
-                    if(x>0 && x<(int)m_width){
-                        if(y>0 && y<(int)m_height){
-                            if(m_Map[x][y].skip_light && m_Map[x][y].visible &&         // if near viewed floor
+                //south-west
+                x = i - 1;
+                y = j + 1;
+                if(x>0 && x<(int)m_width){
+                    if(y>0 && y<(int)m_height){
+                        if(m_Map[x][y].skip_light && m_Map[x][y].visible &&         // if near viewed floor
                                 !m_Map[x][j].skip_light && !m_Map[i][y].skip_light){    // and near 2 block
                                 m_Map[i][j].visible=true;
                                 m_Map[i][j].viewed=true;
-                            }
                         }
                     }
                 }
-            }
+
+            } // end checking invisible tile
         }
-        // end post processing fixes
+    }  // end post processing fixes
 
 
-    Log->puts("%d ticks\n",SDL_GetTicks()-start);
+    //Log->puts("%d ticks\n",SDL_GetTicks()-start);
 }
 
 // set global light to ViewPort,TODO: add normal light calculation
@@ -543,6 +550,16 @@ void CDungeonLevel::CalculateLight(){
             }
         }
         m_light_changed=false;
+    }
+}
+
+// Update map. change animated tiles and etc.
+void CDungeonLevel::Update(double DeltaTime){
+    for(unsigned i=0;i<LightSourcesList.size();i++){
+        LightSourcesList[i].dynamic_tile->Update(DeltaTime);
+        if(m_Map[LightSourcesList[i].position.x][LightSourcesList[i].position.y].visible){
+            m_Map[LightSourcesList[i].position.x][LightSourcesList[i].position.y].layer[1]=LightSourcesList[i].dynamic_tile->GetCurrentTile();
+        }
     }
 }
 
