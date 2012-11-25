@@ -38,7 +38,7 @@ bool CEntity::OnCreate(CTexture* texture, int Width, int Height, int MaxFrames, 
     m_texture=texture;
     this->Width = Width;
     this->Height = Height;
-    m_animation->MaxFrames = MaxFrames;
+    m_animation->FramesCount = MaxFrames;
     //
     int dx=0;
     int dy=0;

@@ -159,17 +159,19 @@ Vector3i CFont::ColorFromCode(const char *code){
 
 // render text string
 int CFont::RenderText(const char *string, int max_width){
-    color_changed=false;    // true - if changed color from stecial codes in text
+    m_color_changed=false;    // true - if changed color from stecial codes in text
     unsigned int code=0;
     unsigned int glyph_id;
-    int dx=0, dy=0, max_dx=0;
+    int dx=0, dy=0;//, max_dx=0;
     int str_len=strlen(string);
+    m_last_sizes.width=0; m_last_sizes.height=0;
     //Vector3i last_color;
     glBegin(GL_QUADS);
     for(int i = 0; i < str_len; i++){
         if(string[i] == 10){  // new text line
             dy += this->m_font_height;
-            if(dx > max_dx) max_dx = dx;
+            m_last_sizes.height+=dy;
+            if(dx > m_last_sizes.width) m_last_sizes.width = dx;
             dx = 0;
             continue;
         }
@@ -178,10 +180,10 @@ int CFont::RenderText(const char *string, int max_width){
                 if(string[i+1]=='^'){
                     i++;
                 }else{  // check for color
-                    if(i<(str_len-7)){
-                        last_color=ColorFromCode(&string[i+1]);
-                        MyOGL::Render->SetColor(last_color);
-                        color_changed=true;
+                    if(i<(str_len-6)){
+                        m_last_color=ColorFromCode(&string[i+1]);
+                        MyOGL::Render->SetColor(m_last_color,true); // force change color (special for use in display list)
+                        m_color_changed=true;
                         i+=7;
                     }else{
                         Log->puts("Warning in CFont::RenderText. Not have text size for color code! Ignore '^'\n");
@@ -202,15 +204,17 @@ int CFont::RenderText(const char *string, int max_width){
         if(max_width){
             if((dx+m_chars[glyph_id].orig_width)>max_width){ // new line
                 dy += this->m_font_height;
-                if(dx > max_dx) max_dx = dx;
+                m_last_sizes.height+=this->m_font_height;
+                if(dx > m_last_sizes.width) m_last_sizes.width = dx;
                 dx = 0;
             }
         }
         dx += RenderGlyph(dx, dy, &m_chars[glyph_id]);
     }
     glEnd();
-    if(dx > max_dx) max_dx = dx;
-    return max_dx;
+    if(dx > m_last_sizes.width) m_last_sizes.width = dx;
+    m_last_sizes.height+=this->m_font_height;
+    return m_last_sizes.width;
 }
 
 // render text *string at coordinates x,y. using color color
@@ -233,12 +237,13 @@ int CFont::PrintAt(int x, int y, const char *string, Vector4f color){
 }
 
 // create text onject
-CText::CText(CFont *font, const char *text){
+CText::CText(CFont *font, const char *text, int max_width){
     m_list_id=0;
     m_font=font;
     m_text=NULL;
+    m_max_width=max_width;
     if(text){
-        SetText(text);
+        SetText(text, max_width);
     }
     TextsList.push_back(this);  // add to list
 }
@@ -278,21 +283,25 @@ bool CText::CreateDisplayList(){
     glEndList();
     if(m_font->IsColorChanged()){
         color_changed=true;
-        last_color=m_font->GetLatsColor();
+        last_color=m_font->GetLastColor();
     }
+    m_text_sizes=m_font->GetLastSizes();
+    printf("text size w:%d h:%d\n",m_text_sizes.width, m_text_sizes.height);
     return true;
 }
 
 int CText::PrintAt(int x, int y, Vector4f color){
-    //unsigned int time_start;
-    //time_start=SDL_GetTicks();
-    Render->Set2D();
-    GL.Disable(GL_LIGHTING);
     Render->SetColor(color.r, color.g, color.b, color.a);
+    return PrintAt(x,y);
+}
+
+int CText::PrintAt(int x, int y){
+    Render->Set2D();
+    glTranslatef(x,y,0);
+    GL.Disable(GL_LIGHTING);
     Render->SetBlendMode(blSource);
     m_font->GetTexture()->Bind();
     // move to coords
-    glTranslatef(x,y,0);
     glCallList(m_list_id);
     //m_font->RenderText(m_text);
     // return

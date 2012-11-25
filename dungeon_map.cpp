@@ -532,10 +532,41 @@ void CDungeonLevel::CalculateLOS(int x_pos, int y_pos, int distance){
                 }
 
             } // end checking invisible tile
+
         }
     }  // end post processing fixes
 
+// post processing 2
+/*
+    for(i=m_ViewPort.left;i<(int)(m_ViewPort.left+m_ViewPort.width);i++){
+        for(j=m_ViewPort.top;j<(int)(m_ViewPort.top+m_ViewPort.height);j++){
 
+            if(m_Map[i][j].skip_light && !m_Map[i][j].visible){ // skip light and invisible
+                //if up & down blocked and visible - set visible
+                // if left and right blocked and visible - set visible
+                if(j>1 && j<m_height-1){
+                    if(!m_Map[i][j-1].skip_light && m_Map[i][j-1].visible){
+                        if(!m_Map[i][j+1].skip_light && m_Map[i][j+1].visible){
+                            m_Map[i][j].visible=true;
+                            m_Map[i][j].viewed=true;
+                        }
+                    }
+                }
+
+                //if left & right blocked and visible - set visible
+                // if left and right blocked and visible - set visible
+                if(i>1 && i<m_width-1){
+                    if(!m_Map[i-1][j].skip_light && m_Map[i-1][j].visible &&
+                       !m_Map[i+1][j].skip_light && m_Map[i+1][j].visible){
+                            m_Map[i][j].visible=true;
+                            m_Map[i][j].viewed=true;
+                    }
+                }
+
+            }
+        }
+    } // end postprocessing 2
+*/
     //Log->puts("%d ticks\n",SDL_GetTicks()-start);
 }
 

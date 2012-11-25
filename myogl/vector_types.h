@@ -14,6 +14,9 @@ namespace MyOGL{
             struct{
                 Type u,v;
             };
+            struct{
+                Type width,height;
+            };
             Type data[2];
         };
     };

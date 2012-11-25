@@ -13,8 +13,10 @@
 
 #include "game.h"
 #include "myogl/config_file.h"
+#include "myogl/ui/text_box.h"
 
 CHudSprite *herro_sprite;
+CTextBox *messages;
 
 void OnRender(double dt){
 
@@ -25,6 +27,8 @@ void OnRender(double dt){
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
+// set default viewport
+    Render->Set2D();
 
     dungeon->Render();
     //
@@ -42,6 +46,18 @@ void OnRender(double dt){
 //    font_color.r=0;font_color.g=1;font_color.b=0;font_color.a=1;
 //    text->PrintAt(300,10,font_color);
 
+// set new viewport
+/*
+        glViewport(0,400,100,100);
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        //  x left, y top
+        // left, right, bottom, top
+        glOrtho(0, 100, 100, 0, 1, -1);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+*/
+
     font_color.r=0; font_color.g=1,font_color.b=0, font_color.a=1;
     sprintf(tmp,"FPS: ^ffff00%d",(int)App->GetFPS());
     font->PrintAt(1,1,tmp,font_color);
@@ -50,7 +66,12 @@ void OnRender(double dt){
     font_color.r=1; font_color.g=0,font_color.b=0;
     font->PrintAt(1,14,tmp,font_color);
 
+    // set white color
+    font_color.r=1; font_color.g=1,font_color.b=1;
+    messages->Render(font_color);
+
 /*
+
     // Display FPS evry 5 seconds
 
     if(savedTime==0){
@@ -101,6 +122,7 @@ void OnLoop(double DeltaTime){
 }
 
 void OnEvent(SDL_Event *Event, double DeltaTime){
+    char str[100];
     // change camera position if button pressed
     switch(Event->type) {
         case SDL_KEYDOWN:
@@ -114,7 +136,9 @@ void OnEvent(SDL_Event *Event, double DeltaTime){
                     }else{
                         dungeon->SetGlobalLight(0);
                     }
-                    Log->puts("Current Global Light: %d\n",dungeon->GetGlobalLight());
+                    //Log->puts("Current Global Light: %d\n",dungeon->GetGlobalLight());
+                    sprintf(str,"Current Global Light: ^00ff00%d", dungeon->GetGlobalLight());
+                    messages->AddString(str);
                     break;
                 case SDLK_o:
                     herro->OpenDoor(dungeon);
@@ -133,6 +157,9 @@ void OnWindowResize(unsigned int Width, unsigned int Height){
     dungeon->SetViewportSize(new_vp_h, new_vp_h);
     dungeon->SetViewportToTarget(herro->GetPosX(), herro->GetPosY());
     dungeon->CalculateLOS(herro->GetPosX(), herro->GetPosY());
+    // change message viewport
+    messages->SetViewPort(dungeon->GetViewportWidth()*32,50,MyOGL::Render->GetWidth()-dungeon->GetViewportWidth(),MyOGL::Render->GetHeight()-50);
+
 //    printf("New Dungeon Viewport Size=%dx%d\n",new_vp_h,new_vp_h);
 }
 
@@ -215,12 +242,21 @@ int main(int argc, char **argv){
 
     Log->puts("Minimum map tile size: %d Bytes\n",sizeof(sMapField));
 
+    messages=new MyOGL::CTextBox(font);
+    // right from dungeon vievport
+    messages->SetViewPort(dungeon->GetViewportWidth()*32,50,Render->GetWidth()-dungeon->GetViewportWidth()*32,Render->GetHeight()-50);
+    messages->AddString("First Test string!!!");
+    messages->AddString("Second string!!!");
+    messages->AddString("Next string! Строка может быть очень длинной, тогда будет работать перенос на новую!!!");
+
     dungeon->SetViewportToTarget(herro->GetPosX(),herro->GetPosY());
     dungeon->CalculateLOS(herro->GetPosX(),herro->GetPosY());
 
     App->Run();
 
     delete dungeon;
+    delete text;
+    delete messages;
     delete font;
     delete App; // required
     delete herro_sprite;

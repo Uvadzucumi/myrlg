@@ -184,7 +184,7 @@ bool CRender::Init(int width, int height, int bpp, bool full_screen, const char 
 // Set Orthogonal projection
 void CRender::Set2D(bool force){
     if(force || GL.mode3d){
-
+        glViewport (0, 0, this->m_width, this->m_height);
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         glOrtho(0, this->m_width, this->m_height, 0, 1, -1);
@@ -192,7 +192,7 @@ void CRender::Set2D(bool force){
         glLoadIdentity();
         GL.mode3d=false;
         GL.Disable(GL_DEPTH_TEST);
-        Log->puts("Set 2D projection\n");
+    //    Log->puts("Set 2D projection\n");
     }
 }
 
