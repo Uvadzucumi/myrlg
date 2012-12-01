@@ -7,17 +7,6 @@
 
 using namespace MyOGL;
 
-// tiles types
-enum eTileTypes{
-    ttWall=0,
-    ttCoridor,
-    ttRoom,
-    ttDoor,
-    ttContainer,
-    ttStairs,
-    ttFire
-};
-
 // tiles names in tilest
 enum eTileNames{
     tnWall=0,

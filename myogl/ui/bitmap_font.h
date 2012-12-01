@@ -1,8 +1,8 @@
 #ifndef BITMAP_FONT_H_INCLUDED
 #define BITMAP_FONT_H_INCLUDED
 
-#include "vector_types.h"
-#include "texture.h"
+#include "../vector_types.h"
+#include "../texture.h"
 #include <vector>
 
 namespace MyOGL{

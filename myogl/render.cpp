@@ -2,7 +2,7 @@
 #include "render.h"
 
 #include "texture.h"
-#include "bitmap_font.h"
+#include "ui/bitmap_font.h"
 
 using namespace MyOGL;
 

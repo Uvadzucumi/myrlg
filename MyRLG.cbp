@@ -83,6 +83,10 @@
 		<Unit filename="game.h" />
 		<Unit filename="items.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="map/grid_dungeon.cpp" />
+		<Unit filename="map/grid_dungeon.h" />
+		<Unit filename="map/level_map.cpp" />
+		<Unit filename="map/level_map.h" />
 		<Unit filename="myogl/animation.cpp" />
 		<Unit filename="myogl/animation.h" />
 		<Unit filename="myogl/bitmap_font.cpp" />

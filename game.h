@@ -2,7 +2,7 @@
 #define GAME_H_INCLUDED
 
 #include "myogl/myogl.h"
-#include "myogl/bitmap_font.h"
+#include "myogl/ui/bitmap_font.h"
 #include "myogl/vector_types.h" // vector type size
 #include "myogl/entity.h"   // for animation
 #include "myogl/material.h"

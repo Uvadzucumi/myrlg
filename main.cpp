@@ -158,7 +158,7 @@ void OnWindowResize(unsigned int Width, unsigned int Height){
     dungeon->SetViewportToTarget(herro->GetPosX(), herro->GetPosY());
     dungeon->CalculateLOS(herro->GetPosX(), herro->GetPosY());
     // change message viewport
-    messages->SetViewPort(dungeon->GetViewportWidth()*32,50,MyOGL::Render->GetWidth()-dungeon->GetViewportWidth(),MyOGL::Render->GetHeight()-50);
+    messages->SetViewPort(dungeon->GetViewportWidth()*32,50,MyOGL::Render->GetWidth()-dungeon->GetViewportWidth()*32,MyOGL::Render->GetHeight()-50);
 
 //    printf("New Dungeon Viewport Size=%dx%d\n",new_vp_h,new_vp_h);
 }
@@ -226,15 +226,17 @@ int main(int argc, char **argv){
     Tileset=new CTileset(tiles_texture);
 
     // create dungeon
-    dungeon=new CDungeonLevel(200,200,20,20,150);
+    dungeon=new CDungeonLevel(200,200);
     dungeon->SetTileset(Tileset);
-    dungeon->NewLevel();
+    dungeon->NewGridDungeon(20,20,150);
 
     // create herro
-    sroom FirstRoom=dungeon->GetRoom(0);
+
+    MyOGL::Vector2i pos=dungeon->GetStartPosition();
+
     herro=new CHerro();
     herro->movement_delay=cfg_file->GetParamValue("movement_delay",50);
-    herro->SetPosition(rand()%FirstRoom.width+FirstRoom.left,rand()%FirstRoom.height+FirstRoom.top);
+    herro->SetPosition(pos.x, pos.y);
     herro_sprite=new CHudSprite(tiles_texture);
     herro_sprite->SetUVPixelCoords(0,128,32,32);
     herro_sprite->SetSize(32,32);
@@ -244,7 +246,7 @@ int main(int argc, char **argv){
 
     messages=new MyOGL::CTextBox(font);
     // right from dungeon vievport
-    messages->SetViewPort(dungeon->GetViewportWidth()*32,50,Render->GetWidth()-dungeon->GetViewportWidth()*32,Render->GetHeight()-50);
+    messages->SetViewPort(dungeon->GetViewportWidth()*32, 50, Render->GetWidth()-dungeon->GetViewportWidth()*32, Render->GetHeight()-50);
     messages->AddString("First Test string!!!");
     messages->AddString("Second string!!!");
     messages->AddString("Next string! Строка может быть очень длинной, тогда будет работать перенос на новую!!!");

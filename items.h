@@ -12,18 +12,20 @@ enum eItemTypes{
     itWand,
     itCloth,
     itCloth2,
-    itTource,
+    itTrousers,
     itBoots,
     itHat,
-    itNekoJav,
+    itNeckJav,
     itRing,
     itMagicBook,
-    itPrayeBook
+    itPrayerBook
 };
 
 class CItem{
     unsigned char m_item_type;
     char *m_item_name;
+    bool m_examined;
+    void *m_obj_data;
 };
 
 
