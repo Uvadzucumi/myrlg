@@ -236,6 +236,30 @@ int CFont::PrintAt(int x, int y, const char *string, Vector4f color){
     return width;
 }
 
+// render text *string at coordinates x,y. using color color
+int CFont::PrintAt(int x, int y, const char *string){
+    int width;
+    // move to coords
+    glTranslatef(x,y,0);
+    width=Print(string);
+    // return coords
+    glTranslatef(-x,-y,0);
+    return width;
+}
+
+// render text *string at coordinates x,y. using color color
+int CFont::Print(const char *string, int max_width){
+    int width;
+    Render->Set2D();
+    GL.Disable(GL_LIGHTING);
+    Render->SetBlendMode(blSource);
+    Render->BindTexture(m_texture->GetID());
+    // move to coords
+    width=RenderText(string, max_width);
+    // return
+    return width;
+}
+
 // create text onject
 CText::CText(CFont *font, const char *text, int max_width){
     m_list_id=0;

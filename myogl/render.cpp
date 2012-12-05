@@ -259,6 +259,9 @@ void CRender::SetBlendMode(MyGlBlendMode mode){
             glBlendFunc(GL_CONSTANT_COLOR, GL_DST_COLOR);
             GL.Enable(GL_BLEND);
             break;
+        case blAdditive:
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+            GL.Enable(GL_BLEND);
         default:
             //printf("warnind: unknown blend mode %d\n",mode);
             Log->puts("warnind: unknown blend mode %x\n",mode);
@@ -333,6 +336,14 @@ void CRender::SetClearColor(float r, float g, float b, float a){
     }
 }
 
+// Set Blend color
+void CRender::SetBlendColor(float r, float g, float b, float a, bool force){
+    if(GL.BlendColor.r!=r || GL.BlendColor.g!=g || GL.BlendColor.b != b || GL.BlendColor.a!=a || force){
+        GL.BlendColor.r=r; GL.BlendColor.g=g; GL.BlendColor.b=b; GL.BlendColor.a=a;
+        glBlendColor(r,g,b,a);
+    }
+}
+
 // cashed OGL states
 void RenderStates::Enable(GLenum cap){
     bool *param;
@@ -388,6 +399,8 @@ void RenderStates::GetCurrentStates(){
    DepthTest=glIsEnabled(GL_DEPTH_TEST);
    Lighting=glIsEnabled(GL_LIGHTING);
    Blend=glIsEnabled(GL_BLEND);
+   // blend color
+   glGetFloatv(GL_BLEND_COLOR, BlendColor.data);
    // get current color
    glGetFloatv(GL_CURRENT_COLOR, Color.data);
    // -//- clear color
@@ -404,6 +417,7 @@ void RenderStates::Debug(void){
     Log->puts("GL_DEPTH_TEST: %s\n",(DepthTest)?"true":"false");
     Log->puts("GL_LIGHTING: %s\n",(Lighting)?"true":"false");
     Log->puts("GL_BLEND: %s\n",(Blend)?"true":"false");
+    Log->puts("GL_BLEND_COLOR: (%f,%f,%f,%f)\n",&BlendColor);
     Log->puts("GL_CURRENT_COLOR: (%f,%f,%f,%f)\n",&Color);
     Log->puts("GL_COLOR_CLEAR_VALUE: (%f,%f,%f,%f)\n",&ClearColor);
     Log->puts("GL_MAX_TEXTURE_UNITS: %d\n",MaxTextureUnits);

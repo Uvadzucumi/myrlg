@@ -109,3 +109,9 @@ bool CHerro::Move(int dx, int dy, CDungeonLevel *dungeon){
     return CCreature::Move(dx, dy, dungeon);
 
 }
+
+void CHerro::Render(){
+    CCreature::Render(); // rener sprite
+    // render equipped items
+    inventory->RenderEquipped();
+}

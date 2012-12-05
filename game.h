@@ -11,6 +11,15 @@
 #include "creature.h"       // for player
 #include "myogl/config_file.h"  // for read confin
 
+typedef enum {
+    gwMain=0,
+    gwInventory,
+    gwInventoryItemDescription,
+    gwEquip,
+    gwCharacter,
+    gwHelpScreen
+} eGameWindow;
+
 extern MyOGL::CMaterial LightMaterials[10];  // materials for light sources
 
 extern MyOGL::CApplication *App;   // need delete
@@ -25,5 +34,7 @@ extern CHerro *herro;
 extern CDungeonLevel *dungeon;
 
 extern CConfigFile *cfg_file;
+
+extern eGameWindow ActiveWindow;
 
 #endif // GAME_H_INCLUDED

@@ -16,7 +16,17 @@ enum eTileNames{
     tnDoorOpenedDungeon,
     tnDoorBrokenDungeon,
     tnFire=48,
-    tnHerro=64
+    tnHerro=64,
+    tnDagger=80,
+    tnSword=82,
+    tnSpear=84,
+    tnStaff=86,
+    tnMace=88,
+    tnMeat,
+    tnBread,
+    tnBootleEmpty,
+    tnBootleWater,
+    tnBootleBeer
 };
 
 

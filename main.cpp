@@ -32,6 +32,12 @@ void OnRender(double dt){
 
     dungeon->Render();
     //
+    if(ActiveWindow==gwInventory){
+        herro->inventory->Render();
+    }else if(ActiveWindow==gwInventoryItemDescription){
+        herro->inventory->RenderItemDetail();
+    }
+
     glTranslatef((herro->GetPosX()-dungeon->GetViewportLeft())*32,(herro->GetPosY()-dungeon->GetViewportTop())*32,0);
     herro->Render();
 
@@ -89,35 +95,36 @@ void OnRender(double dt){
 // Update objects
 void OnLoop(double DeltaTime){
 //    float speed=100;
-    if(App->IsKeyPressed(SDLK_LEFT) || App->IsKeyPressed(SDLK_KP4)){
-        herro->Move(-1,0, dungeon);
-        //dungeon->ChangeViewportPosition(-1,0);
+    if(ActiveWindow==gwMain){
+        if(App->IsKeyPressed(SDLK_LEFT) || App->IsKeyPressed(SDLK_KP4)){
+            herro->Move(-1,0, dungeon);
+        }
+        if(App->IsKeyPressed(SDLK_RIGHT)|| App->IsKeyPressed(SDLK_KP6)){
+            herro->Move(1,0, dungeon);
+        }
+        if(App->IsKeyPressed(SDLK_UP)|| App->IsKeyPressed(SDLK_KP8)){
+            herro->Move(0,-1, dungeon);
+        }
+        if(App->IsKeyPressed(SDLK_DOWN)|| App->IsKeyPressed(SDLK_KP2)){
+            herro->Move(0,1, dungeon);
+        }
+        if(App->IsKeyPressed(SDLK_KP7)){
+            herro->Move(-1,-1, dungeon);
+        }
+        if(App->IsKeyPressed(SDLK_KP9)){
+            herro->Move(1,-1, dungeon);
+        }
+        if(App->IsKeyPressed(SDLK_KP1)){
+            herro->Move(-1,1, dungeon);
+        }
+        if(App->IsKeyPressed(SDLK_KP3)){
+            herro->Move(1,1, dungeon);
+        }
+        if(App->IsKeyPressed(SDLK_i)){  // goto imventory window
+            ActiveWindow=gwInventory;
+        }
     }
-    if(App->IsKeyPressed(SDLK_RIGHT)|| App->IsKeyPressed(SDLK_KP6)){
-        herro->Move(1,0, dungeon);
-        //dungeon->ChangeViewportPosition(1,0);
-    }
-    if(App->IsKeyPressed(SDLK_UP)|| App->IsKeyPressed(SDLK_KP8)){
-        herro->Move(0,-1, dungeon);
-        //dungeon->ChangeViewportPosition(0,-1);
-    }
-    if(App->IsKeyPressed(SDLK_DOWN)|| App->IsKeyPressed(SDLK_KP2)){
-        herro->Move(0,1, dungeon);
-        //dungeon->ChangeViewportPosition(0,1);;
-    }
-    if(App->IsKeyPressed(SDLK_KP7)){
-        herro->Move(-1,-1, dungeon);
-    }
-    if(App->IsKeyPressed(SDLK_KP9)){
-        herro->Move(1,-1, dungeon);
-    }
-    if(App->IsKeyPressed(SDLK_KP1)){
-        herro->Move(-1,1, dungeon);
-    }
-    if(App->IsKeyPressed(SDLK_KP3)){
-        herro->Move(1,1, dungeon);
-    }
-    // update map
+    // update map - only animations and lights
     dungeon->Update(DeltaTime);
 }
 
@@ -126,6 +133,9 @@ void OnEvent(SDL_Event *Event, double DeltaTime){
     // change camera position if button pressed
     switch(Event->type) {
         case SDL_KEYDOWN:
+
+        if(ActiveWindow==gwMain){
+
             switch(Event->key.keysym.sym){
                 case SDLK_ESCAPE:
                     App->OnExit();
@@ -147,6 +157,51 @@ void OnEvent(SDL_Event *Event, double DeltaTime){
 //                    printf("Pressed key: %d\n",Event->key.keysym.sym);
                     break;
            }
+        }else if(ActiveWindow==gwInventory){
+            if(Event->key.keysym.sym==SDLK_ESCAPE){ // exit to main window
+                ActiveWindow=gwMain;
+            }else{
+                // get items from pressed button
+                if(herro->inventory->SelectItemByKey(Event->key.keysym.sym)){
+                    ActiveWindow=gwInventoryItemDescription;
+                }else{
+                    MyOGL::Log->puts("Pressed %d key in Inventory Window\n",Event->key.keysym.sym);
+                }
+            }
+        }else if(ActiveWindow==gwInventoryItemDescription){
+            if(Event->key.keysym.sym==SDLK_ESCAPE){ // exit to inventory window
+                ActiveWindow=gwInventory;
+            }else{
+            // TODO - equip, drop item(s)
+                switch(Event->key.keysym.sym){
+                    case 'e':
+                        if(App->IsKeyPressed(SDLK_RSHIFT) || App->IsKeyPressed(SDLK_LSHIFT)){
+                            MyOGL::Log->puts("Eat/Drink action!\n");
+                        }else{
+                            //MyOGL::Log->puts("Equip action!\n");
+                            herro->inventory->Equip(); // equip current selected item
+                        }
+                        break;
+                    case 't':
+                        //MyOGL::Log->puts("UnEquip action!\n");
+                        herro->inventory->Unequip(); // UnEquip current selected item
+                        break;
+                    case 'd':
+                        MyOGL::Log->puts("Drop action!\n");
+                        break;
+                    //case 'E':
+                    //    MyOGL::Log->puts("Eat/Drink action!\n");
+                    //    break;
+                    case 'r':
+                        MyOGL::Log->puts("Read action!\n");
+                        break;
+                    default:
+                        //MyOGL::Log->puts("Unknown item action\n",Event->key.keysym.sym);
+                        break;
+                }
+
+            }
+        }
     }
 }
 
@@ -225,6 +280,9 @@ int main(int argc, char **argv){
     tiles_texture->LoadFromFile("data/tileset.bmp");
     Tileset=new CTileset(tiles_texture);
 
+    // Inicialize Items Database
+    InitItemsDB();
+
     // create dungeon
     dungeon=new CDungeonLevel(200,200);
     dungeon->SetTileset(Tileset);
@@ -242,6 +300,14 @@ int main(int argc, char **argv){
     herro_sprite->SetSize(32,32);
     herro->SetSprite(herro_sprite);
 
+    herro->inventory->SetItemTileset(Tileset); // Items tileset
+    herro->inventory->SetFont(font);
+    herro->inventory->AddItem(100,1);
+    herro->inventory->AddItem(101,1);
+    herro->inventory->AddItem(102,1);
+    herro->inventory->AddItem(103,1);
+    herro->inventory->AddItem(104,1);
+
     Log->puts("Minimum map tile size: %d Bytes\n",sizeof(sMapField));
 
     messages=new MyOGL::CTextBox(font);
@@ -254,7 +320,12 @@ int main(int argc, char **argv){
     dungeon->SetViewportToTarget(herro->GetPosX(),herro->GetPosY());
     dungeon->CalculateLOS(herro->GetPosX(),herro->GetPosY());
 
+    ActiveWindow=gwMain;
+
     App->Run();
+
+    // Clear Items Database
+    DeleteItemsDB();
 
     delete dungeon;
     delete text;

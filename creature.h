@@ -28,20 +28,6 @@ enum eCreatureClass{
     ccPaladin
 };
 
-// humanoid slots
-enum eWearSlots{
-    slHead,
-    slNeck,
-    slBody,
-    slBody2,
-    slLArm,
-    slRArm,
-    slLegs,
-    slLegs2,
-    slRing1,
-    slRing2
-};
-
 class CCreature{
 // attributes
     unsigned char m_str;
@@ -62,6 +48,7 @@ class CCreature{
 //  std::vector <CItem> *inventory;
     MyOGL::CHudSprite *m_sprite;
     Vector2i GetMapCoords(eDirections direction);
+
     public:
         CCreature(){ m_sprite=NULL; };
         ~CCreature(){};
@@ -78,12 +65,19 @@ class CCreature{
 class CHerro : public CCreature{
         unsigned int m_last_mov_tick;   // for movement delay
         public:
+            CInventory *inventory;
             unsigned int movement_delay;    // only for herro
             CHerro(){
                 m_last_mov_tick=0;
-                movement_delay=1000;
+                movement_delay=10;
+                inventory=new CInventory;
             };
+            ~CHerro(){
+                delete inventory;
+            }
             bool Move(int dx, int dy, CDungeonLevel *dungeon);
+            void Render();
+
 };
 
 

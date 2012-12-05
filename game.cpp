@@ -19,3 +19,6 @@ CDungeonLevel *dungeon;
 
 // config file class
 CConfigFile *cfg_file;
+
+// Current Active game Window
+eGameWindow ActiveWindow;

@@ -29,12 +29,15 @@ namespace MyOGL{
             bool LoadGlyphData(const char *file_name, CTexture *fexture);
             void debug(void);
             int PrintAt(int x, int y, const char *string, Vector4f color);
+            int PrintAt(int x, int y, const char *string);
+            int Print(const char *string, int max_width=0);
             int GetGlyphId(unsigned int code);
             int RenderText(const char *string, int max_width=0);
             CTexture *GetTexture(){ return m_texture;};
             bool IsColorChanged(){ return m_color_changed;};  // true if color changed in rendering time (with special color codes in text)
             Vector3i GetLastColor(){ return m_last_color;};   // return last rendered color
             Vector2i GetLastSizes(){ return m_last_sizes;};
+            int GetHeight(){ return m_font_height;};
     };
 
     class CText{
