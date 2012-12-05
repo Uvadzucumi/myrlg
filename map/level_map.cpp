@@ -1,9 +1,12 @@
 
 #include "level_map.h"
 
-void CLevelMap::AddMapTile(eTileTypes TileType, unsigned int x, unsigned int y, void *tile_data){
+void CLevelMap::AddMapTile(eTileTypes TileType, int x, int y, void *tile_data){
     //void *data;
     // default values
+    if(x>=m_width || y>=m_height){
+        Log->puts("CLevelMap::AddMapTile() Error. Wrong coordinates [%d,%d]. Skipped\n",x,y);
+    }
     m_Map[x][y].tile_type=TileType;
     m_Map[x][y].layer[1]=255;
     m_Map[x][y].layer[2]=255;

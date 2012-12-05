@@ -92,6 +92,11 @@ class CLevelMap{
             m_Map = new sMapField *[m_width];
             for (int i = 0; i < m_width; i++){
                 m_Map[i] = new sMapField[m_height];
+                for(int j=0; j < m_height; j++){
+                    m_Map[i][j].p_tile_data=NULL;
+                    m_Map[i][j].p_monsters=NULL;
+                    m_Map[i][j].p_items=NULL;
+                }
             }
         };
 
@@ -122,9 +127,11 @@ class CLevelMap{
 
         };
 
-        void AddMapTile(eTileTypes TileType, unsigned int x, unsigned int y, void *tile_data=NULL);
+        void AddMapTile(eTileTypes TileType, int x, int y, void *tile_data=NULL);
         void AddLightSource(unsigned int x, unsigned int y, unsigned char strength);
         void Update(double DeltaTime);
+        int GetWidth(){ return m_width; }
+        int GetHeight() { return m_height; }
 
         sMapField **GetMap(){ return m_Map; };
         bool IsVisible(int x, int y){ return m_Map[x][y].visible; };

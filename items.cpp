@@ -293,7 +293,7 @@ bool CInventory::Unequip(int inv_id){
         }
         m_slots[slot].item_inv_id=-1;
         m_items[inv_id].equip=false;
-        if(item_id=-1){ // selected item - need update flags
+        if(item_id==-1){ // selected item - need update flags
             BuildSelectedItemAtions();
         }
         return true;

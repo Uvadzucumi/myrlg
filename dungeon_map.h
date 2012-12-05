@@ -13,25 +13,24 @@
 class CDungeonLevel{
         //TODO add dyn tiles list for use in method "Update"
         //std::vector <CMapDynamicTile> DynamicTilesLIst
-        unsigned int m_width, m_height;
+        int m_map_width, m_map_height;
 
         CLevelMap *m_Map;
         CTileset *m_tileset;
 
         unsigned int m_global_light;
         bool m_light_changed;
-        Vector4ui m_ViewPort;
+        Vector4i m_ViewPort;
         //bool **LOS;
         bool LineOfSight(int x1, int y1, int x2, int y2);
 
     public:
 
-        CDungeonLevel(unsigned int width, unsigned int height){
-        //, unsigned int grid_width, unsigned int grid_height, unsigned int rooms_num){
+        CDungeonLevel(int width, int height){
 
-            m_height=height; m_width=width;
+            m_map_height=height; m_map_width=width;
 
-            m_Map=new CLevelMap(width, height);
+            m_Map=new CLevelMap(m_map_width, m_map_height);
 
             m_ViewPort.left=0;
             m_ViewPort.top=0;
@@ -60,8 +59,8 @@ class CDungeonLevel{
             int new_y=(int)(y-m_ViewPort.height/2);
             if(new_x<0){ new_x=0; }
             if(new_y<0){ new_y=0; }
-            if(new_x>(int)(m_width-m_ViewPort.width)){ new_x=m_width-m_ViewPort.width;}
-            if(new_y>(int)(m_height-m_ViewPort.height)){ new_y=m_height-m_ViewPort.height;}
+            if(new_x>(int)(m_map_width-m_ViewPort.width)){ new_x=m_map_width-m_ViewPort.width;}
+            if(new_y>(int)(m_map_height-m_ViewPort.height)){ new_y=m_map_height-m_ViewPort.height;}
             SetViewportPosition(new_x, new_y);
         }
         void SetViewportSize(unsigned int width, unsigned int height){
@@ -74,16 +73,16 @@ class CDungeonLevel{
         void ChangeViewportPosition(int dx, int dy){
             if(((int)m_ViewPort.left+dx)<=0){
                 m_ViewPort.left=0;
-            }else if ((m_ViewPort.left+dx+m_ViewPort.width)>m_width){
-                m_ViewPort.left=m_width-m_ViewPort.width;
+            }else if ((m_ViewPort.left+dx+m_ViewPort.width)>m_map_width){
+                m_ViewPort.left=m_map_width-m_ViewPort.width;
             }else{
                 m_ViewPort.left+=dx;
             }
 
             if(((int)m_ViewPort.top+dy)<0){
                 m_ViewPort.top=0;
-            }else if ((m_ViewPort.top+dy+m_ViewPort.height)>m_height){
-                m_ViewPort.top=m_height-m_ViewPort.height;
+            }else if ((m_ViewPort.top+dy+m_ViewPort.height)>m_map_height){
+                m_ViewPort.top=m_map_height-m_ViewPort.height;
             }else{
                 m_ViewPort.top+=dy;
             }
@@ -97,8 +96,8 @@ class CDungeonLevel{
         unsigned int GetGlobalLight(void){ return m_global_light;};
         void Render(void);
         void CalculateLOS(int x, int y, int distance=0);
-        unsigned int GetWidth(){ return m_width;};
-        unsigned int GetHeight(){ return m_height;};
+        unsigned int GetWidth(){ return m_map_width;};
+        unsigned int GetHeight(){ return m_map_height;};
 
         sMapField **Map(){
             return m_Map->GetMap();

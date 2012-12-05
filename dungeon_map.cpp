@@ -88,8 +88,8 @@ void CDungeonLevel::CalculateLOS(int x_pos, int y_pos, int distance){
         }
 */
         // clear full map, TODO: remember and clean last filled LOS field
-    for(i=0;i<(int)m_width;i++){
-        for(j=0;j<(int)m_height;j++){
+    for(i=0;i<m_map_width;i++){
+        for(j=0;j<m_map_height;j++){
             m_Map->GetMap()[i][j].visible=false;
         }
     }
@@ -121,8 +121,8 @@ void CDungeonLevel::CalculateLOS(int x_pos, int y_pos, int distance){
                 // north
                 x = i;
                 y = j - 1;
-                if(x>0 && x<(int)m_width){
-                    if(y>0 && y<(int)m_height){
+                if(x>0 && x<m_map_width){
+                    if(y>0 && y<m_map_height){
                         if(m_Map->IsSkipLight(x,y) && m_Map->IsVisible(x,y)){  // if near viewed floor
                             m_Map->GetMap()[i][j].visible=true;
                             m_Map->GetMap()[i][j].viewed=true;
@@ -132,8 +132,8 @@ void CDungeonLevel::CalculateLOS(int x_pos, int y_pos, int distance){
                 // south
                 x = i;
                 y = j + 1;
-                if(x>0 && x<(int)m_width){
-                    if(y>0 && y<(int)m_height){
+                if(x>0 && x<m_map_width){
+                    if(y>0 && y<m_map_height){
                         if(m_Map->IsSkipLight(x,y) && m_Map->IsVisible(x,y)){  // if near viewed floor
                             m_Map->GetMap()[i][j].visible=true;
                             m_Map->GetMap()[i][j].viewed=true;
@@ -143,8 +143,8 @@ void CDungeonLevel::CalculateLOS(int x_pos, int y_pos, int distance){
                 // west
                 x = i - 1;
                 y = j;
-                if(x>0 && x<(int)m_width){
-                    if(y>0 && y<(int)m_height){
+                if(x>0 && x<m_map_width){
+                    if(y>0 && y<m_map_height){
                         if(m_Map->IsSkipLight(x,y) && m_Map->IsVisible(x,y)){  // if near viewed floor
                             m_Map->GetMap()[i][j].visible=true;
                             m_Map->GetMap()[i][j].viewed=true;
@@ -154,8 +154,8 @@ void CDungeonLevel::CalculateLOS(int x_pos, int y_pos, int distance){
                 // east
                 x = i + 1;
                 y = j;
-                if(x>0 && x<(int)m_width){
-                    if(y>0 && y<(int)m_height){
+                if(x>0 && x<m_map_width){
+                    if(y>0 && y<m_map_height){
                         if(m_Map->IsSkipLight(x,y) && m_Map->IsVisible(x,y)){  // if near viewed floor
                             m_Map->GetMap()[i][j].visible=true;
                             m_Map->GetMap()[i][j].viewed=true;
@@ -166,8 +166,8 @@ void CDungeonLevel::CalculateLOS(int x_pos, int y_pos, int distance){
                 // nort-west
                 x = i - 1;
                 y = j - 1;
-                if(x>0 && x<(int)m_width){
-                    if(y>0 && y<(int)m_height){
+                if(x>0 && x<m_map_width){
+                    if(y>0 && y<m_map_height){
                         if(m_Map->IsSkipLight(x,y) && m_Map->IsVisible(x,y) &&         // if near viewed floor
                             !m_Map->IsSkipLight(x,j) && !m_Map->IsSkipLight(i,y)){    // and 2 block
                             m_Map->GetMap()[i][j].visible=true;
@@ -178,8 +178,8 @@ void CDungeonLevel::CalculateLOS(int x_pos, int y_pos, int distance){
                 // north-east
                 x = i + 1;
                 y = j - 1;
-                if(x>0 && x<(int)m_width){
-                    if(y>0 && y<(int)m_height){
+                if(x>0 && x<m_map_width){
+                    if(y>0 && y<m_map_height){
                         if(m_Map->IsSkipLight(x,y) && m_Map->IsVisible(x,y)  &&         // if near viewed floor
                             !m_Map->IsSkipLight(x, j) && !m_Map->IsSkipLight(i,y)){    // and 2 block
                             m_Map->GetMap()[i][j].visible=true;
@@ -190,8 +190,8 @@ void CDungeonLevel::CalculateLOS(int x_pos, int y_pos, int distance){
                 // south-east
                 x = i + 1;
                 y = j + 1;
-                if(x>0 && x<(int)m_width){
-                    if(y>0 && y<(int)m_height){
+                if(x>0 && x<m_map_width){
+                    if(y>0 && y<m_map_height){
                         if(m_Map->IsSkipLight(x,y) && m_Map->IsVisible(x,y) &&         // if near viewed floor
                             !m_Map->IsSkipLight(x,j) && !m_Map->IsSkipLight(i,y)){    // and 2 block
                             m_Map->GetMap()[i][j].visible=true;
@@ -203,8 +203,8 @@ void CDungeonLevel::CalculateLOS(int x_pos, int y_pos, int distance){
                 //south-west
                 x = i - 1;
                 y = j + 1;
-                if(x>0 && x<(int)m_width){
-                    if(y>0 && y<(int)m_height){
+                if(x>0 && x<m_map_width){
+                    if(y>0 && y<m_map_height){
                         if(m_Map->IsSkipLight(x,y) && m_Map->IsVisible(x,y) &&         // if near viewed floor
                             !m_Map->IsSkipLight(x,j) && !m_Map->IsSkipLight(i,y)){    // and near 2 block
                                 m_Map->GetMap()[i][j].visible=true;
@@ -256,7 +256,7 @@ void CDungeonLevel::CalculateLOS(int x_pos, int y_pos, int distance){
 void CDungeonLevel::CalculateLight(){
     // check viewport and set global light
     if(m_light_changed){
-        unsigned int dx, dy;
+        int dx, dy;
         for(dy=m_ViewPort.top; dy<m_ViewPort.top+m_ViewPort.height; dy++){
             for(dx=m_ViewPort.left;dx<m_ViewPort.left+m_ViewPort.width;dx++){
                 m_Map->GetMap()[dx][dy].light=m_global_light;
@@ -272,7 +272,7 @@ void CDungeonLevel::Update(double DeltaTime){
 }
 
 void CDungeonLevel::Render(){
-    unsigned int dy,dx;
+    int dy,dx;
     int pos_x, pos_y;
     pos_y=0, pos_x=0;
     CalculateLight();

@@ -11,7 +11,7 @@ typedef struct{
 } grid_field;
 
 typedef struct{
-    unsigned int left,top,width,height; // room position & size
+    int left,top,width,height; // room position & size
     bool connected; // connected to first room
 } sroom;
 
@@ -24,6 +24,9 @@ class CDungeonGeneration{
         sroom *m_rooms;
         unsigned int m_room_min_w, m_room_min_h;
 
+        int m_width, m_height;  // map width & height
+        CLevelMap *m_Map;       // map object
+
         int GetRoomIdByCoords(unsigned int x, unsigned int y);
         void CreateRoom(sroom *sroom, unsigned int grid_x, unsigned int grid_y);
         void RoomToMap(unsigned int room_id);
@@ -32,11 +35,9 @@ class CDungeonGeneration{
         void *RandomDoorType();    // return random door type
         void AddLightSource(unsigned int x, unsigned int y, unsigned char strength);
 
-        int m_width, m_height;  // map width & height
-        CLevelMap *m_Map;       // map object
-
     public:
         CDungeonGeneration(int grid_width, int grid_height, int rooms_num){
+            m_width=0; m_height=0;  // map width & height
             // create grid array
             m_grid_w=grid_width; m_grid_h=grid_height;
             m_grid=new grid_field *[m_grid_w];

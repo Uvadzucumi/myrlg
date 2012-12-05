@@ -40,7 +40,7 @@ void *CDungeonGeneration::RandomDoorType(){
 }
 
 void CDungeonGeneration::AddDoors(unsigned int room_id){
-    unsigned int i;
+    int i;
     // vertical walls
     for(i=m_rooms[room_id].top;i<m_rooms[room_id].top+m_rooms[room_id].height;i++){
         // left wall
@@ -94,8 +94,8 @@ void CDungeonGeneration::AddDoors(unsigned int room_id){
 
 // add room room_id to map array
 void CDungeonGeneration::RoomToMap(unsigned int room_id){
-    for(unsigned int y = m_rooms[room_id].top; y < m_rooms[room_id].top + m_rooms[room_id].height; y++){
-        for(unsigned int x = m_rooms[room_id].left; x < m_rooms[room_id].left + m_rooms[room_id].width; x++){
+    for(int y = m_rooms[room_id].top; y < m_rooms[room_id].top + m_rooms[room_id].height; y++){
+        for(int x = m_rooms[room_id].left; x < m_rooms[room_id].left + m_rooms[room_id].width; x++){
             m_Map->AddMapTile(ttRoom,x,y);
         }
     }
@@ -227,23 +227,25 @@ void CDungeonGeneration::Generate(CLevelMap *Map){
     // fill level to wall block
 
     m_Map=Map;
+    m_width=m_Map->GetWidth();
+    m_height=m_Map->GetHeight();
 
-    for(y=0;y<m_height;y++){
-        for(x=0;x<m_width;x++){
+    for(y=0; y<m_height; y++){
+        for(x=0; x<m_width; x++){
             m_Map->AddMapTile(ttWall,x,y);
             m_Map->GetMap()[x][y].viewed=false;
         }
     }
 
     // clear grid array
-    for(y=0;y<m_grid_h;y++){
+    for(y=0; y<m_grid_h; y++){
         for(x=0;x<m_grid_w;x++){
             m_grid[x][y].filled=false;
         }
     }
 
     // create rooms
-    for(i=0;i<m_rooms_num;i++){
+    for(i=0; i<m_rooms_num; i++){
         // search empty grid field
         do{
             x=rand()%m_grid_w;
