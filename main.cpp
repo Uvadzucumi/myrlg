@@ -320,6 +320,8 @@ int main(int argc, char **argv){
     dungeon->SetViewportToTarget(herro->GetPosX(),herro->GetPosY());
     dungeon->CalculateLOS(herro->GetPosX(),herro->GetPosY());
 
+    Log->puts("Dungeond Created\n");
+
     ActiveWindow=gwMain;
 
     App->Run();
