@@ -44,7 +44,8 @@ void CRender::InitGL(){
     glColor3f(1,0,0);
     glClearColor(0,0,0,1);
     glClearDepth(1.0f);
-    glViewport(0, 0, this->m_width, this->m_height);
+    // now - not need - ViewPort cahgend in Set2D
+    //glViewport(0, 0, this->m_width, this->m_height);
     glEnable(GL_TEXTURE_2D);
     glDepthFunc(GL_LEQUAL);
     glEnable(GL_DEPTH_TEST);
@@ -72,28 +73,24 @@ bool CRender::Init(int width, int height, int bpp, bool full_screen, const char 
         return false;
     }
 #ifdef __WIN32__
-    SDL_GL_SetAttribute(SDL_GL_RED_SIZE,            8);
-    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE,          8);
-    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE,           8);
-    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE,          8);
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE,            5);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE,          5);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE,           5);
+//    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE,          8);
 
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE,          16);
-    SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE,         32);
-
-    SDL_GL_SetAttribute(SDL_GL_ACCUM_RED_SIZE,      8);
-    SDL_GL_SetAttribute(SDL_GL_ACCUM_GREEN_SIZE,    8);
-    SDL_GL_SetAttribute(SDL_GL_ACCUM_BLUE_SIZE,     8);
-    SDL_GL_SetAttribute(SDL_GL_ACCUM_ALPHA_SIZE,    8);
-
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS,  1);
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES,  2);
+//    SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE,         32);
+//    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS,  1);
+//    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES,  2);
 #endif
     window_flags = SDL_HWSURFACE | SDL_OPENGL;
     #ifdef MYOGL_DOUBLE_BUFFER
         window_flags |= SDL_GL_DOUBLEBUFFER;
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+        printf("Double Buffer Enabled!\n");
     #else
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 0);
+        printf("Dounble Buffer Disabled\n");
     #endif
 
     #ifdef MYOGL_RESIZABLE_WINDOW
@@ -110,6 +107,10 @@ bool CRender::Init(int width, int height, int bpp, bool full_screen, const char 
         Log->puts("CRender::Init SDL_SetVideoMode(): false\n");
         return false;
     }
+    // Check double buffer
+    int tmp;
+    SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &tmp);
+    printf("Double Buffering: %s\n",(tmp)?"Enabled":"Disabled");
     // show Opengl Info
     this->gl_vendor = (char *) glGetString(GL_VENDOR);
     Log->puts("OpenGL Vendor: %s\n",gl_vendor);
@@ -129,55 +130,8 @@ bool CRender::Init(int width, int height, int bpp, bool full_screen, const char 
     }
 
     // Init OpenGL
-    //SetClearColor(0,0,1);
-    //SetColor(1,0,0);
     InitGL();
 
-/*
-    if(SDL_Init(SDL_INIT_EVERYTHING) < 0) {
-        return false;
-    }
-
-    SDL_GL_SetAttribute(SDL_GL_RED_SIZE,            8);
-    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE,          8);
-    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE,           8);
-    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE,          8);
-
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE,          16);
-    SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE,            32);
-
-    SDL_GL_SetAttribute(SDL_GL_ACCUM_RED_SIZE,        8);
-    SDL_GL_SetAttribute(SDL_GL_ACCUM_GREEN_SIZE,    8);
-    SDL_GL_SetAttribute(SDL_GL_ACCUM_BLUE_SIZE,        8);
-    SDL_GL_SetAttribute(SDL_GL_ACCUM_ALPHA_SIZE,    8);
-
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS,  1);
-
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES,  2);
-
-    if((Context = SDL_SetVideoMode(640, 480, 32, SDL_HWSURFACE | SDL_GL_DOUBLEBUFFER | SDL_OPENGL)) == NULL) {
-        return false;
-    }
-
-    glClearColor(0, 0, 0, 0);
-
-    glViewport(0, 0, 640, 480);
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-
-    glOrtho(0, 640, 480, 0, 1, -1);
-
-    glMatrixMode(GL_MODELVIEW);
-
-    glEnable(GL_TEXTURE_2D);
-
-    glLoadIdentity();
-
-//    Set2D(true);    // Set2D projection
-    GL.GetCurrentStates();
-    GL.Debug();
-*/
     return true;
 }
 
@@ -199,6 +153,7 @@ void CRender::Set2D(bool force){
 // Set Orthogonal projection
 void CRender::Set3D(bool force){
     if(force || !GL.mode3d){
+        glViewport (0, 0, this->m_width, this->m_height);
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         gluPerspective( 45.0f, (GLfloat)this->m_width/(GLfloat)this->m_height, 0.1f, 100.0f );
@@ -211,12 +166,7 @@ void CRender::Set3D(bool force){
 
 // Swap render buffers
 void CRender::SwapBuffers(){
-#ifdef MYOGL_DOUBLE_BUFFER
     SDL_GL_SwapBuffers();
-#endif
-#ifdef __LINUX__
-    SDL_GL_SwapBuffers();
-#endif
 }
 
 // Window functions

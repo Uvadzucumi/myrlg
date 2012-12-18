@@ -13,6 +13,7 @@ enum eItemTypes{
     itScroll,
     itMeleeWeapon,
     itRangedWeapon,
+    itBullets,
     itWand,
     itCloth,
     itArmor,
