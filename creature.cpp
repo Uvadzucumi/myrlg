@@ -10,7 +10,7 @@ bool CCreature::Move(int dx, int dy, CDungeonLevel *dungeon){
         MyOGL::Log->puts("Wrong creature movement dx=%d dy=%d\n",dx,dy);
         return false;
     }
-    if(dungeon->Map()[m_x+dx][m_y+dy].can_move){
+    if(dungeon->IsCanMove(m_x+dx,m_y+dy)){
         SetPosition(m_x+dx, m_y+dy);
         dungeon->SetViewportToTarget(m_x,m_y);
         dungeon->CalculateLOS(m_x,m_y);
@@ -19,6 +19,7 @@ bool CCreature::Move(int dx, int dy, CDungeonLevel *dungeon){
     return false;
 };
 
+// get direction & return map coords
 Vector2i CCreature::GetMapCoords(eDirections direction){
     Vector2i coords;
     switch(direction){
@@ -40,10 +41,10 @@ Vector2i CCreature::GetMapCoords(eDirections direction){
     return coords;
 }
 
+// Open door command
 bool CCreature::OpenDoor(CDungeonLevel *dungeon, eDirections direction){
     // search door position
     Vector2i map_coord;
-    sTileDataDoor *data=NULL;
     map_coord.x=-1;
     switch(direction){
         case dNorth:
@@ -58,17 +59,13 @@ bool CCreature::OpenDoor(CDungeonLevel *dungeon, eDirections direction){
                 Vector2i tmp_coord;
                 tmp_coord=GetMapCoords((eDirections)i);
                 Log->puts("Check [%d][%d]\n",tmp_coord.x,tmp_coord.y);
-                if(dungeon->Map()[tmp_coord.x][tmp_coord.y].tile_type==ttDoor){
+                if(dungeon->IsDoor(tmp_coord.x, tmp_coord.y)){
                     Log->puts("Founded door in coords [%d][%d]\n",tmp_coord.x,tmp_coord.y);
                     // founded door
-                    if((sTileDataDoor *)dungeon->Map()[tmp_coord.x][tmp_coord.y].p_tile_data!=NULL){
-                        data=(sTileDataDoor *)dungeon->Map()[tmp_coord.x][tmp_coord.y].p_tile_data;
-                        if(!data->opened && !data->hidden && !data->broken){
-                        // founded closed door
-                            map_coord=tmp_coord;
-                            Log->puts("Founded closed door in map coords [%d][%d]\n",map_coord.x, map_coord.y);
-                            break;
-                        }
+                    if(dungeon->IsDoorClosed(tmp_coord.x, tmp_coord.y)){
+                        map_coord=tmp_coord;
+                        Log->puts("Founded closed door in map coords [%d][%d]\n",map_coord.x, map_coord.y);
+                        break;
                     }else{
                         Log->puts("Error: Door p_tile_data=NULL\n");
                     }
@@ -79,16 +76,9 @@ bool CCreature::OpenDoor(CDungeonLevel *dungeon, eDirections direction){
                 return false;
             }
     }
-    if(dungeon->Map()[map_coord.x][map_coord.y].tile_type==ttDoor &&
-                    ! ((sTileDataDoor *)(dungeon->Map()[map_coord.x][map_coord.y].p_tile_data))->opened &&
-                    ! ((sTileDataDoor *)(dungeon->Map()[map_coord.x][map_coord.y].p_tile_data))->broken &&
-                    ! ((sTileDataDoor *)(dungeon->Map()[map_coord.x][map_coord.y].p_tile_data))->hidden
-    ){
-    // Open door
-        ((sTileDataDoor *)(dungeon->Map()[map_coord.x][map_coord.y].p_tile_data))->opened=true;
-        dungeon->Map()[map_coord.x][map_coord.y].can_move=true;
-        dungeon->Map()[map_coord.x][map_coord.y].skip_light=true;
-        dungeon->Map()[map_coord.x][map_coord.y].layer[1]=tnDoorOpenedDungeon;
+
+    if(dungeon->OpenDoor(map_coord.x, map_coord.y)){ // Door opened
+        // Open door
         Log->puts("Door opened!\n");
         dungeon->CalculateLOS(m_x,m_y);
         return true;
@@ -97,11 +87,11 @@ bool CCreature::OpenDoor(CDungeonLevel *dungeon, eDirections direction){
         return false;
     }
 }
-
+// Herro movement
 bool CHerro::Move(int dx, int dy, CDungeonLevel *dungeon){
 // movement delay
     unsigned int tick=SDL_GetTicks();
-    if(m_last_mov_tick && (tick-m_last_mov_tick)<movement_delay){
+    if(m_last_mov_tick && (tick-m_last_mov_tick)<m_movement_delay){
         return false;
     }
     m_last_mov_tick=tick;
@@ -109,6 +99,12 @@ bool CHerro::Move(int dx, int dy, CDungeonLevel *dungeon){
     return CCreature::Move(dx, dy, dungeon);
 
 }
+
+// Pick up items from floor
+void CHerro::PikUp(CDungeonLevel *dungeon){
+    dungeon->SearchItemsIn(m_x, m_y);
+}
+
 
 void CHerro::Render(){
     CCreature::Render(); // rener sprite

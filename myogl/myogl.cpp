@@ -27,10 +27,9 @@ bool CApplication::Init(int width, int height, int bpp, bool full_screen, const 
     user_home_dir=new char[strlen(getenv("USERPROFILE")+1)];
     strcpy(user_home_dir,getenv("USERPROFILE"));
 #endif
-    printf("user home dir: %s\n",user_home_dir);
-
     Log=new CLog();
     Log->Init("log.txt");
+    Log->puts("user home dir: %s\n",user_home_dir);
     // init keys state array
     for(int i = 0; i < 322; i++) { // init them all to false
         KEYS[i] = false;
@@ -148,7 +147,4 @@ void CApplication::Free(){
     EntityList.clear();
     if(Render!=NULL) delete Render;
 }
-
-
-
 

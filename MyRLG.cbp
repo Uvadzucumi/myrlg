@@ -81,6 +81,8 @@
 		<Unit filename="dungeon_map.h" />
 		<Unit filename="game.cpp" />
 		<Unit filename="game.h" />
+		<Unit filename="inventory.cpp" />
+		<Unit filename="inventory.h" />
 		<Unit filename="items.cpp" />
 		<Unit filename="items.h" />
 		<Unit filename="main.cpp" />

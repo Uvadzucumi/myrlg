@@ -153,6 +153,9 @@ void OnEvent(SDL_Event *Event, double DeltaTime){
                 case SDLK_o:
                     herro->OpenDoor(dungeon);
                     break;
+                case SDLK_g:
+                    herro->PikUp(dungeon);
+                    break;
                 default:
 //                    printf("Pressed key: %d\n",Event->key.keysym.sym);
                     break;
@@ -172,18 +175,16 @@ void OnEvent(SDL_Event *Event, double DeltaTime){
             if(Event->key.keysym.sym==SDLK_ESCAPE){ // exit to inventory window
                 ActiveWindow=gwInventory;
             }else{
-            // TODO - equip, drop item(s)
+                // TODO - equip, drop item(s)
                 switch(Event->key.keysym.sym){
                     case 'e':
                         if(App->IsKeyPressed(SDLK_RSHIFT) || App->IsKeyPressed(SDLK_LSHIFT)){
                             MyOGL::Log->puts("Eat/Drink action!\n");
                         }else{
-                            //MyOGL::Log->puts("Equip action!\n");
                             herro->inventory->Equip(); // equip current selected item
                         }
                         break;
                     case 't':
-                        //MyOGL::Log->puts("UnEquip action!\n");
                         herro->inventory->Unequip(); // UnEquip current selected item
                         break;
                     case 'd':
@@ -293,7 +294,7 @@ int main(int argc, char **argv){
     MyOGL::Vector2i pos=dungeon->GetStartPosition();
 
     herro=new CHerro();
-    herro->movement_delay=cfg_file->GetParamValue("movement_delay",50);
+    herro->SetMovementDelay(cfg_file->GetParamValue("movement_delay",50));
     herro->SetPosition(pos.x, pos.y);
     herro_sprite=new CHudSprite(tiles_texture);
     herro_sprite->SetUVPixelCoords(0,128,32,32);

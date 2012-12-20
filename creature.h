@@ -1,7 +1,7 @@
 #ifndef CREATURE_H_INCLUDED
 #define CREATURE_H_INCLUDED
 
-#include "items.h"
+#include "inventory.h"
 #include "myogl/sprites.h"
 #include "dungeon_map.h"   // for dungeon
 
@@ -29,6 +29,7 @@ enum eCreatureClass{
 };
 
 class CCreature{
+    private:
 // attributes
     unsigned char m_str;
     unsigned char m_con;
@@ -44,11 +45,12 @@ class CCreature{
     unsigned int m_health, m_max_health;
     unsigned int m_mana, m_max_mana;
 // map position
-    unsigned int m_x, m_y;
+
 //  std::vector <CItem> *inventory;
     MyOGL::CHudSprite *m_sprite;
     Vector2i GetMapCoords(eDirections direction);
-
+    protected:
+        int m_x, m_y;
     public:
         CCreature(){ m_sprite=NULL; };
         ~CCreature(){};
@@ -63,20 +65,24 @@ class CCreature{
 
 // herro class
 class CHerro : public CCreature{
-        unsigned int m_last_mov_tick;   // for movement delay
+            unsigned int m_last_mov_tick;   // for movement delay
+            unsigned int m_movement_delay;    // only for herro
         public:
             CInventory *inventory;
-            unsigned int movement_delay;    // only for herro
             CHerro(){
                 m_last_mov_tick=0;
-                movement_delay=10;
+                m_movement_delay=10;
                 inventory=new CInventory;
             };
             ~CHerro(){
                 delete inventory;
             }
-            bool Move(int dx, int dy, CDungeonLevel *dungeon);
+            void SetMovementDelay(unsigned int delay){ m_movement_delay=delay;};
             void Render();
+            // Commands
+            void PikUp(CDungeonLevel *dungeon);
+            void Drop(CDungeonLevel *dungeon);
+            bool Move(int dx, int dy, CDungeonLevel *dungeon);
 
 };
 

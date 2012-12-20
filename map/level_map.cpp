@@ -98,3 +98,45 @@ void CLevelMap::Update(double DeltaTime){
     }
 }
 
+// check doorin coords x,y
+bool CLevelMap::IsDoor(int x, int y){
+    if(m_Map[x][y].p_tile_data==NULL){
+        return false;
+    }
+    return m_Map[x][y].tile_type==ttDoor;
+}
+
+// return true if in coords x,y closed door
+bool CLevelMap::IsDoorClosed(int x, int y){
+    sTileDataDoor* door_data;
+    if(IsDoor(x, y)){
+        door_data=(sTileDataDoor *)m_Map[x][y].p_tile_data;
+        if(!door_data->opened && !door_data->hidden && !door_data->broken){
+            return true;
+        }
+    }
+    return false;
+}
+
+// open door in coords x, y
+bool CLevelMap::OpenDoor(int x, int y){
+    sTileDataDoor* door_data;
+    if(IsDoor(x, y)){
+        door_data=(sTileDataDoor *)m_Map[x][y].p_tile_data;
+        if( !door_data->opened && !door_data->broken && !door_data->hidden ){// all ok - open door
+                door_data->opened=true;
+                m_Map[x][y].can_move=true;
+                m_Map[x][y].skip_light=true;
+                m_Map[x][y].layer[1]=tnDoorOpenedDungeon;
+                return true;
+        }else{
+            return false;
+        }
+    }
+    return false;
+}
+
+bool CLevelMap::CloseDoor(int x, int y){
+
+    return false;
+}

@@ -10,6 +10,7 @@
 
 
 // Dungeon level class
+// mapmanager class
 class CDungeonLevel{
         //TODO add dyn tiles list for use in method "Update"
         //std::vector <CMapDynamicTile> DynamicTilesLIst
@@ -90,7 +91,7 @@ class CDungeonLevel{
         }
         void SetTileset(CTileset *tileset){ m_tileset=tileset;};
         void NewGridDungeon(int grid_w, int grid_h, int rooms);
-        int GetRoomIdByCoords(unsigned int x, unsigned int y);
+        //int GetRoomIdByCoords(unsigned int x, unsigned int y);
         void CalculateLight();
         void SetGlobalLight(unsigned int light_index){ m_global_light=light_index;m_light_changed=true;};
         unsigned int GetGlobalLight(void){ return m_global_light;};
@@ -99,9 +100,13 @@ class CDungeonLevel{
         unsigned int GetWidth(){ return m_map_width;};
         unsigned int GetHeight(){ return m_map_height;};
 
-        sMapField **Map(){
-            return m_Map->GetMap();
-        };
+        bool IsCanMove(int x, int y){ return m_Map->IsCanMove(x, y);};
+        bool IsDoor(int x, int y){ return m_Map->IsDoor(x, y); };
+        bool IsDoorClosed(int x, int y){ return m_Map->IsDoorClosed(x, y); };
+        bool OpenDoor(int x, int y){ return m_Map->OpenDoor(x,y); };
+        bool CloseDoor(int x, int y){ return m_Map->CloseDoor(x,y); };
+        void SearchItemsIn(int x, int y){ m_Map->GetItemsInField(x,y)->RemoveByIndex('a',1); };
+
 
         MyOGL::Vector2i GetStartPosition(){ return m_Map->GetStartPosition(); };
 

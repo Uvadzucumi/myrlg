@@ -8,6 +8,8 @@
 //#include <stdlib.h> // NULL, rand
 #include "../tileset.h" // tile names - for addTile
 
+#include "../items.h"
+
 // tile types
 enum eTileTypes{
     ttWall=0,
@@ -43,7 +45,8 @@ typedef struct{
     bool can_move;  // TODO: move_speed, if 0 - cannot move
     void *p_tile_data;
     void *p_monsters;
-    void *p_items;
+    //void *p_items;
+    CItemsContainer items;
 }sMapField;
 
 class CMapDynamicTile{
@@ -95,7 +98,7 @@ class CLevelMap{
                 for(int j=0; j < m_height; j++){
                     m_Map[i][j].p_tile_data=NULL;
                     m_Map[i][j].p_monsters=NULL;
-                    m_Map[i][j].p_items=NULL;
+//                    m_Map[i][j].p_items=NULL;
                 }
             }
         };
@@ -137,9 +140,18 @@ class CLevelMap{
         bool IsVisible(int x, int y){ return m_Map[x][y].visible; };
         bool IsSkipLight(int x, int y){ return m_Map[x][y].skip_light; };
         bool IsViewed(int x, int y){ return m_Map[x][y].viewed; };
+        bool IsCanMove(int x, int y){ return m_Map[x][y].can_move; }; // TODO: add check big items, mobs - etc?
+        bool IsDoor(int x, int y);
+        bool IsDoorClosed(int x, int y);
+        bool OpenDoor(int x, int y);
+        bool CloseDoor(int x, int y);
+        CItemsContainer* GetItemsInField(int x, int y){ return &m_Map[x][y].items; };   // return pointer to items list in field x, y
+
         MyOGL::Vector2i GetStartPosition() { return m_StartPosition; };
         void SetStartPosition(int x, int y){ m_StartPosition.x=x; m_StartPosition.y=y; };
         eTileTypes GetTileType(int x, int y){ return m_Map[x][y].tile_type;}
+
+
 };
 
 #endif // LEVEL_MAP_H_INCLUDED
