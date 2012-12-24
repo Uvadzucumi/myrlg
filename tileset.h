@@ -17,16 +17,36 @@ enum eTileNames{
     tnDoorBrokenDungeon,
     tnFire=48,
     tnHerro=64,
+
     tnDagger=80,
     tnSword=82,
     tnSpear=84,
     tnStaff=86,
     tnMace=88,
+
+    tnBread=96,
+    tnSlime,
     tnMeat,
-    tnBread,
     tnBootleEmpty,
     tnBootleWater,
-    tnBootleBeer
+    tnBootleBeer,
+
+    tnPotionAqua=112,
+    tnPotionBlack,
+    tnPotionBlue,
+    tnPotionFuchsia,
+    tnPotionGray,
+    tnPotionGreen,
+    tnPotionLime,
+    tnPotionMaroon,
+    tnPotionNavy,
+    tnPotionOlive,
+    tnPotionPurple,
+    tnPotionRed,
+    tnPotionSilver,
+    tnPotionTeal,
+    tnPotionWhite,
+    tnPotionYellow
 };
 
 
