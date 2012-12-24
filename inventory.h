@@ -10,7 +10,8 @@ struct sInventoryEqSlots{
 };
 
 class CInventory{
-        std::vector <sContainerItem> m_items;    // indexes - inv_id
+        //std::vector <sContainerItem> m_items;    // indexes - inv_id
+        CItemsContainer m_items;
         std::vector <sInventoryEqSlots> m_slots; // indexes slot_id
         struct {
             bool drop;
@@ -54,6 +55,7 @@ class CInventory{
         // remove from inventory
         bool RemoveItemByButton(char button);
         // equip/unequip item
+        bool IsEquipped(int list_id);
         bool Equip(int inv_id=-1); // inv_id
         bool Unequip(int inv_id=-1); // inv_id
 

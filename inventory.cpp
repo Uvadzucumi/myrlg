@@ -2,17 +2,11 @@
 #include "inventory.h"
 
 // buttons for select items from inventory (TODO: from container)
-char LetterButtonsList[]={"abcdefghijklmnopqrstuvwxyz"};
+//char LetterButtonsList[]={"abcdefghijklmnopqrstuvwxyz"};
 
-// Inventory Class. TODO - devide to Container and Inventory::Container
 CInventory::CInventory(){
     m_font=NULL;
     m_item_tileset=NULL;
-    // create used_buttons array
-    used_buttons=new bool[strlen(LetterButtonsList)];
-    for(unsigned int i=0;i<strlen(LetterButtonsList);i++){
-        used_buttons[i]=false;
-    }
     // add humanoid slots
     AddEquipmentSlot(slHead,"Голова");
     AddEquipmentSlot(slNeck,"Шея");
@@ -36,76 +30,25 @@ void CInventory::AddEquipmentSlot(eEquipSlotNames position, const char *name){
     m_slots.push_back(slot);
 }
 
-// search first unused button
-int CInventory::SearchFreeButtonIndex(){
-    for(unsigned int i=0;i<strlen(LetterButtonsList);i++){
-        if(!used_buttons[i]){
-            return i;
-        }
-    }
-    return -1;
-}
-
-// serch button index in buttons array
-int CInventory::GetButtonIndex(char button){
-    for(unsigned int i=0;i<strlen(LetterButtonsList);i++){
-        if(LetterButtonsList[i]==button){
-            return i;
-        }
-    }
-    return -1;
-}
-
 // get item index by item button
 int CInventory::GetItemIndexByButton(char button){
-    for(unsigned int i=0;i<m_items.size();i++){
-        if(button==m_items[i].button){ // founded in items list
-            return i;
-        }
-    }
-    // not found
-    return -1;
+    return m_items.GetIndexByButton(button);
 }
 
 // add item to inventory
 bool CInventory::AddItem(unsigned int item_id, int amount){
-    int indx;
-    if((indx=SearchFreeButtonIndex())<0){
-        Log->puts("CInventory::AddItem() Error. Not found Free Button Index! Item not Added to inventory!\n");
-        return false;
-    }else{ // Add item
-        sContainerItem tmp;
-        tmp.equip=false;
-        tmp.id=item_id;
-        tmp.amount=amount;
-        tmp.button=LetterButtonsList[indx];
-        used_buttons[indx]=true;    // set button to "used!"
-        m_items.push_back(tmp);
-   }
-   return true;
+    return m_items.AddItem(item_id, amount);
 }
 
-// remove item from inventory
-bool CInventory::RemoveItem(unsigned int list_id){
-    if(m_items.size()>list_id){
-        if(m_items[list_id].equip){
-            Unequip(list_id);
-        }
-        // need free used button
-        int indx=GetButtonIndex(m_items[list_id].button);
-        if(indx!=-1){
-            used_buttons[indx]=false;
-            m_items.erase(m_items.begin()+list_id);
+bool CInventory::IsEquipped(int list_id){
+// check slots and search equipped items
+    for(unsigned int i=0;i<m_slots.size();i++){
+        if(m_slots[i].item_inv_id==list_id){
             return true;
-        }else{
-            Log->puts("CInventory::RemoveItem() Error! Not found button index! Item not removed\n");
-            return false;
         }
-    }else{
-        MyOGL::Log->puts("Error CInventory::DelItem(%d) - wrong items list ID\n");
-        return false;
     }
-};
+    return false;
+}
 
 // fill m_sel_item_actions structure for current selected item
 void CInventory::BuildSelectedItemAtions(){
@@ -117,9 +60,9 @@ void CInventory::BuildSelectedItemAtions(){
     m_sel_item_actions.read=false;
     m_sel_item_actions.unequip=false;
     // get item from database
-    item=DBItemByID(m_items[m_selected_item].id);
+    item=DBItemByID(m_items.GetByIndex(m_selected_item));
     // if equip
-    if(m_items[m_selected_item].equip){
+    if(IsEquipped(m_selected_item)){
         m_sel_item_actions.unequip=true;
     }else{ // not equiped
         m_sel_item_actions.drop=true;
@@ -218,7 +161,7 @@ bool CInventory::Unequip(int inv_id){
     if(inv_id==-1){
         inv_id=m_selected_item;
     }
-    if(m_items[inv_id].equip){
+    if(IsEquipped(inv_id)){
         // search slot
         int slot=SearchSlotIdByInvItemId(inv_id);
         if(slot==-1){
@@ -226,7 +169,7 @@ bool CInventory::Unequip(int inv_id){
             return false;
         }
         m_slots[slot].item_inv_id=-1;
-        m_items[inv_id].equip=false;
+        //m_items[inv_id].equip=false;
         if(item_id==-1){ // selected item - need update flags
             BuildSelectedItemAtions();
         }
@@ -246,9 +189,9 @@ bool CInventory::Equip(int inv_id){
         inv_id=m_selected_item;
     }
 
-    if(!m_items[inv_id].equip){
+    if(!IsEquipped(inv_id)){
         sItemDescription *item;
-        item=DBItemByID(m_items[inv_id].id);
+        item=DBItemByID(m_items.GetByIndex(inv_id));
         int slot_id=SearchEmptyEqSlots(item->equip_slot);
         if(slot_id==-1){ // not founded empty
                 // search not empty
@@ -264,7 +207,7 @@ bool CInventory::Equip(int inv_id){
             Unequip(m_slots[slot_id].item_inv_id);
         }
         m_slots[slot_id].item_inv_id=inv_id;
-        m_items[inv_id].equip=true;
+        //m_items[inv_id].equip=true;
         if(item_id==-1){ // rebuild selected item
             BuildSelectedItemAtions();
         }
@@ -319,9 +262,18 @@ void CInventory::Render(){
     // return translate
     glTranslatef(-430,34,0);
     dy+=34;
+    /*
+    Log->puts("%d items in Inventory\n",m_items.size());
+    for(int i=0;i<m_items.size();i++){
+        Log->puts("index: %d ",i);
+        Log->puts("item: %d amount: %d", m_items.GetByIndex(i), m_items.AmountByIndex(i));
+        Log->puts("button: %c\n",m_items.ButtonByIndex(i));
+
+    }
+    */
 
     for(unsigned int i=0; i<m_items.size();i++){
-        item=DBItemByID(m_items[i].id);
+        item=DBItemByID(m_items.GetByIndex(i));
         // item ico
         if(m_item_tileset!=NULL){
             m_item_tileset->Render(item->sprite_id);    // change current color to White
@@ -330,17 +282,17 @@ void CInventory::Render(){
         }
         // item name
         glTranslatef(50,0,0);
-        sprintf(tmp,"%c)", m_items[i].button);
+        sprintf(tmp,"%c)", m_items.ButtonByIndex(i));
         m_font->Print(tmp); // White color
         glTranslatef(20,0,0);
         MyOGL::Render->SetColor(1.0,1.0,0.0,1.0);   // Yellow
         m_font->Print(item->name);
         glTranslatef(280,0,0);
-        sprintf(tmp,"%d", m_items[i].amount);
+        sprintf(tmp,"%d", m_items.AmountByIndex(i));
         m_font->Print(tmp);
         // weight
         glTranslatef(80,0,0);
-        sprintf(tmp,"%d", m_items[i].amount*item->weight);
+        sprintf(tmp,"%d", m_items.AmountByIndex(i)*item->weight);
         m_font->Print(tmp);
 
         // go to new line
@@ -359,7 +311,7 @@ void CInventory::Render(){
 void CInventory::RenderItemDetail(void){
     sItemDescription* item;
     // get item from database
-    item=DBItemByID(m_items[m_selected_item].id);
+    item=DBItemByID(m_items.GetByIndex(m_selected_item));
 
     // black quad
 
@@ -397,7 +349,7 @@ void CInventory::RenderItemDetail(void){
     // TODO: show equip only for equipment items
     int dx=0, w=0;
     if(m_sel_item_actions.equip){
-            w=m_font->Print("(e) - экипировать,");
+            w=m_font->Print("(w) - экипировать,");
             dx+=w+10;
             glTranslatef(w+10,0,0);
     }
@@ -407,7 +359,7 @@ void CInventory::RenderItemDetail(void){
             glTranslatef(w+10,0,0);
     }
     if(m_sel_item_actions.eat_drink){
-            w=m_font->Print("(E) - съесть/выпить,");
+            w=m_font->Print("(e) - съесть/выпить,");
             dx+=w+10;
             glTranslatef(w+10,0,0);
     }
@@ -433,7 +385,7 @@ void CInventory::RenderEquipped(void){
     for(unsigned int i=0;i<m_slots.size();i++){
         if(m_slots[i].item_inv_id!=-1){ // found item - render
             // get item from database
-            item=DBItemByID(m_items[m_slots[i].item_inv_id].id);
+            item=DBItemByID(m_items.GetByIndex(m_slots[i].item_inv_id));
             // render item sprite
             m_item_tileset->Render(item->sprite_id+1);
         }

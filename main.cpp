@@ -31,16 +31,16 @@ void OnRender(double dt){
     Render->Set2D();
 
     dungeon->Render();
+    // herro render
+    glTranslatef((herro->GetPosX()-dungeon->GetViewportLeft())*32,(herro->GetPosY()-dungeon->GetViewportTop())*32,0);
+    herro->Render();
+    glTranslatef(-((herro->GetPosX()-dungeon->GetViewportLeft())*32),-((herro->GetPosY()-dungeon->GetViewportTop())*32),0);
     //
     if(ActiveWindow==gwInventory){
         herro->inventory->Render();
     }else if(ActiveWindow==gwInventoryItemDescription){
         herro->inventory->RenderItemDetail();
     }
-
-    glTranslatef((herro->GetPosX()-dungeon->GetViewportLeft())*32,(herro->GetPosY()-dungeon->GetViewportTop())*32,0);
-    herro->Render();
-
 
 //    for(unsigned int i = 0;i < MyOGL::EntityList.size();i++) {
 //        if(!MyOGL::EntityList[i]) continue;
@@ -120,7 +120,7 @@ void OnLoop(double DeltaTime){
         if(App->IsKeyPressed(SDLK_KP3)){
             herro->Move(1,1, dungeon);
         }
-        if(App->IsKeyPressed(SDLK_i)){  // goto imventory window
+        if(App->IsKeyPressed(SDLK_i)){  // goto inventory window
             ActiveWindow=gwInventory;
         }
     }
@@ -177,12 +177,11 @@ void OnEvent(SDL_Event *Event, double DeltaTime){
             }else{
                 // TODO - equip, drop item(s)
                 switch(Event->key.keysym.sym){
+                    case 'w':
+                            herro->inventory->Equip();
+                        break;
                     case 'e':
-                        if(App->IsKeyPressed(SDLK_RSHIFT) || App->IsKeyPressed(SDLK_LSHIFT)){
                             MyOGL::Log->puts("Eat/Drink action!\n");
-                        }else{
-                            herro->inventory->Equip(); // equip current selected item
-                        }
                         break;
                     case 't':
                         herro->inventory->Unequip(); // UnEquip current selected item
@@ -190,9 +189,6 @@ void OnEvent(SDL_Event *Event, double DeltaTime){
                     case 'd':
                         MyOGL::Log->puts("Drop action!\n");
                         break;
-                    //case 'E':
-                    //    MyOGL::Log->puts("Eat/Drink action!\n");
-                    //    break;
                     case 'r':
                         MyOGL::Log->puts("Read action!\n");
                         break;

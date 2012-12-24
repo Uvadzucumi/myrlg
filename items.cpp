@@ -6,6 +6,8 @@
 
 std::vector <sItemDescription> ItemsDB;
 
+char LetterButtonsList[]={"abcdefghijklmnopqrstuvwxyz\0"};
+
 #define ADD_ITEM(item_id, item_type, item_name, item_description, item_sprite_id, dice_count, dice_name, dice_delta, item_weight, item_equip_pos) \
     tmp_item.id=item_id; \
     tmp_item.type=item_type; \
@@ -26,8 +28,9 @@ void InitItemsDB(){
     sItemDescription tmp_item;
     char tmp[100];
     // Eat
-    ADD_ITEM(1, itEat, "Хлеб", "Кусок заплесневешего хлеба.", tnBread, 1,6,0, 1, slNone)
+    ADD_ITEM(1, itEat, "Хлеб", "Кусок заплесневешего хлеба.", tnBread, 3,6,0, 1, slNone)
     ADD_ITEM(2, itEat, "Мясо", "Свежее мясо. Еще совсем недавно бегало и пищало.", tnMeat, 10,6,0, 1, slNone)
+    ADD_ITEM(2, itEat, "Слизь", "Странно пахнущая, бесформенная масса.", tnSlime, 10,6,0, 1, slNone)
     // Potions
     ADD_ITEM(10, itDrink, "Пустая бутылка", "Обычная пустая бутылка", tnBootleEmpty, 0,0,0, 1, slNone)
     ADD_ITEM(11, itDrink, "Бутылка воды", "Уталяет жажду", tnBootleWater, 0,0,0, 1, slNone)
@@ -76,23 +79,185 @@ CItemsContainer::CItemsContainer(){
     head = NULL;
 }
 
-// Add item in to container. stack in one field if needed
-void CItemsContainer::AddItem(unsigned int item_id, int amount){
-    Log->puts("Drop item %d, amount: %d\n", item_id, amount);
-// fromm first to last (search id), if founded - add amount
-    // else
-      // create new node, search first not used letters, insert item after last used letters
+// return element count in container
+unsigned int CItemsContainer::size() const{
+    unsigned int count=0;
+    Node *node;
+    node=head;
+    while(node!=NULL){
+        count++;
+        node=node->next;
+    }
+    return count;
 }
 
-// search specified item in container and remove
-void CItemsContainer::RemoveItem(unsigned int item_id, int amount){
+// search items in container and merge if posible
+bool CItemsContainer::MergeItem(unsigned int item_id, int amount){
+    Node *node;
+    node=head;
+    while(node!=NULL){
+        if(node->item==item_id){
+            node->amount+=amount;
+            return true;
+        }
+        node=node->next;
+    }
+    return false;
+}
+
+// clear container
+void CItemsContainer::clear(){
+    Node *node, *next_node;
+    node=head;
+    while(node!=NULL){
+        next_node=node->next;
+        delete node;
+        node=next_node;
+    }
+}
+
+// return index by button
+int CItemsContainer::GetIndexByButton(char button){
+    Node *node;
+    int index=0;
+    node=head;
+    while(node!=NULL){
+        if(node->button==button){
+            return index;
+        }
+        node=node->next;
+        index++;
+    }
+    // not found
+    return -1;
+}
+
 //
-    Log->puts("Remove item %d, amount: %d\n",item_id, amount);
+char CItemsContainer::GetFirstFreeButton(){
+    int button_index;
+    bool founded=true;
+    Node *node;
+    for(button_index=0;button_index<(int)strlen(LetterButtonsList);button_index++){
+        node=head;
+        while(node!=NULL){
+            // check current button
+            if(LetterButtonsList[button_index]==node->button){
+                founded=false;
+                break;
+            }
+            node=node->next;
+        }
+        if(founded){
+            Log->puts("Found free button %c\n",LetterButtonsList[button_index]);
+            return LetterButtonsList[button_index];
+        }else{
+            founded=true;
+        }
+    }
+    return '_';
 }
 
-void CItemsContainer::RemoveByIndex(char index_letter, int amount){
+// Get By ID
+int CItemsContainer::GetByIndex(int index){
+    Node *node=head;
+    int count=0;
+    while(node!=NULL){
+        if(count==index){
+            return node->item;
+        }
+        node=node->next;
+        count++;
+    }
+    return -1;
+}
+
+// return button
+char CItemsContainer::ButtonByIndex(int index){
+    Node *node=head;
+    int count=0;
+    while(node!=NULL){
+        if(count==index){
+            return node->button;
+        }
+        count++;
+        node=node->next;
+    }
+    return '_';
+}
+
+// return amount
+int CItemsContainer::AmountByIndex(int index){
+    Node *node=head;
+    int count=0;
+    while(node!=NULL){
+        if(count==index){
+            return node->amount;
+        }
+        node=node->next;
+        count++;
+    }
+    return -1;
+}
+
+// add item to end of container
+bool CItemsContainer::push_back(int item_id, int amount){
+    Node *node, *prev;
+    if(!head){ // if list empty
+        head=new Node;
+        head->item=item_id;
+        head->amount=amount;
+        head->button=LetterButtonsList[0];
+        return true;
+    }else{
+        // search last
+        node=head;
+        while(node!=NULL){
+            prev=node;
+            node=node->next;
+        }
+    // in prev - last node
+        prev->next=new Node;
+        if(!prev->next){
+            Log->puts("Error: not created new item! in CItemsContainer::push_back()");
+            return false;
+        }
+        prev->next->item=item_id;
+        prev->next->amount=amount;
+        prev->next->button=GetFirstFreeButton();
+        return true;
+    }
+}
+
+// Add item in to container. stack in one field if needed
+bool CItemsContainer::AddItem(unsigned int item_id, int amount){
+    if(!size()){    // first item
+        return push_back(item_id, amount);
+    }
+    if(MergeItem(item_id, amount)){
+        return true;    // item merged
+    }
+    // push_back, TODO - search prev button index (automatictly sort)
+    return push_back(item_id, amount);
+}
+
+bool CItemsContainer::RemoveByIndex(int index){
 // search for letter index
-// remove
-    Log->puts("Drop item %c, amount: %d\n", index_letter, amount);
+    Node *node, *prev;
+    int count=0;
+    node=head;
+    prev=head;
+    while(node!=NULL){
+        if(count==index){ // remove
+            prev->next=node->next;   // connect prex and next
+            delete node;            // delete current
+            Log->puts("Delete from index=%d\n",index);
+            return true;
+        }
+        count++;
+        prev=node;
+        node=node->next;
+    }
+    Log->puts("CItemsContainer::RemoveByIndex - item not removed, not founded by index %d\n", index);
+    return false;
 }
 

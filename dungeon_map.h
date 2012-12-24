@@ -105,7 +105,9 @@ class CDungeonLevel{
         bool IsDoorClosed(int x, int y){ return m_Map->IsDoorClosed(x, y); };
         bool OpenDoor(int x, int y){ return m_Map->OpenDoor(x,y); };
         bool CloseDoor(int x, int y){ return m_Map->CloseDoor(x,y); };
-        void SearchItemsIn(int x, int y){ m_Map->GetItemsInField(x,y)->RemoveByIndex('a',1); };
+        void SearchItemsIn(int x, int y){
+            printf("in field %d items\n",m_Map->GetItemsInField(x,y)->size());
+        };
 
 
         MyOGL::Vector2i GetStartPosition(){ return m_Map->GetStartPosition(); };

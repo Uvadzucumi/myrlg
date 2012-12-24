@@ -42,6 +42,7 @@ enum eEquipSlotNames{
     slLegs,
     // Rings
     slRing,
+    // Light items
     slLight
 };
 
@@ -56,26 +57,39 @@ struct sItemDescription{
     int weight;
     eEquipSlotNames equip_slot;
 };
-
+/*
 struct sContainerItem{
     unsigned int id;       // database item id
-    int amount;             // items count
-    bool equip;             // ? equiped or not
-    int button;             // button - used for this item in this container
+//    char button;
+//    bool equip;             // ? equiped or not
 };
+*/
 
 class CItemsContainer{
     public:
         CItemsContainer();
-        void AddItem(unsigned int item_id, int amount);
-        void RemoveItem(unsigned int item_id, int amount);
-        void RemoveByIndex(char index_letter, int amount);
+        bool push_back(int item_id, int amount);            // add item to end
+        bool AddItem(unsigned int item_id, int amount);     // add item to list (merge if posible)
+        //void InsertByIndex(unsigned int item_id, int amount, int index);      // insert new item to container (used index)
+        int GetByIndex(int index);              // return item id
+        //bool IsEquipped();
+        bool RemoveByIndex(int index);
+        unsigned int size() const;
         bool IsEmpty() const;
+        void clear();
+        int GetIndexByButton(char button);  // return item index or -1 if not have
+        char ButtonByIndex(int index);
+        int AmountByIndex(int index);
     private:
+        char GetFirstFreeButton();
+        bool MergeItem(unsigned int item_id, int amount);   // if posible
         class Node{
             public:
-                sContainerItem item;
+                unsigned int item;
+                char button;
+                int amount;
                 Node *next;
+                Node(){next=NULL;}
              //   Node *prev;
         };
         Node *head;
@@ -94,5 +108,7 @@ extern sItemDescription* DBItemByID(unsigned int item_id);
 //extern int ItemsDB_SelectedItem;
 // Show items detail description window
 extern void ItemsDB_RenderDescription(int item_id);
+
+//extern char LetterButtonsList[];
 
 #endif // ITEMS_H_INCLUDED
