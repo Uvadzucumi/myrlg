@@ -80,6 +80,7 @@ class CItemsContainer{
         int GetIndexByButton(char button);  // return item index or -1 if not have
         char ButtonByIndex(int index);
         int AmountByIndex(int index);
+//        eEquipSlotNames EquippedSlot(int index);
     private:
         char GetFirstFreeButton();
         bool MergeItem(unsigned int item_id, int amount);   // if posible
@@ -88,6 +89,7 @@ class CItemsContainer{
                 unsigned int item;
                 char button;
                 int amount;
+//                eEquipSlotNames eq_slot;
                 Node *next;
                 Node(){next=NULL;}
              //   Node *prev;

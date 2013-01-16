@@ -24,15 +24,10 @@ CInventory::CInventory(){
 void CInventory::AddEquipmentSlot(eEquipSlotNames position, const char *name){
     sInventoryEqSlots slot;
     slot.slot_position=position;
-    slot.item_inv_id=-1;
+    slot.item_button=-1;
     slot.displayed_name=new char[strlen(name)+1];
     strcpy(slot.displayed_name, name);
     m_slots.push_back(slot);
-}
-
-// get item index by item button
-int CInventory::GetItemIndexByButton(char button){
-    return m_items.GetIndexByButton(button);
 }
 
 // add item to inventory
@@ -40,10 +35,10 @@ bool CInventory::AddItem(unsigned int item_id, int amount){
     return m_items.AddItem(item_id, amount);
 }
 
-bool CInventory::IsEquipped(int list_id){
+bool CInventory::IsEquipped(char inv_button){
 // check slots and search equipped items
     for(unsigned int i=0;i<m_slots.size();i++){
-        if(m_slots[i].item_inv_id==list_id){
+        if(m_slots[i].item_button==inv_button){
             return true;
         }
     }
@@ -95,7 +90,7 @@ void CInventory::BuildSelectedItemAtions(){
 // select items by key code, if founded in inventory - return true, else - false
 bool CInventory::SelectItemByKey(int key_code){
     // check inventory for key
-    int indx=GetItemIndexByButton((char)key_code);
+    int indx=m_items.GetIndexByButton((char) key_code);
     if(indx!=-1){
         m_selected_item=indx;
         BuildSelectedItemAtions();
@@ -121,8 +116,8 @@ bool CInventory::SelectItemById(int inv_id){
 int CInventory::SearchEmptyEqSlots(eEquipSlotNames slot_position){
 
     for(unsigned int i=0; i<m_slots.size(); i++){
-        printf("indx: %d slot %d item %d (looking for %d)\n",i,m_slots[i].slot_position, m_slots[i].item_inv_id, slot_position);
-        if(m_slots[i].slot_position==slot_position && m_slots[i].item_inv_id==-1){
+        //printf("indx: %d slot %d item %d (looking for %d)\n",i,m_slots[i].slot_position, m_slots[i].item_inv_id, slot_position);
+        if(m_slots[i].slot_position==slot_position && m_slots[i].item_button==-1){
             return i;
         }
     }
@@ -134,7 +129,7 @@ int CInventory::SearchEmptyEqSlots(eEquipSlotNames slot_position){
 // return first slot id or -1 - if slot not founded
 int CInventory::SearchFirstEqSlot(eEquipSlotNames slot_position){
     for(unsigned int i=0; i<m_slots.size(); i++){
-        if(slot_position==m_slots[i].slot_position){ // founded empty slot
+        if(slot_position==m_slots[i].slot_position){ // founded slot
             return i;
         }
     }
@@ -146,7 +141,7 @@ int CInventory::SearchFirstEqSlot(eEquipSlotNames slot_position){
 // get item inventory id and return slot id if item equipped or -1 if not
 int CInventory::SearchSlotIdByInvItemId(int inv_id){
     for(unsigned int i=0;i<m_slots.size();i++){
-        if(m_slots[i].item_inv_id==inv_id){
+        if(m_slots[i].item_button==m_items.ButtonByIndex(inv_id)){
             return i;
         }
     }
@@ -168,8 +163,7 @@ bool CInventory::Unequip(int inv_id){
             Log->puts("Warning CInventory::Unequip() - not found item in slots\n");
             return false;
         }
-        m_slots[slot].item_inv_id=-1;
-        //m_items[inv_id].equip=false;
+        m_slots[slot].item_button=-1;
         if(item_id==-1){ // selected item - need update flags
             BuildSelectedItemAtions();
         }
@@ -204,9 +198,9 @@ bool CInventory::Equip(int inv_id){
                 return false;
             }
             // not empty slot - unequip item
-            Unequip(m_slots[slot_id].item_inv_id);
+            Unequip(m_items.GetIndexByButton(m_slots[slot_id].item_button));
         }
-        m_slots[slot_id].item_inv_id=inv_id;
+        m_slots[slot_id].item_button=m_items.ButtonByIndex(inv_id);
         //m_items[inv_id].equip=true;
         if(item_id==-1){ // rebuild selected item
             BuildSelectedItemAtions();
@@ -262,15 +256,6 @@ void CInventory::Render(){
     // return translate
     glTranslatef(-430,34,0);
     dy+=34;
-    /*
-    Log->puts("%d items in Inventory\n",m_items.size());
-    for(int i=0;i<m_items.size();i++){
-        Log->puts("index: %d ",i);
-        Log->puts("item: %d amount: %d", m_items.GetByIndex(i), m_items.AmountByIndex(i));
-        Log->puts("button: %c\n",m_items.ButtonByIndex(i));
-
-    }
-    */
 
     for(unsigned int i=0; i<m_items.size();i++){
         item=DBItemByID(m_items.GetByIndex(i));
@@ -383,9 +368,9 @@ void CInventory::RenderItemDetail(void){
 void CInventory::RenderEquipped(void){
     sItemDescription* item;
     for(unsigned int i=0;i<m_slots.size();i++){
-        if(m_slots[i].item_inv_id!=-1){ // found item - render
+        if(m_slots[i].item_button!=-1){ // found item - render
             // get item from database
-            item=DBItemByID(m_items.GetByIndex(m_slots[i].item_inv_id));
+            item=DBItemByID(m_items.GetByIndex((m_items.GetIndexByButton(m_slots[i].item_button))));
             // render item sprite
             m_item_tileset->Render(item->sprite_id+1);
         }
