@@ -4,6 +4,55 @@
 #include "texture.h"
 #include "ui/bitmap_font.h"
 
+// FBO functions
+PFNGLGENFRAMEBUFFERSEXTPROC         glGenFramebuffersEXT      = NULL;
+PFNGLGENRENDERBUFFERSEXTPROC        glGenRenderbuffersEXT     = NULL;
+PFNGLBINDFRAMEBUFFEREXTPROC         glBindFramebufferEXT      = NULL;
+PFNGLBINDRENDERBUFFEREXTPROC        glBindRenderbufferEXT     = NULL;
+PFNGLRENDERBUFFERSTORAGEEXTPROC     glRenderbufferStorageEXT  = NULL;
+PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC glFramebufferRenderbufferEXT = NULL;
+PFNGLFRAMEBUFFERTEXTURE2DEXTPROC    glFramebufferTexture2DEXT = NULL;
+PFNGLGENERATEMIPMAPEXTPROC          glGenerateMipmapEXT       = NULL;
+PFNGLDELETERENDERBUFFERSEXTPROC     glDeleteRenderbuffersEXT  = NULL;
+PFNGLDELETEFRAMEBUFFERSEXTPROC      glDeleteFramebuffersEXT   = NULL;
+PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC  glCheckFramebufferStatusEXT = NULL;
+
+// VBO functions
+PFNGLGENBUFFERSARBPROC       glGenBuffersARB         = NULL;
+PFNGLBINDBUFFERARBPROC       glBindBufferARB         = NULL;
+PFNGLMAPBUFFERARBPROC        glMapBufferARB          = NULL;
+PFNGLUNMAPBUFFERARBPROC      glUnmapBufferARB        = NULL;
+PFNGLBUFFERDATAARBPROC       glBufferDataARB         = NULL;
+PFNGLBUFFERSUBDATAARBPROC    glBufferSubDataARB      = NULL;
+PFNGLDELETEBUFFERSARBPROC    glDeleteBuffersARB      = NULL;
+PFNGLGETBUFFERSUBDATAARBPROC glGetBufferSubDataARB   = NULL;
+
+// Shaders
+PFNGLCREATEPROGRAMOBJECTARBPROC  glCreateProgramObjectARB   = NULL;
+PFNGLDELETEOBJECTARBPROC         glDeleteObjectARB          = NULL;
+PFNGLUSEPROGRAMOBJECTARBPROC     glUseProgramObjectARB      = NULL;
+PFNGLCREATESHADEROBJECTARBPROC   glCreateShaderObjectARB    = NULL;
+PFNGLSHADERSOURCEARBPROC         glShaderSourceARB          = NULL;
+PFNGLCOMPILESHADERARBPROC        glCompileShaderARB         = NULL;
+PFNGLGETOBJECTPARAMETERIVARBPROC glGetObjectParameterivARB  = NULL;
+PFNGLATTACHOBJECTARBPROC         glAttachObjectARB          = NULL;
+PFNGLGETINFOLOGARBPROC           glGetInfoLogARB            = NULL;
+PFNGLLINKPROGRAMARBPROC          glLinkProgramARB           = NULL;
+PFNGLGETUNIFORMLOCATIONARBPROC   glGetUniformLocationARB    = NULL;
+PFNGLUNIFORM1FARBPROC            glUniform1fARB             = NULL;
+PFNGLUNIFORM2FARBPROC            glUniform2fARB             = NULL;
+PFNGLUNIFORM3FARBPROC            glUniform3fARB             = NULL;
+PFNGLUNIFORM4FARBPROC            glUniform4fARB             = NULL;
+PFNGLUNIFORM1FVARBPROC           glUniform1fvARB            = NULL;
+PFNGLUNIFORM2FVARBPROC           glUniform2fvARB            = NULL;
+PFNGLUNIFORM3FVARBPROC           glUniform3fvARB            = NULL;
+PFNGLUNIFORM4FVARBPROC           glUniform4fvARB            = NULL;
+PFNGLUNIFORM1IARBPROC            glUniform1iARB             = NULL;
+PFNGLBINDATTRIBLOCATIONARBPROC   glBindAttribLocationARB    = NULL;
+PFNGLGETACTIVEUNIFORMARBPROC     glGetActiveUniformARB      = NULL;
+PFNGLGETSHADERIVPROC             glGetShaderiv              = NULL;
+PFNGLGETPROGRAMIVPROC            glGetProgramiv             = NULL;
+
 using namespace MyOGL;
 
 // extern pointer to render class
@@ -87,10 +136,8 @@ bool CRender::Init(int width, int height, int bpp, bool full_screen, const char 
     #ifdef MYOGL_DOUBLE_BUFFER
         window_flags |= SDL_GL_DOUBLEBUFFER;
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-        printf("Double Buffer Enabled!\n");
     #else
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 0);
-        printf("Dounble Buffer Disabled\n");
     #endif
 
     #ifdef MYOGL_RESIZABLE_WINDOW
@@ -122,15 +169,20 @@ bool CRender::Init(int width, int height, int bpp, bool full_screen, const char 
     }else{
 
         gl_extensions = (char *) glGetString(GL_EXTENSIONS);
+
         Log->puts("OpenGL Extensions:\n");
         for(int i=0;gl_extensions[i]!=0;i++){
             if(gl_extensions[i]==32) { gl_extensions[i]=10; }
         }
         Log->puts(gl_extensions);
-    }
 
+    }
+    // if supported
+    m_vbo=EnableVBOFunctions();
+    m_shaders=EnableShadersFunctions();
+    m_fbo=EnableFBOFunctions();
     // Init OpenGL
-    InitGL();
+    InitGL();   // start opengl states
 
     return true;
 }
@@ -294,6 +346,126 @@ void CRender::SetBlendColor(float r, float g, float b, float a, bool force){
     }
 }
 
+// Check OpenGL extension
+bool CRender::isExtensionSupported ( const char * ext ){
+
+    const char * extensions = (const char *)glGetString ( GL_EXTENSIONS );
+    const char * start      = extensions;
+    const char * ptr;
+
+    while ( ( ptr = strstr ( start, ext ) ) != NULL )
+    {
+        // we've found, ensure name is exactly ext
+        const char * end = ptr + strlen ( ext );
+
+        if ( isspace ( *end ) || *end == '\0' )
+            return true;
+        start = end;
+    }
+    return false;
+}
+
+bool CRender::EnableFBOFunctions(){
+    if ( isExtensionSupported ( "GL_ARB_framebuffer_object" ) ){
+
+        glGenFramebuffersEXT  = (PFNGLGENFRAMEBUFFERSEXTPROC)  GetProcAddress("glGenFramebuffersEXT");
+        glGenRenderbuffersEXT = (PFNGLGENRENDERBUFFERSEXTPROC) GetProcAddress("glGenRenderbuffersEXT");
+        glBindFramebufferEXT  = (PFNGLBINDFRAMEBUFFEREXTPROC)  GetProcAddress("glBindFramebufferEXT");
+        glBindRenderbufferEXT = (PFNGLBINDRENDERBUFFEREXTPROC) GetProcAddress("glBindRenderbufferEXT");
+        glRenderbufferStorageEXT = (PFNGLRENDERBUFFERSTORAGEEXTPROC) GetProcAddress("glRenderbufferStorageEXT");
+        glFramebufferRenderbufferEXT = (PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC) GetProcAddress("glFramebufferRenderbufferEXT");
+        glFramebufferTexture2DEXT = (PFNGLFRAMEBUFFERTEXTURE2DEXTPROC) GetProcAddress("glFramebufferTexture2DEXT");
+        glGenerateMipmapEXT   = (PFNGLGENERATEMIPMAPEXTPROC)   GetProcAddress("glGenerateMipmapEXT");
+        glDeleteRenderbuffersEXT = (PFNGLDELETERENDERBUFFERSEXTPROC)        GetProcAddress("glDeleteRenderbuffersEXT");
+        glDeleteFramebuffersEXT = (PFNGLDELETEFRAMEBUFFERSEXTPROC)          GetProcAddress("glDeleteFramebuffersEXT");
+        glCheckFramebufferStatusEXT = (PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC)  GetProcAddress("glCheckFramebufferStatusEXT");
+
+        // check functions addresses
+        if(glGenFramebuffersEXT && glGenRenderbuffersEXT && glBindFramebufferEXT && glBindRenderbufferEXT &&
+           glRenderbufferStorageEXT && glFramebufferRenderbufferEXT && glFramebufferTexture2DEXT && glGenerateMipmapEXT &&
+           glDeleteRenderbuffersEXT && glDeleteFramebuffersEXT && glCheckFramebufferStatusEXT){
+
+            Log->puts("FBO: OK\n");
+            return true;
+
+        }
+
+    }
+    Log->puts("FBO: none!\n");
+    return false;
+}
+
+bool CRender::EnableVBOFunctions(){
+    if ( isExtensionSupported ( "GL_ARB_vertex_buffer_object" ) ){
+        glGenBuffersARB = (PFNGLGENBUFFERSARBPROC)       GetProcAddress("glGenBuffersARB");
+        glBindBufferARB = (PFNGLBINDBUFFERARBPROC)       GetProcAddress("glBindBufferARB");
+        glMapBufferARB = (PFNGLMAPBUFFERARBPROC)        GetProcAddress("glMapBufferARB");
+        glUnmapBufferARB = (PFNGLUNMAPBUFFERARBPROC)      GetProcAddress("glUnmapBufferARB");
+        glBufferDataARB = (PFNGLBUFFERDATAARBPROC)       GetProcAddress("glBufferDataARB");
+        glBufferSubDataARB = (PFNGLBUFFERSUBDATAARBPROC)    GetProcAddress("glBufferSubDataARB");
+        glDeleteBuffersARB = (PFNGLDELETEBUFFERSARBPROC)    GetProcAddress("glDeleteBuffersARB");
+        glGetBufferSubDataARB = (PFNGLGETBUFFERSUBDATAARBPROC) GetProcAddress("glGetBufferSubDataARB");
+        if(glGenBuffersARB && glBindBufferARB && glMapBufferARB && glUnmapBufferARB &&
+           glBufferDataARB && glBufferSubDataARB && glDeleteBuffersARB && glGetBufferSubDataARB){
+                Log->puts("VBO: OK\n");
+                return true;
+        }
+    }
+    Log->puts("VBO: none!\n");
+    return false;
+}
+
+bool CRender::EnableShadersFunctions(){
+    if(     isExtensionSupported("GL_ARB_shading_language_100") &&
+            isExtensionSupported("GL_ARB_shader_objects") &&
+            isExtensionSupported("GL_ARB_fragment_shader") &&
+            isExtensionSupported("GL_ARB_vertex_shader")){
+        // inicialize functions
+        glCreateProgramObjectARB = (PFNGLCREATEPROGRAMOBJECTARBPROC)    GetProcAddress("glCreateProgramObjectARB");
+        glDeleteObjectARB = (PFNGLDELETEOBJECTARBPROC)                  GetProcAddress("glDeleteObjectARB");
+        glUseProgramObjectARB  = (PFNGLUSEPROGRAMOBJECTARBPROC)         GetProcAddress("glUseProgramObjectARB");
+        glCreateShaderObjectARB = (PFNGLCREATESHADEROBJECTARBPROC)      GetProcAddress("glCreateShaderObjectARB");
+
+        glShaderSourceARB = (PFNGLSHADERSOURCEARBPROC)                  GetProcAddress("glShaderSourceARB");
+        glCompileShaderARB = (PFNGLCOMPILESHADERARBPROC)                GetProcAddress("glCompileShaderARB");
+        glGetObjectParameterivARB = (PFNGLGETOBJECTPARAMETERIVARBPROC)  GetProcAddress("glGetObjectParameterivARB");
+        glAttachObjectARB = (PFNGLATTACHOBJECTARBPROC)                  GetProcAddress("glAttachObjectARB");
+
+        glGetInfoLogARB = (PFNGLGETINFOLOGARBPROC)                      GetProcAddress("glGetInfoLogARB");
+        glLinkProgramARB = (PFNGLLINKPROGRAMARBPROC)                    GetProcAddress("glLinkProgramARB");
+        glGetUniformLocationARB = (PFNGLGETUNIFORMLOCATIONARBPROC)      GetProcAddress("glGetUniformLocationARB");
+        glUniform1fARB = (PFNGLUNIFORM1FARBPROC)                        GetProcAddress("glUniform1fARB");
+
+        glUniform2fARB = (PFNGLUNIFORM2FARBPROC)                        GetProcAddress("glUniform2fARB");
+        glUniform3fARB = (PFNGLUNIFORM3FARBPROC)                        GetProcAddress("glUniform3fARB");
+        glUniform4fARB = (PFNGLUNIFORM4FARBPROC)                        GetProcAddress("glUniform4fARB");
+        glUniform1fvARB = (PFNGLUNIFORM1FVARBPROC)                      GetProcAddress("glUniform1fvARB");
+
+        glUniform2fvARB = (PFNGLUNIFORM2FVARBPROC)                      GetProcAddress("glUniform2fvARB");
+        glUniform3fvARB = (PFNGLUNIFORM3FVARBPROC)                      GetProcAddress("glUniform3fvARB");
+        glUniform4fvARB = (PFNGLUNIFORM4FVARBPROC)                      GetProcAddress("glUniform4fvARB");
+        glUniform1iARB = (PFNGLUNIFORM1IARBPROC)                        GetProcAddress("glUniform1iARB");
+
+        glBindAttribLocationARB = (PFNGLBINDATTRIBLOCATIONARBPROC)      GetProcAddress("glBindAttribLocationARB");
+        glGetActiveUniformARB = (PFNGLGETACTIVEUNIFORMARBPROC)          GetProcAddress("glGetActiveUniformARB");
+        glGetShaderiv = (PFNGLGETSHADERIVPROC)                          GetProcAddress("glGetShaderiv");
+        glGetProgramiv = (PFNGLGETPROGRAMIVPROC)                        GetProcAddress("glGetProgramiv");
+        // check functions
+        if(glCreateProgramObjectARB && glDeleteObjectARB && glUseProgramObjectARB && glCreateShaderObjectARB &&
+           glShaderSourceARB && glCompileShaderARB && glGetObjectParameterivARB && glAttachObjectARB &&
+           glGetInfoLogARB && glLinkProgramARB && glGetUniformLocationARB && glUniform1fARB &&
+           glUniform2fARB && glUniform3fARB && glUniform4fARB && glUniform1fvARB &&
+           glUniform2fvARB && glUniform3fvARB && glUniform4fvARB && glUniform1iARB &&
+           glBindAttribLocationARB && glGetActiveUniformARB && glGetShaderiv && glGetProgramiv
+        ){
+            Log->puts("Shaders: OK\n");
+            return true;
+        }
+    }
+    Log->puts("Shaders: none!\n");
+    return false;
+}
+
 // cashed OGL states
 void RenderStates::Enable(GLenum cap){
     bool *param;
@@ -373,3 +545,4 @@ void RenderStates::Debug(void){
     Log->puts("GL_MAX_TEXTURE_UNITS: %d\n",MaxTextureUnits);
     Log->puts("----------------------------\n");
 }
+

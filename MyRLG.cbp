@@ -101,6 +101,8 @@
 		<Unit filename="myogl/entity.h" />
 		<Unit filename="myogl/events.cpp" />
 		<Unit filename="myogl/events.h" />
+		<Unit filename="myogl/frame_buffer.cpp" />
+		<Unit filename="myogl/frame_buffer.h" />
 		<Unit filename="myogl/log.cpp" />
 		<Unit filename="myogl/log.h" />
 		<Unit filename="myogl/material.cpp" />
@@ -115,6 +117,7 @@
 		<Unit filename="myogl/texture.h" />
 		<Unit filename="myogl/ui/bitmap_font.cpp" />
 		<Unit filename="myogl/ui/bitmap_font.h" />
+		<Unit filename="myogl/ui/text_box.cpp" />
 		<Unit filename="myogl/ui/text_box.h" />
 		<Unit filename="myogl/vector_types.h" />
 		<Unit filename="tileset.cpp" />

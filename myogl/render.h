@@ -3,8 +3,18 @@
 
 #include <stdio.h>
 #include <SDL/SDL.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
+
+//#include <GL/gl.h>
+//#include <GL/glu.h>
+//#include <GL/glext.h>
+
+#ifdef __ANDROID_API__
+    #define GL_GLEXT_PROTOTYPES
+    #include <GLES2/gl2.h>
+    #include <GLES2/gl2ext.h>
+#else
+    #include <SDL/SDL_opengl.h>
+#endif
 
 #include "config.h"
 #include "vector_types.h"
@@ -15,6 +25,60 @@
     #define GL_BGR                                  0x80E0
     #define GL_BGRA                                 0x80E1
 #endif
+
+//typedef void (*GLfunction)();
+//extern GLfunction glXGetProcAddressARB(const GLubyte *procName);
+//void (*glXGetProcAddressARB(const GLubyte *procName))();
+
+
+// FBO functions
+extern PFNGLGENFRAMEBUFFERSEXTPROC         glGenFramebuffersEXT;
+extern PFNGLGENRENDERBUFFERSEXTPROC        glGenRenderbuffersEXT;
+extern PFNGLBINDFRAMEBUFFEREXTPROC         glBindFramebufferEXT;
+extern PFNGLBINDRENDERBUFFEREXTPROC        glBindRenderbufferEXT;
+extern PFNGLRENDERBUFFERSTORAGEEXTPROC     glRenderbufferStorageEXT;
+extern PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC glFramebufferRenderbufferEXT;
+extern PFNGLFRAMEBUFFERTEXTURE2DEXTPROC    glFramebufferTexture2DEXT;
+extern PFNGLGENERATEMIPMAPEXTPROC          glGenerateMipmapEXT;
+extern PFNGLDELETERENDERBUFFERSEXTPROC     glDeleteRenderbuffersEXT;
+extern PFNGLDELETEFRAMEBUFFERSEXTPROC      glDeleteFramebuffersEXT;
+extern PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC  glCheckFramebufferStatusEXT;
+
+// VBO functions (GL_ARB_vertex_buffer_object)
+extern PFNGLGENBUFFERSARBPROC       glGenBuffersARB;
+extern PFNGLBINDBUFFERARBPROC       glBindBufferARB;
+extern PFNGLMAPBUFFERARBPROC        glMapBufferARB;
+extern PFNGLUNMAPBUFFERARBPROC      glUnmapBufferARB;
+extern PFNGLBUFFERDATAARBPROC       glBufferDataARB;
+extern PFNGLBUFFERSUBDATAARBPROC    glBufferSubDataARB;
+extern PFNGLDELETEBUFFERSARBPROC    glDeleteBuffersARB;
+extern PFNGLGETBUFFERSUBDATAARBPROC glGetBufferSubDataARB;
+
+// GL_ARB_shading_language_100, GL_ARB_shader_objects, GL_ARB_fragment_shader, GL_ARB_vertex_shader
+extern PFNGLCREATEPROGRAMOBJECTARBPROC  glCreateProgramObjectARB;
+extern PFNGLDELETEOBJECTARBPROC         glDeleteObjectARB;
+extern PFNGLUSEPROGRAMOBJECTARBPROC     glUseProgramObjectARB;
+extern PFNGLCREATESHADEROBJECTARBPROC   glCreateShaderObjectARB;
+extern PFNGLSHADERSOURCEARBPROC         glShaderSourceARB;
+extern PFNGLCOMPILESHADERARBPROC        glCompileShaderARB;
+extern PFNGLGETOBJECTPARAMETERIVARBPROC glGetObjectParameterivARB;
+extern PFNGLATTACHOBJECTARBPROC         glAttachObjectARB;
+extern PFNGLGETINFOLOGARBPROC           glGetInfoLogARB;
+extern PFNGLLINKPROGRAMARBPROC          glLinkProgramARB;
+extern PFNGLGETUNIFORMLOCATIONARBPROC   glGetUniformLocationARB;
+extern PFNGLUNIFORM1FARBPROC            glUniform1fARB;
+extern PFNGLUNIFORM2FARBPROC            glUniform2fARB;
+extern PFNGLUNIFORM3FARBPROC            glUniform3fARB;
+extern PFNGLUNIFORM4FARBPROC            glUniform4fARB;
+extern PFNGLUNIFORM1FVARBPROC           glUniform1fvARB;
+extern PFNGLUNIFORM2FVARBPROC           glUniform2fvARB;
+extern PFNGLUNIFORM3FVARBPROC           glUniform3fvARB;
+extern PFNGLUNIFORM4FVARBPROC           glUniform4fvARB;
+extern PFNGLUNIFORM1IARBPROC            glUniform1iARB;
+extern PFNGLBINDATTRIBLOCATIONARBPROC   glBindAttribLocationARB;
+extern PFNGLGETACTIVEUNIFORMARBPROC     glGetActiveUniformARB;
+extern PFNGLGETSHADERIVPROC             glGetShaderiv;
+extern PFNGLGETPROGRAMIVPROC            glGetProgramiv;
 
 namespace MyOGL{
 
@@ -54,7 +118,7 @@ namespace MyOGL{
 
     // window class
     class CWindow{
-            int width, height;
+            int m_width, m_height;
             char *title;
             bool full_screen;
         public:
@@ -70,6 +134,9 @@ namespace MyOGL{
             char *gl_vendor;
             char *gl_version;
             char *gl_extensions;
+            bool m_fbo;
+            bool m_vbo;
+            bool m_shaders;
        //     CWindow *win;
             float zNearPlane, zFarPlane;
             void InitGL();  // set start OpenGL states, save states to GL object
@@ -102,6 +169,21 @@ namespace MyOGL{
             void SetColor(Vector3i color, bool force=false);
 
             void SetClearColor(float r, float g, float b, float a=1.0);
+            // check OpenGL Extension
+            bool isExtensionSupported ( const char * ext );
+            static void  * GetProcAddress ( const char * name ){
+/*
+#ifdef	__WIN32__
+                return wglGetProcAddress ( name );
+#else
+                return (void *)glXGetProcAddressARB ( (const GLubyte *)name );
+#endif
+*/
+                return (void *)SDL_GL_GetProcAddress( name );
+            };
+            bool EnableFBOFunctions(); // Enable FBO Extension functions
+            bool EnableVBOFunctions();  // Enable VBO Extension functions
+            bool EnableShadersFunctions(); // Enable Shader Extension functions
     };
 
     extern CRender *Render;
