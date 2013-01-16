@@ -33,7 +33,6 @@ class CDungeonGeneration{
         void CreateCoridor(unsigned int start_room_id, unsigned int end_room_id);
         void AddDoors(unsigned int room_id);
         void *RandomDoorType();    // return random door type
-        void AddLightSource(unsigned int x, unsigned int y, unsigned char strength);
 
     public:
         CDungeonGeneration(int grid_width, int grid_height, int rooms_num){

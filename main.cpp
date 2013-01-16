@@ -15,6 +15,8 @@
 #include "myogl/config_file.h"
 #include "myogl/ui/text_box.h"
 
+#include "myogl/frame_buffer.h"
+
 CHudSprite *herro_sprite;
 CTextBox *messages;
 
@@ -31,11 +33,12 @@ void OnRender(double dt){
     Render->Set2D();
 
     dungeon->Render();
+    //
     // herro render
+    glPushMatrix();
     glTranslatef((herro->GetPosX()-dungeon->GetViewportLeft())*32,(herro->GetPosY()-dungeon->GetViewportTop())*32,0);
     herro->Render();
-    glTranslatef(-((herro->GetPosX()-dungeon->GetViewportLeft())*32),-((herro->GetPosY()-dungeon->GetViewportTop())*32),0);
-    //
+    glPopMatrix();
     if(ActiveWindow==gwInventory){
         herro->inventory->Render();
     }else if(ActiveWindow==gwInventoryItemDescription){
@@ -149,6 +152,8 @@ void OnEvent(SDL_Event *Event, double DeltaTime){
                     //Log->puts("Current Global Light: %d\n",dungeon->GetGlobalLight());
                     sprintf(str,"Current Global Light: ^00ff00%d", dungeon->GetGlobalLight());
                     messages->AddString(str);
+                    // show map light
+                    dungeon->DebugMapLight();
                     break;
                 case SDLK_o:
                     herro->OpenDoor(dungeon);

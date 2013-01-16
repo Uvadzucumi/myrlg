@@ -256,10 +256,14 @@ void CDungeonLevel::CalculateLOS(int x_pos, int y_pos, int distance){
 void CDungeonLevel::CalculateLight(){
     // check viewport and set global light
     if(m_light_changed){
+        m_Map->CalculateMapLight(m_light_intensivity,m_ViewPort.left, m_ViewPort.top, m_ViewPort.width, m_ViewPort.height);
         int dx, dy;
         for(dy=m_ViewPort.top; dy<m_ViewPort.top+m_ViewPort.height; dy++){
             for(dx=m_ViewPort.left;dx<m_ViewPort.left+m_ViewPort.width;dx++){
-                m_Map->GetMap()[dx][dy].light=m_global_light;
+                //m_Map->GetMap()[dx][dy].light=m_global_light;
+                if(m_Map->GetMap()[dx][dy].light==0){
+                    m_Map->GetMap()[dx][dy].light=1;
+                }
             }
         }
         m_light_changed=false;
@@ -276,20 +280,26 @@ void CDungeonLevel::Render(){
     int pos_x, pos_y;
     pos_y=0, pos_x=0;
     CalculateLight();
+    unsigned int tile_light;
     for(dy=m_ViewPort.top; dy<m_ViewPort.top+m_ViewPort.height; dy++, pos_y+=32){
         glTranslatef(-pos_x,0,0);
         for(dx=m_ViewPort.left, pos_x=0;dx<m_ViewPort.left+m_ViewPort.width;dx++,pos_x+=32){
             //if(m_Map[dx][dy].visible){
-            if(m_Map->IsVisible(dx,dy) || m_Map->IsViewed(dx,dy)){
+            if(m_Map->IsViewed(dx,dy)){
             //if(m_Map[dx][dy].layer[0]!=255){
                 //m_tileset->RenderAt(pos_x,pos_y,m_Map[dx][dy].layer[0],&LightMaterials[m_Map[dx][dy].light]);
                 if(m_Map->IsVisible(dx,dy)){
-                    m_tileset->Tile(m_Map->GetMap()[dx][dy].layer[0])->Render(&LightMaterials[m_Map->GetMap()[dx][dy].light]);
+                    // get light
+                    //tile_light=m_Map->GetMap()[dx][dy].light;
+                    //if(tile_light<m_light_intensivity[dx-m_ViewPort.left][dy-m_ViewPort.top]){
+                        tile_light=m_light_intensivity[dx-m_ViewPort.left+(dy-m_ViewPort.top)*m_ViewPort.width];
+                    //}
+                    m_tileset->Tile(m_Map->GetMap()[dx][dy].layer[0])->Render(&LightMaterials[9-tile_light]);
                     if(m_Map->GetMap()[dx][dy].layer[1]!=255){
-                        m_tileset->Tile(m_Map->GetMap()[dx][dy].layer[1])->Render(&LightMaterials[m_Map->GetMap()[dx][dy].light]);
+                        m_tileset->Tile(m_Map->GetMap()[dx][dy].layer[1])->Render(&LightMaterials[9-tile_light]);
                     }
                     if(m_Map->GetMap()[dx][dy].layer[2]!=255){
-                        m_tileset->Tile(m_Map->GetMap()[dx][dy].layer[2])->Render(&LightMaterials[m_Map->GetMap()[dx][dy].light]);
+                        m_tileset->Tile(m_Map->GetMap()[dx][dy].layer[2])->Render(&LightMaterials[9-tile_light]);
                     }
                     // TODO, show dropped items
                     // show monsters

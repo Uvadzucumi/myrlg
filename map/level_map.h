@@ -10,6 +10,8 @@
 
 #include "../items.h"
 
+#include <math.h> // sqrt
+
 // tile types
 enum eTileTypes{
     ttWall=0,
@@ -76,8 +78,19 @@ class CMapDynamicTile{
 
 typedef struct{
     Vector2i position;
+    float diffuse;
     unsigned char strength;
     CMapDynamicTile *dynamic_tile;
+    int GetIntnsivity(int x, int y){    // return light intensivity in coords x,y
+        // calculate distance
+        int distance = sqrt(((x - position.x) * (x - position.x)) + ((y - position.y) * (y - position.y)));
+        int ret=strength-distance;
+        if(ret<=0){
+            return 0;
+        }else{
+            return (int) (strength-distance) / 1;
+        }
+    };
 } sMapLightSource;
 
 class CLevelMap{
@@ -131,7 +144,7 @@ class CLevelMap{
         };
 
         void AddMapTile(eTileTypes TileType, int x, int y, void *tile_data=NULL);
-        void AddLightSource(unsigned int x, unsigned int y, unsigned char strength);
+        void AddLightSource(unsigned int x, unsigned int y, unsigned char strength, float diffuse=1);
         void Update(double DeltaTime);
         int GetWidth(){ return m_width; }
         int GetHeight() { return m_height; }
@@ -150,8 +163,8 @@ class CLevelMap{
         MyOGL::Vector2i GetStartPosition() { return m_StartPosition; };
         void SetStartPosition(int x, int y){ m_StartPosition.x=x; m_StartPosition.y=y; };
         eTileTypes GetTileType(int x, int y){ return m_Map[x][y].tile_type;}
-
-
+        // calculate light in map part, light_array - result array, left,top, width, height - map part coords
+        void CalculateMapLight(int *light_array, int left, int top, int width, int height);
 };
 
 #endif // LEVEL_MAP_H_INCLUDED

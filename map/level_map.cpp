@@ -71,11 +71,12 @@ void CLevelMap::AddMapTile(eTileTypes TileType, int x, int y, void *tile_data){
 }
 
 
-void CLevelMap::AddLightSource(unsigned int x, unsigned int y, unsigned char strength){
+void CLevelMap::AddLightSource(unsigned int x, unsigned int y, unsigned char strength, float diffuse){
     sMapLightSource light;
     light.position.x=x;
     light.position.y=y;
     light.strength=strength;
+    light.diffuse=diffuse;
     light.dynamic_tile=new CMapDynamicTile();
     light.dynamic_tile->AddTiles(tnFire+1,4);
     light.dynamic_tile->Update((rand()%200)/100);
@@ -134,6 +135,37 @@ bool CLevelMap::OpenDoor(int x, int y){
         }
     }
     return false;
+}
+
+// calculate light in map part, light_array - result array, left,top, width, height - map part coords
+void CLevelMap::CalculateMapLight(int *light_array, int left, int top, int width, int height){
+    int dx, dy;
+    int x,y;
+    // clear array
+    for(int i=0;i<width*height;i++){
+        light_array[i]=0;   // light intensivity
+    }
+    // create light sorce list in current coords
+    for(unsigned int i=0; i < LightSourcesList.size(); i++){
+        if( LightSourcesList[i].position.x>left-LightSourcesList[i].strength &&
+            LightSourcesList[i].position.x<left+width+LightSourcesList[i].strength &&
+            LightSourcesList[i].position.y>top-LightSourcesList[i].strength &&
+            LightSourcesList[i].position.y<top+height+LightSourcesList[i].strength
+        ){
+            // fill light intensivity array
+            for(dx=0; dx<width; dx++){
+                for(dy=0; dy<height; dy++){
+                    x=left+dx; y=top+dy;
+                    // skip unvisible fields
+                    if(x<0 || y< 0 || x> m_width-1 || y > m_height-1) continue;
+                    if(this->IsVisible(x,y) && this->IsSkipLight(x,y) ){
+                        // add light intensivity
+                        light_array[dx+dy*width]+=LightSourcesList[i].GetIntnsivity(x,y);
+                    }
+                }
+            }
+        }
+    }
 }
 
 bool CLevelMap::CloseDoor(int x, int y){

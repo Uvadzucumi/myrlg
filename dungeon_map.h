@@ -24,7 +24,7 @@ class CDungeonLevel{
         Vector4i m_ViewPort;
         //bool **LOS;
         bool LineOfSight(int x1, int y1, int x2, int y2);
-
+        int *m_light_intensivity;
     public:
 
         CDungeonLevel(int width, int height){
@@ -44,11 +44,12 @@ class CDungeonLevel{
 //            for(i=0;i<m_ViewPort.width;i++){
 //                LOS[i]=new bool[m_ViewPort.height];
 //            }
+            m_light_intensivity=new int[m_ViewPort.width*m_ViewPort.height];
         };
 
         ~CDungeonLevel(){
             Log->puts("Delete dungeon obj\n");
-
+            delete m_light_intensivity;
             delete m_Map;
 //            for(unsigned int i=0;i<m_ViewPort.width;i++) delete LOS[i];
 //            delete LOS;
@@ -66,6 +67,9 @@ class CDungeonLevel{
         }
         void SetViewportSize(unsigned int width, unsigned int height){
             m_ViewPort.width=width; m_ViewPort.height=height; m_light_changed=true;
+            // recreate light intensivity array
+            delete m_light_intensivity;
+            m_light_intensivity=new int[m_ViewPort.width * m_ViewPort.height];
         };
         unsigned int GetViewportLeft(){ return m_ViewPort.left; };
         unsigned int GetViewportTop(){ return m_ViewPort.top; };
@@ -109,9 +113,16 @@ class CDungeonLevel{
             printf("in field %d items\n",m_Map->GetItemsInField(x,y)->size());
         };
 
-
         MyOGL::Vector2i GetStartPosition(){ return m_Map->GetStartPosition(); };
 
+        void DebugMapLight(){
+            for(int dx=0;dx<m_ViewPort.width; dx++){
+                for(int dy=0;dy<m_ViewPort.height;dy++){
+                    printf("%d ",m_light_intensivity[dx+dy*m_ViewPort.width]);
+                }
+                printf("\n");
+            }
+        }
 };
 
 #endif // DUNGEON_MAP_H_INCLUDED
