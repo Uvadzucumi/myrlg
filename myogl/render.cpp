@@ -338,6 +338,7 @@ void CRender::SetClearColor(float r, float g, float b, float a){
     }
 }
 
+/*
 // Set Blend color
 void CRender::SetBlendColor(float r, float g, float b, float a, bool force){
     if(GL.BlendColor.r!=r || GL.BlendColor.g!=g || GL.BlendColor.b != b || GL.BlendColor.a!=a || force){
@@ -345,7 +346,7 @@ void CRender::SetBlendColor(float r, float g, float b, float a, bool force){
         glBlendColor(r,g,b,a);
     }
 }
-
+*/
 // Check OpenGL extension
 bool CRender::isExtensionSupported ( const char * ext ){
 
@@ -522,7 +523,7 @@ void RenderStates::GetCurrentStates(){
    Lighting=glIsEnabled(GL_LIGHTING);
    Blend=glIsEnabled(GL_BLEND);
    // blend color
-   glGetFloatv(GL_BLEND_COLOR, BlendColor.data);
+   //glGetFloatv(GL_BLEND_COLOR, BlendColor.data);
    // get current color
    glGetFloatv(GL_CURRENT_COLOR, Color.data);
    // -//- clear color
@@ -539,7 +540,7 @@ void RenderStates::Debug(void){
     Log->puts("GL_DEPTH_TEST: %s\n",(DepthTest)?"true":"false");
     Log->puts("GL_LIGHTING: %s\n",(Lighting)?"true":"false");
     Log->puts("GL_BLEND: %s\n",(Blend)?"true":"false");
-    Log->puts("GL_BLEND_COLOR: (%f,%f,%f,%f)\n",&BlendColor);
+//    Log->puts("GL_BLEND_COLOR: (%f,%f,%f,%f)\n",&BlendColor);
     Log->puts("GL_CURRENT_COLOR: (%f,%f,%f,%f)\n",&Color);
     Log->puts("GL_COLOR_CLEAR_VALUE: (%f,%f,%f,%f)\n",&ClearColor);
     Log->puts("GL_MAX_TEXTURE_UNITS: %d\n",MaxTextureUnits);

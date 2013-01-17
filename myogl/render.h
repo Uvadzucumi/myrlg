@@ -103,7 +103,7 @@ namespace MyOGL{
             MyGlBlendMode CurrentBlendMode;    // blNone, blSource
             Vector4f Color;
             Vector4f ClearColor;
-            Vector4f BlendColor;
+            //Vector4f BlendColor;
             bool ColorMaterial;         // enabled color material mode
             bool Texture2D;
             bool DepthTest;
@@ -165,7 +165,7 @@ namespace MyOGL{
             void SetBlendMode(MyGlBlendMode mode);
         // DrawColor
             void SetColor(float r, float g, float b, float a=1.0, bool force=false);
-            void SetBlendColor(float r, float g, float b, float a=1.0, bool force=false);
+            //void SetBlendColor(float r, float g, float b, float a=1.0, bool force=false);
             void SetColor(Vector3i color, bool force=false);
 
             void SetClearColor(float r, float g, float b, float a=1.0);
