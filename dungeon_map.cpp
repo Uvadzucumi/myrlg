@@ -10,71 +10,8 @@ void CDungeonLevel::NewGridDungeon(int grid_w, int grid_h, int rooms){
     dlg.Generate(m_Map);
 };
 
-// Bresenhams line algo
-bool CDungeonLevel::LineOfSight(int x1, int y1, int x2, int y2){
-    int i, deltax, deltay, numtiles;
-    int d, dinc1, dinc2;
-    int x, xinc1, xinc2;
-    int y, yinc1, yinc2;
-    bool isseen=true;
-
-    deltax = abs(x2 - x1);
-    deltay = abs(y2 - y1);
-
-    if(deltax >= deltay){
-        numtiles = deltax + 1;
-        d = (2 * deltay) - deltax;
-        dinc1 = deltay*2;
-        dinc2 = (deltay - deltax)*2;
-        xinc1 = 1;
-        xinc2 = 1;
-        yinc1 = 0;
-        yinc2 = 1;
-    }else{
-        numtiles = deltay + 1;
-        d = (2 * deltax) - deltay;
-        dinc1 = deltax*2;
-        dinc2 = (deltax - deltay)*2;
-        xinc1 = 0;
-        xinc2 = 1;
-        yinc1 = 1;
-        yinc2 = 1;
-    }
-
-    if( x1 > x2 ){
-        xinc1 = - xinc1;
-        xinc2 = - xinc2;
-    }
-
-    if(y1 > y2){
-        yinc1 = - yinc1;
-        yinc2 = - yinc2;
-    }
-
-    x = x1;
-    y = y1;
-
-    for(i = 2;i<=numtiles;i++){
-      if(!m_Map->IsSkipLight(x,y)){
-        isseen = false;
-        break;
-      }
-      if( d < 0 ){
-          d = d + dinc1;
-          x = x + xinc1;
-          y = y + yinc1;
-      }else{
-          d = d + dinc2;
-          x = x + xinc2;
-          y = y + yinc2;
-      }
-    }
-    return isseen;
-}
 
 void CDungeonLevel::CalculateLOS(int x_pos, int y_pos, int distance){
-//    unsigned int start=SDL_GetTicks();
-    //Log->puts("calc LOS ");
 
     int i,j;
     //unsigned int map_x, map_y;   // los array to map array coords
@@ -104,7 +41,7 @@ void CDungeonLevel::CalculateLOS(int x_pos, int y_pos, int distance){
             int distance_to_tile = sqrt(((i - x_pos) * (i - x_pos)) + ((j - y_pos) * (j - y_pos)));
                 // skip far tiles
             if(distance < distance_to_tile){ continue;}
-            if(LineOfSight(i,j,x_pos,y_pos)){
+            if(m_Map->LineOfSight(i,j,x_pos,y_pos)){
                     m_Map->GetMap()[i][j].visible=true;
                     m_Map->GetMap()[i][j].viewed=true;
             }
@@ -255,8 +192,9 @@ void CDungeonLevel::CalculateLOS(int x_pos, int y_pos, int distance){
 // set global light to ViewPort,TODO: add normal light calculation
 void CDungeonLevel::CalculateLight(){
     // check viewport and set global light
+/*
     if(m_light_changed){
-        m_Map->CalculateMapLight(m_light_intensivity,m_ViewPort.left, m_ViewPort.top, m_ViewPort.width, m_ViewPort.height);
+        m_Map->CalculateMapLight(m_ViewPort.left, m_ViewPort.top, m_ViewPort.width, m_ViewPort.height);
         int dx, dy;
         for(dy=m_ViewPort.top; dy<m_ViewPort.top+m_ViewPort.height; dy++){
             for(dx=m_ViewPort.left;dx<m_ViewPort.left+m_ViewPort.width;dx++){
@@ -268,6 +206,9 @@ void CDungeonLevel::CalculateLight(){
         }
         m_light_changed=false;
     }
+*/
+        m_Map->CalculateMapLight(/*m_light_intensivity,*/m_ViewPort.left, m_ViewPort.top, m_ViewPort.width, m_ViewPort.height);
+
 }
 
 // Update map. change animated tiles and etc.
@@ -290,10 +231,9 @@ void CDungeonLevel::Render(){
                 //m_tileset->RenderAt(pos_x,pos_y,m_Map[dx][dy].layer[0],&LightMaterials[m_Map[dx][dy].light]);
                 if(m_Map->IsVisible(dx,dy)){
                     // get light
-                    //tile_light=m_Map->GetMap()[dx][dy].light;
-                    //if(tile_light<m_light_intensivity[dx-m_ViewPort.left][dy-m_ViewPort.top]){
-                        tile_light=m_light_intensivity[dx-m_ViewPort.left+(dy-m_ViewPort.top)*m_ViewPort.width];
-                    //}
+                    //tile_light=m_light_intensivity[dx-m_ViewPort.left+(dy-m_ViewPort.top)*m_ViewPort.width];
+                    tile_light=m_Map->GetMap()[dx][dy].light;
+
                     m_tileset->Tile(m_Map->GetMap()[dx][dy].layer[0])->Render(&LightMaterials[9-tile_light]);
                     if(m_Map->GetMap()[dx][dy].layer[1]!=255){
                         m_tileset->Tile(m_Map->GetMap()[dx][dy].layer[1])->Render(&LightMaterials[9-tile_light]);

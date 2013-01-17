@@ -48,6 +48,6 @@ void CAnimation::SetCurrentFrame(int Frame) {
     CurrentFrame = Frame;
 }
 
-unsigned int CAnimation::GetCurrentFrame() {
+int CAnimation::GetCurrentFrame() {
     return CurrentFrame;
 }

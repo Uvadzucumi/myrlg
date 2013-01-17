@@ -22,9 +22,7 @@ class CDungeonLevel{
         unsigned int m_global_light;
         bool m_light_changed;
         Vector4i m_ViewPort;
-        //bool **LOS;
-        bool LineOfSight(int x1, int y1, int x2, int y2);
-        int *m_light_intensivity;
+        int *m_light_intensivity; // light strength in viewport coords
     public:
 
         CDungeonLevel(int width, int height){
@@ -116,9 +114,10 @@ class CDungeonLevel{
         MyOGL::Vector2i GetStartPosition(){ return m_Map->GetStartPosition(); };
 
         void DebugMapLight(){
-            for(int dx=0;dx<m_ViewPort.width; dx++){
-                for(int dy=0;dy<m_ViewPort.height;dy++){
-                    printf("%d ",m_light_intensivity[dx+dy*m_ViewPort.width]);
+            for(int dy=0;dy<m_ViewPort.height; dy++){
+                for(int dx=0;dx<m_ViewPort.height;dx++){
+                    //printf("%d ",m_light_intensivity[dx+dy*m_ViewPort.width]);
+                    printf("%d ",m_Map->GetMap()[dx][dy].light);
                 }
                 printf("\n");
             }

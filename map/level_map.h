@@ -39,8 +39,8 @@ typedef struct{
 
 typedef struct{
     eTileTypes tile_type;
-    unsigned char layer[3];
-    unsigned char light;
+    short layer[3];
+    short light;
     bool viewed;
     bool visible;
     bool skip_light;
@@ -71,24 +71,26 @@ class CMapDynamicTile{
         void Update(double DeltaTime){
             m_animation->OnAnimate(DeltaTime);
         };
-        unsigned char GetCurrentTile(){ return TileNamesList[m_animation->GetCurrentFrame()];};
+        short GetCurrentTile(){ return TileNamesList[m_animation->GetCurrentFrame()]; };
+        int GetCurrentFrame(){ return m_animation->GetCurrentFrame(); };
         void SetAnimationOscillate(bool Oscillate){ m_animation->Oscillate=Oscillate; }
         void SetAnimationRate(double Rate){ m_animation->SetFrameRate(Rate); };
 };
 
 typedef struct{
     Vector2i position;
-    float diffuse;
-    unsigned char strength;
+    //float diffuse;
+    int strength;
     CMapDynamicTile *dynamic_tile;
     int GetIntnsivity(int x, int y){    // return light intensivity in coords x,y
         // calculate distance
         int distance = sqrt(((x - position.x) * (x - position.x)) + ((y - position.y) * (y - position.y)));
-        int ret=strength-distance;
+        //int ret=strength-distance-1+dynamic_tile->GetCurrentFrame()%2;
+        int ret=strength-distance-dynamic_tile->GetCurrentFrame();
         if(ret<=0){
             return 0;
         }else{
-            return (int) (strength-distance) / 1;
+            return ret;
         }
     };
 } sMapLightSource;
@@ -143,8 +145,9 @@ class CLevelMap{
 
         };
 
+        bool LineOfSight(int x1, int y1, int x2, int y2); // line on sight between x1,y1 and x2,y2
         void AddMapTile(eTileTypes TileType, int x, int y, void *tile_data=NULL);
-        void AddLightSource(unsigned int x, unsigned int y, unsigned char strength, float diffuse=1);
+        void AddLightSource(unsigned int x, unsigned int y, unsigned char strength);
         void Update(double DeltaTime);
         int GetWidth(){ return m_width; }
         int GetHeight() { return m_height; }
@@ -164,7 +167,7 @@ class CLevelMap{
         void SetStartPosition(int x, int y){ m_StartPosition.x=x; m_StartPosition.y=y; };
         eTileTypes GetTileType(int x, int y){ return m_Map[x][y].tile_type;}
         // calculate light in map part, light_array - result array, left,top, width, height - map part coords
-        void CalculateMapLight(int *light_array, int left, int top, int width, int height);
+        void CalculateMapLight(/*int *light_array,*/ int left, int top, int width, int height);
 };
 
 #endif // LEVEL_MAP_H_INCLUDED

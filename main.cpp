@@ -15,7 +15,7 @@
 #include "myogl/config_file.h"
 #include "myogl/ui/text_box.h"
 
-#include "myogl/frame_buffer.h"
+//#include "myogl/frame_buffer.h"
 
 CHudSprite *herro_sprite;
 CTextBox *messages;

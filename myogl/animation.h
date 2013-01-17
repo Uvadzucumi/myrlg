@@ -22,7 +22,7 @@ namespace MyOGL{
 
             void SetFrameRate(double Rate);
             void SetCurrentFrame(int Frame);
-            unsigned int GetCurrentFrame();
+            int GetCurrentFrame();
     };
 
 }
