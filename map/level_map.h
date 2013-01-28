@@ -40,9 +40,9 @@ typedef struct{
 typedef struct{
     eTileTypes tile_type;
     short layer[3];
-    short light;
+    //short light;
     bool viewed;
-    bool visible;
+    //bool visible;
     bool skip_light;
     bool can_move;  // TODO: move_speed, if 0 - cannot move
     void *p_tile_data;
@@ -50,6 +50,15 @@ typedef struct{
     //void *p_items;
     CItemsContainer items;
 }sMapField;
+
+struct sMapFovField{
+    bool is_visible: 1;
+    bool north: 1;
+    bool south: 1;
+    bool east: 1;
+    bool west: 1;
+    unsigned char light;
+};
 
 class CMapDynamicTile{
         CAnimation *m_animation;
@@ -86,7 +95,8 @@ typedef struct{
         // calculate distance
         int distance = sqrt(((x - position.x) * (x - position.x)) + ((y - position.y) * (y - position.y)));
         //int ret=strength-distance-1+dynamic_tile->GetCurrentFrame()%2;
-        int ret=strength-distance-dynamic_tile->GetCurrentFrame();
+        //int ret=strength-distance-dynamic_tile->GetCurrentFrame();
+        int ret=strength-distance;
         if(ret<=0){
             return 0;
         }else{
@@ -100,8 +110,8 @@ class CLevelMap{
         int m_width, m_height;
         sMapField **m_Map;
         std::vector <sMapLightSource> LightSourcesList;
-        // map start position
-        MyOGL::Vector2i m_StartPosition;
+        // map player position (useing for )
+        MyOGL::Vector2i m_UnitPosition;
     public:
         CLevelMap(int Width, int Height){
 
@@ -152,8 +162,8 @@ class CLevelMap{
         int GetWidth(){ return m_width; }
         int GetHeight() { return m_height; }
 
-        sMapField **GetMap(){ return m_Map; };
-        bool IsVisible(int x, int y){ return m_Map[x][y].visible; };
+        //sMapField **GetMap(){ return m_Map; };
+        //bool IsVisible(int x, int y){ return m_Map[x][y].visible; };
         bool IsSkipLight(int x, int y){ return m_Map[x][y].skip_light; };
         bool IsViewed(int x, int y){ return m_Map[x][y].viewed; };
         bool IsCanMove(int x, int y){ return m_Map[x][y].can_move; }; // TODO: add check big items, mobs - etc?
@@ -161,13 +171,23 @@ class CLevelMap{
         bool IsDoorClosed(int x, int y);
         bool OpenDoor(int x, int y);
         bool CloseDoor(int x, int y);
+        void SetViewed(int x, int y, bool flag){
+            if(x<0 || y< 0 || x>=m_width || y>=m_height){
+                MyOGL::Log->puts("RANGE ERROR (SetViewed): x: %d y: %d\n",x,y);
+                return;
+            }
+             m_Map[x][y].viewed=flag;
+        }
         CItemsContainer* GetItemsInField(int x, int y){ return &m_Map[x][y].items; };   // return pointer to items list in field x, y
 
-        MyOGL::Vector2i GetStartPosition() { return m_StartPosition; };
-        void SetStartPosition(int x, int y){ m_StartPosition.x=x; m_StartPosition.y=y; };
+        MyOGL::Vector2i GetStartPosition() { return m_UnitPosition; };
+        void SetStartPosition(int x, int y){ m_UnitPosition.x=x; m_UnitPosition.y=y; };
         eTileTypes GetTileType(int x, int y){ return m_Map[x][y].tile_type;}
+        int GetTileID(int x, int y, int layer){
+            return m_Map[x][y].layer[layer];
+        }
         // calculate light in map part, light_array - result array, left,top, width, height - map part coords
-        void CalculateMapLight(/*int *light_array,*/ int left, int top, int width, int height);
+        void CalculateMapLight(sMapFovField *light_array, int left, int top, int width, int height);
 };
 
 #endif // LEVEL_MAP_H_INCLUDED

@@ -7,8 +7,6 @@
 #include "map/level_map.h"
 #include "map/grid_dungeon.h"
 
-
-
 // Dungeon level class
 // mapmanager class
 class CDungeonLevel{
@@ -22,7 +20,8 @@ class CDungeonLevel{
         unsigned int m_global_light;
         bool m_light_changed;
         Vector4i m_ViewPort;
-        int *m_light_intensivity; // light strength in viewport coords
+        sMapFovField *m_light_intensivity; // light strength in viewport coords
+
     public:
 
         CDungeonLevel(int width, int height){
@@ -42,7 +41,7 @@ class CDungeonLevel{
 //            for(i=0;i<m_ViewPort.width;i++){
 //                LOS[i]=new bool[m_ViewPort.height];
 //            }
-            m_light_intensivity=new int[m_ViewPort.width*m_ViewPort.height];
+            m_light_intensivity=new sMapFovField[m_ViewPort.width*m_ViewPort.height];
         };
 
         ~CDungeonLevel(){
@@ -67,7 +66,7 @@ class CDungeonLevel{
             m_ViewPort.width=width; m_ViewPort.height=height; m_light_changed=true;
             // recreate light intensivity array
             delete m_light_intensivity;
-            m_light_intensivity=new int[m_ViewPort.width * m_ViewPort.height];
+            m_light_intensivity=new sMapFovField[m_ViewPort.width * m_ViewPort.height];
         };
         unsigned int GetViewportLeft(){ return m_ViewPort.left; };
         unsigned int GetViewportTop(){ return m_ViewPort.top; };
@@ -116,8 +115,8 @@ class CDungeonLevel{
         void DebugMapLight(){
             for(int dy=0;dy<m_ViewPort.height; dy++){
                 for(int dx=0;dx<m_ViewPort.height;dx++){
-                    //printf("%d ",m_light_intensivity[dx+dy*m_ViewPort.width]);
-                    printf("%d ",m_Map->GetMap()[dx][dy].light);
+                    printf("%d ",m_light_intensivity[dx+dy*m_ViewPort.width].is_visible);
+                    //printf("%d ",m_Map->GetMap()[dx][dy].light);
                 }
                 printf("\n");
             }

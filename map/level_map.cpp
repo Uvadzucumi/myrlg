@@ -156,12 +156,12 @@ void CLevelMap::Update(double DeltaTime){
         // update animations
         LightSourcesList[i].dynamic_tile->Update(DeltaTime);
         // if in visible field, set animation tile
-        if(m_Map[LightSourcesList[i].position.x][LightSourcesList[i].position.y].visible){
+        //if(m_Map[LightSourcesList[i].position.x][LightSourcesList[i].position.y].visible){
             if(m_Map[LightSourcesList[i].position.x][LightSourcesList[i].position.y].layer[1]!=LightSourcesList[i].dynamic_tile->GetCurrentTile()){
                 update_light_field=true;
                 m_Map[LightSourcesList[i].position.x][LightSourcesList[i].position.y].layer[1]=LightSourcesList[i].dynamic_tile->GetCurrentTile();
             };
-        }
+        //}
     }
     if(update_light_field){
 
@@ -207,23 +207,26 @@ bool CLevelMap::OpenDoor(int x, int y){
 }
 
 // calculate light in map part, light_array - result array, left,top, width, height - map part coords
-void CLevelMap::CalculateMapLight(/*int *light_array,*/ int left, int top, int width, int height){
+void CLevelMap::CalculateMapLight(sMapFovField *light_array, int left, int top, int width, int height){
     //printf("calculate light: x:%d, y:%d\n",left,top);
     int dx, dy;
     int max_x=left+width, max_y=top+height;
+    int light_map_index;    // posiont in light map
+    int new_light;          // calculated light in field
     if(max_x>=m_width) max_x=m_width-1;
     if(max_y>=m_height) max_y=m_height-1;
     // clear light map
-    /*
     for(int i=0;i<width*height;i++){
-        light_array[i]=0;
+        light_array[i].light=0;
     }
-    */
+
+/*
     for(dy=top;dy<=max_y;dy++){
         for(dx=left;dx<=max_x;dx++){
             m_Map[dx][dy].light=0;
         }
     }
+    */
     // create light sorce list in current coords
     for(unsigned int i=0; i < LightSourcesList.size(); i++){
 
@@ -233,18 +236,23 @@ void CLevelMap::CalculateMapLight(/*int *light_array,*/ int left, int top, int w
             LightSourcesList[i].position.y<top+height+LightSourcesList[i].strength
         ){
 
-            for(dy=top; dy<=max_y; dy++){
+            for(dy=top; dy<max_y; dy++){
                 for(dx=left; dx<max_x; dx++){
-                    if( this->IsVisible(dx,dy) &&
+                    if( light_array[(dy-top)*width+dx-left].is_visible &&
                         LineOfSight(LightSourcesList[i].position.x, LightSourcesList[i].position.y,dx,dy)
                        ){
                         // add light intensivity
-                        //int vp_index=dx+dy*width;   // view port coordinates index
-                        int new_light=LightSourcesList[i].GetIntnsivity(dx,dy);
-                        if(m_Map[dx][dy].light < new_light) m_Map[dx][dy].light=new_light;
-/*                        if(light_array[vp_index] < new_light){
-                            light_array[vp_index]=new_light;
-                        }*/
+                        light_map_index=(dx-left)+(dy-top)*width;   // view port coordinates index
+                        new_light=LightSourcesList[i].GetIntnsivity(dx,dy);
+                        //if(m_Map[dx][dy].light < new_light) m_Map[dx][dy].light=new_light;
+
+                        // check look position and source position,
+                        // if look_x
+
+
+                        if(light_array[light_map_index].light < new_light){
+                            light_array[light_map_index].light=new_light;
+                        }
                     }
                 }
                 //printf("\n");

@@ -75,7 +75,7 @@ void CEntity::OnRender() {
         }else{
             MyOGL::Render->SetColor(1,1,1);
         }
-        if(SpritesList.size()>m_animation->GetCurrentFrame()){
+        if((int)SpritesList.size() > m_animation->GetCurrentFrame()){
             SpritesList[m_animation->GetCurrentFrame()]->SetPosition(X,Y);
             SpritesList[m_animation->GetCurrentFrame()]->Render();
         }else{

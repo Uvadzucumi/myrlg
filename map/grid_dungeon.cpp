@@ -233,7 +233,8 @@ void CDungeonGeneration::Generate(CLevelMap *Map){
     for(y=0; y<m_height; y++){
         for(x=0; x<m_width; x++){
             m_Map->AddMapTile(ttWall,x,y);
-            m_Map->GetMap()[x][y].viewed=false;
+            //m_Map->GetMap()[x][y].viewed=false;
+            m_Map->SetViewed(x,y,false);
         }
     }
 

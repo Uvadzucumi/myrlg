@@ -235,6 +235,8 @@ int main(int argc, char **argv){
     }
 #endif
 
+    printf("FOV size: %d %d %d\n",sizeof(sMapFovField),sizeof(int),sizeof(char));
+
     srand(time(NULL));
 
     // get user directory
