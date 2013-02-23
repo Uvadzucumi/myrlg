@@ -109,7 +109,7 @@ void CLevelMap::AddMapTile(eTileTypes TileType, int x, int y, void *tile_data){
             break;
         case ttFire: // create fire tile
             m_Map[x][y].layer[0]=tnFloorDungeonRoom;
-            m_Map[x][y].layer[1]=tnFire;
+            m_Map[x][y].layer[1]=tnBonfire;
             m_Map[x][y].skip_light=true;
             m_Map[x][y].can_move=true;
             break;
@@ -134,32 +134,35 @@ void CLevelMap::AddMapTile(eTileTypes TileType, int x, int y, void *tile_data){
 }
 
 
-void CLevelMap::AddLightSource(unsigned int x, unsigned int y, unsigned char strength){
-    sMapLightSource light;
-    light.position.x=x;
-    light.position.y=y;
-    light.strength=strength;
-    light.dynamic_tile=new CMapDynamicTile();
-    light.dynamic_tile->AddTiles(tnFire+1,4);
-    light.dynamic_tile->Update((rand()%200)/100);
-    light.dynamic_tile->SetAnimationRate(.15);
-    light.dynamic_tile->SetAnimationOscillate(true);
+void CLevelMap::AddBonfire(unsigned int x, unsigned int y, unsigned char strength){
+    CMapLightSource *light;
+    // add light source
+    light=new CMapLightSource(x, y, strength);
     LightSourcesList.push_back(light);
+    // add dynamic tile
+    CMapDynamicTile *dynamic_tile=new CMapDynamicTile();
+    dynamic_tile->AddTiles(tnBonfire+1,4);
+    dynamic_tile->Update((rand()%200)/100);
+    dynamic_tile->SetAnimationRate(.15);
+    dynamic_tile->SetAnimationOscillate(true);
+    dynamic_tile->position.x=x;
+    dynamic_tile->position.y=y;
+    dynamic_tile->layer=1;
     //AddMapTile(ttFire,x,y);
-    m_Map[x][y].layer[1]=light.dynamic_tile->GetCurrentTile();
+    m_Map[x][y].layer[dynamic_tile->layer]=dynamic_tile->GetCurrentTile();
+    DynamicTilesList.push_back(dynamic_tile);
 };
 
 void CLevelMap::Update(CFOV *fov, double DeltaTime){
-    bool update_light_field=false;
-    // update fire animation
-    for(unsigned i=0;i<LightSourcesList.size();i++){
+    // update animated sprites
+    for(unsigned i=0;i<DynamicTilesList.size();i++){
         // update animations
-        LightSourcesList[i].dynamic_tile->Update(DeltaTime);
+        DynamicTilesList[i]->Update(DeltaTime);
+
         // if in visible field, may be need change animated tile
-        if(fov->IsVisible(LightSourcesList[i].position.x,LightSourcesList[i].position.y)){
-            if(m_Map[LightSourcesList[i].position.x][LightSourcesList[i].position.y].layer[1]!=LightSourcesList[i].dynamic_tile->GetCurrentTile()){
-                update_light_field=true;
-                m_Map[LightSourcesList[i].position.x][LightSourcesList[i].position.y].layer[1]=LightSourcesList[i].dynamic_tile->GetCurrentTile();
+        if(fov->IsVisible(DynamicTilesList[i]->position.x,DynamicTilesList[i]->position.y)){
+            if(m_Map[DynamicTilesList[i]->position.x][DynamicTilesList[i]->position.y].layer[DynamicTilesList[i]->layer]!=DynamicTilesList[i]->GetCurrentTile()){
+                m_Map[DynamicTilesList[i]->position.x][DynamicTilesList[i]->position.y].layer[DynamicTilesList[i]->layer]=DynamicTilesList[i]->GetCurrentTile();
             };
         }
     }
@@ -214,18 +217,19 @@ void CLevelMap::CalculateMapLight(CFOV *fov, int left, int top, int width, int h
     if(max_y>=m_height) max_y=m_height-1;
     // create light sorce list in current coords
     for(unsigned int i=0; i < LightSourcesList.size(); i++){
-
-        if( LightSourcesList[i].position.x>left-LightSourcesList[i].strength &&
-            LightSourcesList[i].position.x<left+width+LightSourcesList[i].strength &&
-            LightSourcesList[i].position.y>top-LightSourcesList[i].strength &&
-            LightSourcesList[i].position.y<top+height+LightSourcesList[i].strength
+        MyOGL::Vector2i light_pos=LightSourcesList[i]->GetPosition();
+        int strength=LightSourcesList[i]->GetStrength();
+        if( light_pos.x > left-strength &&
+            light_pos.x<left+width+strength &&
+            light_pos.y>top-strength &&
+            light_pos.y<top+height+strength
         ){
 
             for(dy=top; dy<max_y; dy++){
                 for(dx=left; dx<max_x; dx++){
                     //light_map_index=(dx-left)+(dy-top)*width;   // view port coordinates index
                     if( fov->IsVisible(dx,dy) &&
-                        LineOfSight(LightSourcesList[i].position.x, LightSourcesList[i].position.y, dx, dy)
+                        LineOfSight(light_pos.x, light_pos.y, dx, dy)
                        ){
 
                         // get fov field
@@ -233,12 +237,12 @@ void CLevelMap::CalculateMapLight(CFOV *fov, int left, int top, int width, int h
 
                         // check loock side
                         if( m_Map[dx][dy].skip_light ||
-                            (fld->north && LightSourcesList[i].position.y<dy) ||
-                            (fld->south && LightSourcesList[i].position.y>dy) ||
-                            (fld->east && LightSourcesList[i].position.x>dx) ||
-                            (fld->west && LightSourcesList[i].position.x<dx)
+                            (fld->north && light_pos.y<dy) ||
+                            (fld->south && light_pos.y>dy) ||
+                            (fld->east && light_pos.x>dx) ||
+                            (fld->west && light_pos.x<dx)
                            ){ // add light
-                            new_light=LightSourcesList[i].GetIntesivity(dx,dy);
+                            new_light=LightSourcesList[i]->GetIntesivity(dx,dy);
                             if(fov->GetDistance(dx,dy) < new_light){
                                fov->SetDistance(dx,dy,new_light);
                             }

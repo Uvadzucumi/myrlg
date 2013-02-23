@@ -59,6 +59,8 @@ class CFOV{
             };
             MyOGL::Log->puts("FOV array clean old data\n");
         };
+        // set tile (tile_x, tile_y) distance to x_pos, y_pos (if set_distance>0)
+        void SetDistance(int tile_x, int tile_y, int x_pos, int y_pos, int set_distance);
 
         void Calculate(int x, int y, CLevelMap *map, int set_light_distane=0);
 

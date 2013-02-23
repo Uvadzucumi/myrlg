@@ -11,6 +11,7 @@
 #include "../items.h"
 
 #include "fov.h"
+#include "light_source.h"
 
 #include <math.h> // sqrt
 
@@ -58,6 +59,8 @@ class CMapDynamicTile{
         CAnimation *m_animation;
         std::vector<unsigned char> TileNamesList;
     public:
+        MyOGL::Vector2i position;
+        int layer;
         CMapDynamicTile(){
             m_animation=new CAnimation;
         };
@@ -80,31 +83,13 @@ class CMapDynamicTile{
         void SetAnimationRate(double Rate){ m_animation->SetFrameRate(Rate); };
 };
 
-typedef struct{
-    Vector2i position;
-    //float diffuse;
-    int strength;
-    CMapDynamicTile *dynamic_tile;
-    int GetIntesivity(int x, int y){    // return light intensivity in coords x,y
-        // calculate distance
-        int distance = sqrt(((x - position.x) * (x - position.x)) + ((y - position.y) * (y - position.y)));
-        //int ret=strength-distance-1+dynamic_tile->GetCurrentFrame()%2;
-        //int ret=strength-distance-dynamic_tile->GetCurrentFrame();
-        int ret=strength-distance;
-        if(ret<=0){
-            return 0;
-        }else{
-            return ret;
-        }
-    };
-} sMapLightSource;
-
 class CLevelMap{
         // map data
         int m_width, m_height;
         sMapField **m_Map;
-        std::vector <sMapLightSource> LightSourcesList;
-        // map player position (useing for )
+        std::vector <CMapDynamicTile*> DynamicTilesList;
+        std::vector <CMapLightSource*> LightSourcesList;
+        // map player position
         MyOGL::Vector2i m_UnitPosition;
     public:
         CLevelMap(int Width, int Height){
@@ -143,15 +128,19 @@ class CLevelMap{
             }
             // clear lights sources
             for(unsigned int i=0;i<LightSourcesList.size();i++){
-                delete LightSourcesList[i].dynamic_tile;
+                delete LightSourcesList[i];
             }
             LightSourcesList.clear();
-
+            // clear animated tiles
+            for(unsigned int i=0;i<DynamicTilesList.size();i++){
+                delete DynamicTilesList[i];
+            }
+            DynamicTilesList.clear();
         };
 
         bool LineOfSight(int x1, int y1, int x2, int y2); // line on sight between x1,y1 and x2,y2
         void AddMapTile(eTileTypes TileType, int x, int y, void *tile_data=NULL);
-        void AddLightSource(unsigned int x, unsigned int y, unsigned char strength);
+        void AddBonfire(unsigned int x, unsigned int y, unsigned char strength);
         void Update(CFOV *fov, double DeltaTime);
         int GetWidth(){ return m_width; }
         int GetHeight() { return m_height; }

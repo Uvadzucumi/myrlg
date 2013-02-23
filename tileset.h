@@ -15,7 +15,7 @@ enum eTileNames{
     tnDoorClosedDungeon=32,
     tnDoorOpenedDungeon,
     tnDoorBrokenDungeon,
-    tnFire=48,
+    tnBonfire=48,
     tnHerro=64,
 
     tnDagger=80,

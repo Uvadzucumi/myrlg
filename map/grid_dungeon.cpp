@@ -258,7 +258,7 @@ void CDungeonGeneration::Generate(CLevelMap *Map){
         m_grid[x][y].filled=true;
         m_grid[x][y].room_id=i;
         // add light source for room center
-        m_Map->AddLightSource(m_rooms[i].left+(int)m_rooms[i].width/2,m_rooms[i].top+(int)m_rooms[i].height/2,9);
+        m_Map->AddBonfire(m_rooms[i].left+(int)m_rooms[i].width/2,m_rooms[i].top+(int)m_rooms[i].height/2,9);
     }
     m_rooms[0].connected=true;
 
