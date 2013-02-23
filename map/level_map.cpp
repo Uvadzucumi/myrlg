@@ -149,22 +149,19 @@ void CLevelMap::AddLightSource(unsigned int x, unsigned int y, unsigned char str
     m_Map[x][y].layer[1]=light.dynamic_tile->GetCurrentTile();
 };
 
-void CLevelMap::Update(double DeltaTime){
+void CLevelMap::Update(CFOV *fov, double DeltaTime){
     bool update_light_field=false;
     // update fire animation
     for(unsigned i=0;i<LightSourcesList.size();i++){
         // update animations
         LightSourcesList[i].dynamic_tile->Update(DeltaTime);
-        // if in visible field, set animation tile
-        //if(m_Map[LightSourcesList[i].position.x][LightSourcesList[i].position.y].visible){
+        // if in visible field, may be need change animated tile
+        if(fov->IsVisible(LightSourcesList[i].position.x,LightSourcesList[i].position.y)){
             if(m_Map[LightSourcesList[i].position.x][LightSourcesList[i].position.y].layer[1]!=LightSourcesList[i].dynamic_tile->GetCurrentTile()){
                 update_light_field=true;
                 m_Map[LightSourcesList[i].position.x][LightSourcesList[i].position.y].layer[1]=LightSourcesList[i].dynamic_tile->GetCurrentTile();
             };
-        //}
-    }
-    if(update_light_field){
-
+        }
     }
 }
 
@@ -207,7 +204,7 @@ bool CLevelMap::OpenDoor(int x, int y){
 }
 
 // calculate light in map part, light_array - result array, left,top, width, height - map part coords
-void CLevelMap::CalculateMapLight(sMapFovField *light_array, int left, int top, int width, int height){
+void CLevelMap::CalculateMapLight(CFOV *fov, int left, int top, int width, int height){
     //printf("calculate light: x:%d, y:%d\n",left,top);
     int dx, dy;
     int max_x=left+width, max_y=top+height;
@@ -215,18 +212,6 @@ void CLevelMap::CalculateMapLight(sMapFovField *light_array, int left, int top, 
     int new_light;          // calculated light in field
     if(max_x>=m_width) max_x=m_width-1;
     if(max_y>=m_height) max_y=m_height-1;
-    // clear light map
-    for(int i=0;i<width*height;i++){
-        light_array[i].light=0;
-    }
-
-/*
-    for(dy=top;dy<=max_y;dy++){
-        for(dx=left;dx<=max_x;dx++){
-            m_Map[dx][dy].light=0;
-        }
-    }
-    */
     // create light sorce list in current coords
     for(unsigned int i=0; i < LightSourcesList.size(); i++){
 
@@ -238,20 +223,25 @@ void CLevelMap::CalculateMapLight(sMapFovField *light_array, int left, int top, 
 
             for(dy=top; dy<max_y; dy++){
                 for(dx=left; dx<max_x; dx++){
-                    if( light_array[(dy-top)*width+dx-left].is_visible &&
-                        LineOfSight(LightSourcesList[i].position.x, LightSourcesList[i].position.y,dx,dy)
+                    //light_map_index=(dx-left)+(dy-top)*width;   // view port coordinates index
+                    if( fov->IsVisible(dx,dy) &&
+                        LineOfSight(LightSourcesList[i].position.x, LightSourcesList[i].position.y, dx, dy)
                        ){
-                        // add light intensivity
-                        light_map_index=(dx-left)+(dy-top)*width;   // view port coordinates index
-                        new_light=LightSourcesList[i].GetIntnsivity(dx,dy);
-                        //if(m_Map[dx][dy].light < new_light) m_Map[dx][dy].light=new_light;
 
-                        // check look position and source position,
-                        // if look_x
+                        // get fov field
+                        sMapFovField *fld=fov->GetFovField(dx,dy);
 
-
-                        if(light_array[light_map_index].light < new_light){
-                            light_array[light_map_index].light=new_light;
+                        // check loock side
+                        if( m_Map[dx][dy].skip_light ||
+                            (fld->north && LightSourcesList[i].position.y<dy) ||
+                            (fld->south && LightSourcesList[i].position.y>dy) ||
+                            (fld->east && LightSourcesList[i].position.x>dx) ||
+                            (fld->west && LightSourcesList[i].position.x<dx)
+                           ){ // add light
+                            new_light=LightSourcesList[i].GetIntesivity(dx,dy);
+                            if(fov->GetDistance(dx,dy) < new_light){
+                               fov->SetDistance(dx,dy,new_light);
+                            }
                         }
                     }
                 }

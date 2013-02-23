@@ -16,11 +16,12 @@ class CDungeonLevel{
 
         CLevelMap *m_Map;
         CTileset *m_tileset;
+        CFOV *m_fov;
 
         unsigned int m_global_light;
         bool m_light_changed;
         Vector4i m_ViewPort;
-        sMapFovField *m_light_intensivity; // light strength in viewport coords
+        //sMapFovField *m_light_vp; // light strength in viewport coords
 
     public:
 
@@ -36,17 +37,19 @@ class CDungeonLevel{
             m_ViewPort.height=18;
             m_global_light=0;
             m_light_changed=true;
+            m_fov=new CFOV(18/2);
             // create LOS array
 //            LOS=new bool *[m_ViewPort.width];
 //            for(i=0;i<m_ViewPort.width;i++){
 //                LOS[i]=new bool[m_ViewPort.height];
 //            }
-            m_light_intensivity=new sMapFovField[m_ViewPort.width*m_ViewPort.height];
+            //m_light_vp=new sMapFovField[m_ViewPort.width*m_ViewPort.height];
         };
 
         ~CDungeonLevel(){
             Log->puts("Delete dungeon obj\n");
-            delete m_light_intensivity;
+//            delete m_light_vp; // old fov
+            delete m_fov;
             delete m_Map;
 //            for(unsigned int i=0;i<m_ViewPort.width;i++) delete LOS[i];
 //            delete LOS;
@@ -65,8 +68,13 @@ class CDungeonLevel{
         void SetViewportSize(unsigned int width, unsigned int height){
             m_ViewPort.width=width; m_ViewPort.height=height; m_light_changed=true;
             // recreate light intensivity array
-            delete m_light_intensivity;
-            m_light_intensivity=new sMapFovField[m_ViewPort.width * m_ViewPort.height];
+//            delete m_light_vp;
+//            m_light_vp=new sMapFovField[m_ViewPort.width * m_ViewPort.height];
+            if(width>height){
+                m_fov->Resize(width/2);
+            }else{
+                m_fov->Resize(height/2);
+            }
         };
         unsigned int GetViewportLeft(){ return m_ViewPort.left; };
         unsigned int GetViewportTop(){ return m_ViewPort.top; };
@@ -113,13 +121,17 @@ class CDungeonLevel{
         MyOGL::Vector2i GetStartPosition(){ return m_Map->GetStartPosition(); };
 
         void DebugMapLight(){
-            for(int dy=0;dy<m_ViewPort.height; dy++){
-                for(int dx=0;dx<m_ViewPort.height;dx++){
-                    printf("%d ",m_light_intensivity[dx+dy*m_ViewPort.width].is_visible);
-                    //printf("%d ",m_Map->GetMap()[dx][dy].light);
+            // debug visible field
+            for(int dy=m_ViewPort.top; dy<m_ViewPort.top+m_ViewPort.height; dy++){
+                for(int dx=m_ViewPort.left;dx<m_ViewPort.left+m_ViewPort.width;dx++){
+                    //printf("%d ",m_light_vp[dx+dy*m_ViewPort.width].is_visible);
+                    printf("%d ",m_fov->IsVisible(dx,dy));
                 }
                 printf("\n");
             }
+
+            m_fov->debug_visible_sides();
+            m_fov->debug_distance();
         }
 };
 

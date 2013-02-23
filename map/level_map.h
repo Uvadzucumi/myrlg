@@ -10,6 +10,8 @@
 
 #include "../items.h"
 
+#include "fov.h"
+
 #include <math.h> // sqrt
 
 // tile types
@@ -51,14 +53,6 @@ typedef struct{
     CItemsContainer items;
 }sMapField;
 
-struct sMapFovField{
-    bool is_visible: 1;
-    bool north: 1;
-    bool south: 1;
-    bool east: 1;
-    bool west: 1;
-    unsigned char light;
-};
 
 class CMapDynamicTile{
         CAnimation *m_animation;
@@ -91,7 +85,7 @@ typedef struct{
     //float diffuse;
     int strength;
     CMapDynamicTile *dynamic_tile;
-    int GetIntnsivity(int x, int y){    // return light intensivity in coords x,y
+    int GetIntesivity(int x, int y){    // return light intensivity in coords x,y
         // calculate distance
         int distance = sqrt(((x - position.x) * (x - position.x)) + ((y - position.y) * (y - position.y)));
         //int ret=strength-distance-1+dynamic_tile->GetCurrentFrame()%2;
@@ -158,7 +152,7 @@ class CLevelMap{
         bool LineOfSight(int x1, int y1, int x2, int y2); // line on sight between x1,y1 and x2,y2
         void AddMapTile(eTileTypes TileType, int x, int y, void *tile_data=NULL);
         void AddLightSource(unsigned int x, unsigned int y, unsigned char strength);
-        void Update(double DeltaTime);
+        void Update(CFOV *fov, double DeltaTime);
         int GetWidth(){ return m_width; }
         int GetHeight() { return m_height; }
 
@@ -176,7 +170,7 @@ class CLevelMap{
                 MyOGL::Log->puts("RANGE ERROR (SetViewed): x: %d y: %d\n",x,y);
                 return;
             }
-             m_Map[x][y].viewed=flag;
+            m_Map[x][y].viewed=flag;
         }
         CItemsContainer* GetItemsInField(int x, int y){ return &m_Map[x][y].items; };   // return pointer to items list in field x, y
 
@@ -187,7 +181,7 @@ class CLevelMap{
             return m_Map[x][y].layer[layer];
         }
         // calculate light in map part, light_array - result array, left,top, width, height - map part coords
-        void CalculateMapLight(sMapFovField *light_array, int left, int top, int width, int height);
+        void CalculateMapLight(CFOV *light_array, int left, int top, int width, int height);
 };
 
 #endif // LEVEL_MAP_H_INCLUDED

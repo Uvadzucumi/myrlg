@@ -129,6 +129,7 @@ void OnLoop(double DeltaTime){
     }
     // update map - only animations and lights
     dungeon->Update(DeltaTime);
+
 }
 
 void OnEvent(SDL_Event *Event, double DeltaTime){
