@@ -53,6 +53,7 @@ void CTextBox::SetViewPort(int left, int top, int width, int height){
 void CTextBox::Render(Vector4f color){
 // TODO: for optimize need search first display string index
 // set scissor - for cut not displayed text
+    glPushMatrix();
     glEnable(GL_SCISSOR_TEST);
     // left, bottom, width, height
     int bottom=MyOGL::Render->GetHeight()-(m_viewport.top+m_viewport.height);
@@ -80,4 +81,5 @@ void CTextBox::Render(Vector4f color){
     }
 // disable scissor
     glDisable(GL_SCISSOR_TEST);
+    glPopMatrix();
 }

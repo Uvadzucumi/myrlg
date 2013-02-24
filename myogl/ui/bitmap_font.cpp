@@ -170,7 +170,7 @@ int CFont::RenderText(const char *string, int max_width){
     for(int i = 0; i < str_len; i++){
         if(string[i] == 10){  // new text line
             dy += this->m_font_height;
-            m_last_sizes.height+=dy;
+            m_last_sizes.height+=this->m_font_height;
             if(dx > m_last_sizes.width) m_last_sizes.width = dx;
             dx = 0;
             continue;
