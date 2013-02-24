@@ -1,0 +1,10 @@
+TODO LIST:
+
+- remove check all FOV field for add light in CLevelMap::CalculateMapLight(), need use
+  Light->ApplyToFOV(), and check only required fields.
+- Change CalculateAllLights() after Door open, need use CalculateNearestLights(changed field_x, changed field_y)
+  for best perfomance.
+- Display normal field information (current showed debug info, view vector, light strength and etc.)
+- Add Animated Woter tiles
+- Add tile postprocessing after map generation (add noise tiles), after map changed - viewed new map
+  topology.
