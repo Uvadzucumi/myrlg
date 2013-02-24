@@ -9,6 +9,21 @@
 #include "entity.h"
 
 namespace MyOGL{
+    // SDLK_DOWN events
+    #define MYOGL_BUTTONS_COUNT 322
+
+    struct MouseState{
+        bool button_l;
+        bool button_m;
+        bool button_r;
+        Vector2i coords;
+        Vector2i coords_lb_down;
+        Vector2i coords_lb_up;
+        Vector2i coords_rb_down;
+        Vector2i coords_rb_up;
+        Vector2i coords_mb_down;
+        Vector2i coords_mb_up;
+    };
 
     // application class
     class CApplication : public CEvent{
@@ -16,7 +31,8 @@ namespace MyOGL{
             double DeltaTime;
             void Events(SDL_Event *Event,  double DeltaTime);  // parse application events
             bool Running;
-            bool KEYS[322];  // 322 is the number of SDLK_DOWN events
+            bool KEYS[MYOGL_BUTTONS_COUNT];  // 322 is the number of SDLK_DOWN events
+            MouseState MOUSE;
             char *user_home_dir;
         public:
             CApplication(){
@@ -26,7 +42,24 @@ namespace MyOGL{
                 OnLoop=NULL;
                 OnEvent=NULL;
                 OnWindowResize=NULL;
+                // mouse events
+                OnLButtonDown=NULL;
+                OnRButtonDown=NULL;
+                OnMButtonDown=NULL;
+                OnLButtonUp=NULL;
+                OnRButtonUp=NULL;
+                OnMButtonUp=NULL;
+                OnMouseMove=NULL;
+                // user home directory path string
                 user_home_dir=NULL;
+                // set button states
+                for(int i=0;i<MYOGL_BUTTONS_COUNT;i++){
+                    KEYS[i]=false;
+                }
+                // set mouse state
+                MOUSE.button_l=false;
+                MOUSE.button_r=false;
+                MOUSE.button_m=false;
             };
             ~CApplication(){
                 if(user_home_dir){
@@ -40,12 +73,21 @@ namespace MyOGL{
             void SetWinCaption(const char *title){ Render->SetWinCaption(title);};
             void SetWinIcon(const char *file_name){ Render->SetWinIcon(file_name);};
             float GetFPS(){ return FPS; }
+            Vector2i GetMousePos(){ return MOUSE.coords; };
             // user functions
             void( *OnRender)(double dt);
             void( *OnLoop)(double dt);
             //void( *OnEvent)(SDL_Event *OnEvent);
             void( *OnEvent)(SDL_Event *Event, double DeltaTime);
             void( *OnWindowResize)(unsigned int width, unsigned int height);
+            // mouse events
+            void( *OnLButtonDown)(int x, int y);
+            void( *OnRButtonDown)(int x, int y);
+            void( *OnMButtonDown)(int x, int y);
+            void( *OnLButtonUp)(int x, int y);
+            void( *OnRButtonUp)(int x, int y);
+            void( *OnMButtonUp)(int x, int y);
+            void( *OnMouseMove)(int x, int y, int xrel, int yrel, bool l_button, bool r_button, bool m_button);
 
             //void OnEvent(SDL_Event* Event);
             void OnExit() { Running = false; }

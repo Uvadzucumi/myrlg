@@ -14,11 +14,13 @@
 #include "game.h"
 #include "myogl/config_file.h"
 #include "myogl/ui/text_box.h"
+#include "myogl/ui/panel.h"
 
 //#include "myogl/frame_buffer.h"
 
 CHudSprite *herro_sprite;
 CTextBox *messages;
+CUIPanel *ui_panel;
 
 void OnRender(double dt){
 
@@ -39,6 +41,78 @@ void OnRender(double dt){
     glTranslatef((herro->GetPosX()-dungeon->GetViewportLeft())*32,(herro->GetPosY()-dungeon->GetViewportTop())*32,0);
     herro->Render();
     glPopMatrix();
+    // show selected tile
+    if(mouse_on_tile && ActiveWindow==gwMain){
+        int box_coord_x=mouse_on_tile_x*32, box_coord_y=mouse_on_tile_y*32;
+        MyOGL::GL.Disable(GL_TEXTURE_2D);
+        // display tile box
+        MyOGL::Render->SetBlendMode(blNone);
+        MyOGL::Render->SetColor(1,1,0);
+        glBegin(GL_LINE_LOOP);
+        glVertex2i(box_coord_x,box_coord_y);
+        glVertex2i(box_coord_x+34,box_coord_y);
+        glVertex2i(box_coord_x+34,box_coord_y+34);
+        glVertex2i(box_coord_x,box_coord_y+34);
+        glEnd();
+        MyOGL::GL.Enable(GL_TEXTURE_2D);
+        // display tile info
+        // info mouse cursor coords
+        Vector2i mouse_pos;
+        mouse_pos=App->GetMousePos();
+        // get tile info
+        int map_tile_x=dungeon->GetViewportLeft()+mouse_on_tile_x;
+        int map_tile_y=dungeon->GetViewportTop()+mouse_on_tile_y;
+        sMapField field=dungeon->GetMapFiled(map_tile_x, map_tile_y);
+        // display tile information box
+        if(!field.viewed){
+            ui_panel=new CUIPanel(mouse_pos.x+10, mouse_pos.y+10, 200, 35);
+        }else{
+            ui_panel=new CUIPanel(mouse_pos.x+10, mouse_pos.y+10, 280, 180);
+        }
+        ui_panel->Render();
+        delete ui_panel;
+
+        font_color.r=0; font_color.g=1,font_color.b=0, font_color.a=1;
+        sprintf(tmp,"Координаты: ^ffffff%d, %d", map_tile_x, map_tile_y);
+        font->PrintAt(mouse_pos.x+12,mouse_pos.y+10,tmp,font_color);
+        if(!field.viewed){ // unknown field
+            sprintf(tmp,"Местность: ^ffffffНеизвестная");
+            font->PrintAt(mouse_pos.x+12,mouse_pos.y+24,tmp,font_color);
+        }else{
+            sprintf(tmp,"Местность: ^ffffff%s",GetTileNameByType(field.tile_type));
+            font->PrintAt(mouse_pos.x+12,mouse_pos.y+24,tmp,font_color);
+            CFOV *fov=dungeon->GetFOV();
+            sMapFovField *fov_field=fov->GetFovField(map_tile_x, map_tile_y);
+            if(fov_field){
+                sprintf(tmp,"Интенсивность света: ^ffffff%d",fov_field->distance);
+                font->PrintAt(mouse_pos.x+12,mouse_pos.y+24+14,tmp,font_color);
+                font->PrintAt(mouse_pos.x+12,mouse_pos.y+24+14*2,"Вектор взгляда:",font_color);
+                font_color.Set(0,1,1,1);
+                sprintf(tmp,"north: ^ffffff%d",fov_field->north);
+                font->PrintAt(mouse_pos.x+32,mouse_pos.y+24+14*3,tmp,font_color);
+                sprintf(tmp,"south: ^ffffff%d",fov_field->south);
+                font->PrintAt(mouse_pos.x+32,mouse_pos.y+24+14*4,tmp,font_color);
+                sprintf(tmp,"east: ^ffffff%d",fov_field->east);
+                font->PrintAt(mouse_pos.x+32,mouse_pos.y+24+14*5,tmp,font_color);
+                sprintf(tmp,"west: ^ffffff%d",fov_field->west);
+                font->PrintAt(mouse_pos.x+32,mouse_pos.y+24+14*6,tmp,font_color);
+                sprintf(tmp,"north-east: ^ffffff%d",fov_field->north_east);
+                font->PrintAt(mouse_pos.x+32,mouse_pos.y+24+14*7,tmp,font_color);
+                sprintf(tmp,"north-west: ^ffffff%d",fov_field->north_west);
+                font->PrintAt(mouse_pos.x+32,mouse_pos.y+24+14*8,tmp,font_color);
+                sprintf(tmp,"south-east: ^ffffff%d",fov_field->south_east);
+                font->PrintAt(mouse_pos.x+32,mouse_pos.y+24+14*9,tmp,font_color);
+                sprintf(tmp,"south-west: ^ffffff%d",fov_field->south_west);
+                font->PrintAt(mouse_pos.x+32,mouse_pos.y+24+14*10,tmp,font_color);
+
+            }else{
+                font->PrintAt(mouse_pos.x+12,mouse_pos.y+24+14,"FOV field: ^ffffffNULL",font_color);
+            }
+        }
+
+
+    }
+
     if(ActiveWindow==gwInventory){
         herro->inventory->Render();
     }else if(ActiveWindow==gwInventoryItemDescription){
@@ -208,6 +282,24 @@ void OnEvent(SDL_Event *Event, double DeltaTime){
     }
 }
 
+
+void OnMouseMove(int x, int y, int xrel, int yrel, bool l_button, bool r_button, bool m_button){
+    if(ActiveWindow==gwMain){
+        int dungeon_area_w=dungeon->GetViewportWidth()*32; // tile seize - 32poxels
+        int dungeon_area_h=dungeon->GetViewportHeight()*32;
+        if(x<dungeon_area_w && y<dungeon_area_h){ // mouse in tiles area
+            mouse_on_tile=true;
+            mouse_on_tile_x=x/32;
+            mouse_on_tile_y=y/32;
+        }else{
+            mouse_on_tile=false;
+        }
+    }else{
+        mouse_on_tile=false;
+    }
+
+}
+
 void OnWindowResize(unsigned int Width, unsigned int Height){
     // resize dungeon Viewport
 //    printf("w: %d h: %d\n",Width, Height);
@@ -262,6 +354,7 @@ int main(int argc, char **argv){
     App->OnLoop=OnLoop;
     App->OnEvent=OnEvent;
     App->OnWindowResize=OnWindowResize;
+    App->OnMouseMove=OnMouseMove;
 
     // load font textures
     font_texture = new MyOGL::CTexture();

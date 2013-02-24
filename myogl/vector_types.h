@@ -4,7 +4,8 @@
 namespace MyOGL{
 
     template <class Type>
-    struct Vector2{
+    class Vector2{
+        public:
         union{
             //Position2f position;
             //uv2f uv;
@@ -18,6 +19,10 @@ namespace MyOGL{
                 Type width,height;
             };
             Type data[2];
+        };
+        void Set(Type x_value, Type y_value){
+            x=x_value;
+            y=y_value;
         };
     };
 
@@ -33,6 +38,11 @@ namespace MyOGL{
                 Type r,g,b;
             };
             Type data[3];
+        };
+        void Set(Type x_value, Type y_value, Type z_value){
+            x=x_value;
+            y=y_value;
+            z=z_value;
         };
     };
 
@@ -51,6 +61,12 @@ namespace MyOGL{
                 Type r,g,b,a;
             };
             Type data[4];
+        };
+        void Set(Type x_value, Type y_value, Type z_value, Type w_value){
+            x=x_value;
+            y=y_value;
+            z=z_value;
+            w=w_value;
         };
     };
 

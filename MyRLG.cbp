@@ -118,8 +118,10 @@
 		<Unit filename="myogl/sprites.h" />
 		<Unit filename="myogl/texture.cpp" />
 		<Unit filename="myogl/texture.h" />
+		<Unit filename="myogl/ui/base_ui_class.h" />
 		<Unit filename="myogl/ui/bitmap_font.cpp" />
 		<Unit filename="myogl/ui/bitmap_font.h" />
+		<Unit filename="myogl/ui/panel.h" />
 		<Unit filename="myogl/ui/text_box.cpp" />
 		<Unit filename="myogl/ui/text_box.h" />
 		<Unit filename="myogl/vector_types.h" />

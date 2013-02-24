@@ -17,7 +17,8 @@
 
 // tile types
 enum eTileTypes{
-    ttWall=0,
+    ttNone=0,
+    ttWall,
     ttCoridor,
     ttRoom,
     ttDoor,/*
@@ -30,6 +31,8 @@ enum eTileTypes{
     ttStairs,
     ttFire
 };
+
+const char* GetTileNameByType(eTileTypes tile);
 
 // tiles data
 typedef struct{
@@ -102,7 +105,6 @@ class CLevelMap{
                 for(int j=0; j < m_height; j++){
                     m_Map[i][j].p_tile_data=NULL;
                     m_Map[i][j].p_monsters=NULL;
-//                    m_Map[i][j].p_items=NULL;
                 }
             }
         };
@@ -168,6 +170,15 @@ class CLevelMap{
         eTileTypes GetTileType(int x, int y){ return m_Map[x][y].tile_type;}
         int GetTileID(int x, int y, int layer){
             return m_Map[x][y].layer[layer];
+        }
+        sMapField GetMapFiled(int x, int y){
+            if(x>=0 && x<m_width && y>=0 && y<m_height){
+                return m_Map[x][y];
+            }
+            // error return error fild
+            sMapField error_fld;
+            error_fld.tile_type=ttNone;
+            return error_fld;
         }
         // calculate light in map part, light_array - result array, left,top, width, height - map part coords
         void CalculateMapLight(CFOV *light_array, int left, int top, int width, int height);

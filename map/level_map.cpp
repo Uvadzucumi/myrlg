@@ -1,6 +1,18 @@
 
 #include "level_map.h"
 
+const char* GetTileNameByType(eTileTypes tile){
+    switch(tile){
+        case ttNone: return "Непонятный тип тайла"; break;
+        case ttWall: return "Стена"; break;
+        case ttCoridor: return "Коридор подземелья"; break;
+        case ttRoom: return "Комната"; break;
+        case ttDoor: return "Дверь"; break;
+        default: return "Ошибочный тип тайла"; break;
+    }
+
+}
+
 // Bresenhams line algo
 bool CLevelMap::LineOfSight(int x1, int y1, int x2, int y2){
     int i, deltax, deltay, numtiles;
@@ -240,7 +252,11 @@ void CLevelMap::CalculateMapLight(CFOV *fov, int left, int top, int width, int h
                             (fld->north && light_pos.y<dy) ||
                             (fld->south && light_pos.y>dy) ||
                             (fld->east && light_pos.x>dx) ||
-                            (fld->west && light_pos.x<dx)
+                            (fld->west && light_pos.x<dx) ||
+                            (fld->north_east && light_pos.y<dy && light_pos.x>dx) ||
+                            (fld->north_west && light_pos.y<dy && light_pos.x<dx) ||
+                            (fld->south_east && light_pos.y>dy && light_pos.x>dx) ||
+                            (fld->south_west && light_pos.y>dy && light_pos.x<dx)
                            ){ // add light
                             new_light=LightSourcesList[i]->GetIntesivity(dx,dy);
                             if(fov->GetDistance(dx,dy) < new_light){

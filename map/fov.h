@@ -10,6 +10,10 @@ struct sMapFovField{
     bool south: 1;
     bool east: 1;
     bool west: 1;
+    bool north_east: 1;
+    bool north_west: 1;
+    bool south_east: 1;
+    bool south_west: 1;
     unsigned char distance;
 };
 
@@ -44,6 +48,7 @@ class CFOV{
             m_fov_field=new sMapFovField[m_fov_size*m_fov_size];
         };
 
+        // clean previous FOV data
         void ClearOldData(){
             int index;
             for(int y=0; y<m_fov_size; y++){
@@ -55,9 +60,12 @@ class CFOV{
                     m_fov_field[index].south=false;
                     m_fov_field[index].east=false;
                     m_fov_field[index].west=false;
+                    m_fov_field[index].north_east=false;
+                    m_fov_field[index].north_west=false;
+                    m_fov_field[index].south_east=false;
+                    m_fov_field[index].south_west=false;
                 };
             };
-            MyOGL::Log->puts("FOV array clean old data\n");
         };
         // set tile (tile_x, tile_y) distance to x_pos, y_pos (if set_distance>0)
         void SetDistance(int tile_x, int tile_y, int x_pos, int y_pos, int set_distance);

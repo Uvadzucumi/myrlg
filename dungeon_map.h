@@ -120,6 +120,12 @@ class CDungeonLevel{
 
         MyOGL::Vector2i GetStartPosition(){ return m_Map->GetStartPosition(); };
 
+        CFOV* GetFOV(){ return m_fov; } // return for object
+        sMapField GetMapFiled(int x, int y){
+            return m_Map->GetMapFiled(x,y);
+        }
+
+
         void DebugMapLight(){
             // debug visible field
             for(int dy=m_ViewPort.top; dy<m_ViewPort.top+m_ViewPort.height; dy++){

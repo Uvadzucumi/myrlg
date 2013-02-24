@@ -106,6 +106,7 @@ void CFOV::Calculate(int x_pos, int y_pos, CLevelMap *m_Map, int set_distance){
                         //continue;
                     }
                 }
+
                 // nort-west
                 x = vp_x - 1;
                 y = vp_y - 1;
@@ -114,9 +115,8 @@ void CFOV::Calculate(int x_pos, int y_pos, CLevelMap *m_Map, int set_distance){
                         m_Map->SetViewed(vp_x,vp_y,true);
                         SetDistance(vp_x, vp_y, x_pos, y_pos, set_distance);
                         m_fov_field[fov_index].is_visible=true;
-                        //m_fov_field[fov_index].west=true;
-                        //m_fov_field[fov_index].north=true;
-                        continue;
+                        m_fov_field[fov_index].north_west=true;
+                        //continue;
                     }
                 }
                 // nort-east
@@ -127,9 +127,8 @@ void CFOV::Calculate(int x_pos, int y_pos, CLevelMap *m_Map, int set_distance){
                         m_Map->SetViewed(vp_x,vp_y,true);
                         SetDistance(vp_x, vp_y, x_pos, y_pos, set_distance);
                         m_fov_field[fov_index].is_visible=true;
-                        //m_fov_field[fov_index].east=true;
-                        //m_fov_field[fov_index].north=true;
-                        continue;
+                        m_fov_field[fov_index].north_east=true;
+                        //continue;
                     }
                 }
                 // south-west
@@ -140,9 +139,8 @@ void CFOV::Calculate(int x_pos, int y_pos, CLevelMap *m_Map, int set_distance){
                         m_Map->SetViewed(vp_x,vp_y,true);
                         SetDistance(vp_x, vp_y, x_pos, y_pos, set_distance);
                         m_fov_field[fov_index].is_visible=true;
-                        //m_fov_field[fov_index].west=true;
-                        //m_fov_field[fov_index].south=true;
-                        continue;
+                        m_fov_field[fov_index].south_west=true;
+                        //continue;
                     }
                 }
                 // south-east
@@ -153,9 +151,8 @@ void CFOV::Calculate(int x_pos, int y_pos, CLevelMap *m_Map, int set_distance){
                         m_Map->SetViewed(vp_x,vp_y,true);
                         SetDistance(vp_x, vp_y, x_pos, y_pos, set_distance);
                         m_fov_field[fov_index].is_visible=true;
-                        //m_fov_field[fov_index].east=true;
-                        //m_fov_field[fov_index].south=true;
-                        continue;
+                        m_fov_field[fov_index].south_east=true;
+                        //continue;
                     }
                 }
             }

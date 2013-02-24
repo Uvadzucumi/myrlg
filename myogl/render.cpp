@@ -325,6 +325,13 @@ void CRender::SetColor(float r, float g, float b, float a, bool force){
     }
 }
 // Set Inc color
+void CRender::SetColor(Vector4f color, bool force){
+    if(GL.Color.r!=color.r || GL.Color.g!=color.g || GL.Color.b != color.b || GL.Color.a!=color.a || force){
+        GL.Color.r=color.r; GL.Color.g=color.g; GL.Color.b=color.b; GL.Color.a=color.a;
+        glColor4f(color.r, color.g, color.b, color.a);
+    }
+}
+// Set Inc color
 void CRender::SetColor(Vector3i color, bool force){
     this->SetColor(((float)color.r)/255,((float)color.g)/255,((float)color.b)/255,1.0, force);
 }

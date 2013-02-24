@@ -16,6 +16,10 @@ CTileset *Tileset;
 CHerro *herro;
 // Dungeon level
 CDungeonLevel *dungeon;
+// mouse on tile
+bool mouse_on_tile;  // mouse cursor in tile area?
+int mouse_on_tile_x, mouse_on_tile_y; // selected tile
+
 
 // config file class
 CConfigFile *cfg_file;

@@ -70,11 +70,11 @@ int CApplication::Run(void){
         lastTime=currTime;
         // check events
         while(SDL_PollEvent(&Event)) {
-            //if(Event.type == SDL_QUIT) {
-            //    Running = false;
-            //}else{
+            if(Event.type == SDL_QUIT) {
+                Running = false;
+            }else{
                 this->Events(&Event, DeltaTime);
-            //}
+            }
         }
         // render scene
 
@@ -105,18 +105,90 @@ int CApplication::Run(void){
 void CApplication::Events(SDL_Event *Event, double DeltaTime){
     switch(Event->type) {
         case SDL_VIDEORESIZE:     // window resize
-                if(Render->OnResize(Event->resize.w,Event->resize.h) && OnWindowResize){
-                    OnWindowResize(Render->GetWidth(),Render->GetHeight());
-                }
+            if(Render->OnResize(Event->resize.w,Event->resize.h) && OnWindowResize){
+                OnWindowResize(Render->GetWidth(),Render->GetHeight());
+            }
             break;
         case SDL_KEYDOWN:
-                KEYS[Event->key.keysym.sym] = true;
+            KEYS[Event->key.keysym.sym] = true;
                 //Log->puts("Key %d pressed\n",Event->key.keysym.sym);
-                break;
+            break;
         case SDL_KEYUP:
-                KEYS[Event->key.keysym.sym] = false;
+            KEYS[Event->key.keysym.sym] = false;
                 //Log->puts("Key %d unpressed\n",Event->key.keysym.sym);
-                break;
+            break;
+        case SDL_MOUSEMOTION:
+            MOUSE.coords.x=Event->motion.x;
+            MOUSE.coords.y=Event->motion.y;
+            if(OnMouseMove){
+                OnMouseMove( Event->motion.x, Event->motion.y, Event->motion.xrel, Event->motion.yrel, \
+                            (Event->motion.state & SDL_BUTTON(SDL_BUTTON_LEFT))!=0, \
+                            (Event->motion.state & SDL_BUTTON(SDL_BUTTON_RIGHT))!=0, \
+                            (Event->motion.state & SDL_BUTTON(SDL_BUTTON_MIDDLE))!=0);
+            }
+            break;
+        case SDL_MOUSEBUTTONDOWN:
+            switch(Event->button.button) {
+                case SDL_BUTTON_LEFT: {
+                    MOUSE.button_l=true;
+                    MOUSE.coords_lb_down.x=Event->button.x;
+                    MOUSE.coords_lb_down.y=Event->button.y;
+                    if(OnLButtonDown){
+                        OnLButtonDown(Event->button.x,Event->button.y);
+                    }
+                    break;
+                }
+                case SDL_BUTTON_RIGHT: {
+                    MOUSE.button_r=true;
+                    MOUSE.coords_rb_down.x=Event->button.x;
+                    MOUSE.coords_rb_down.y=Event->button.y;
+                    if(OnRButtonDown){
+                        OnRButtonDown(Event->button.x,Event->button.y);
+                    }
+                    break;
+                }
+                case SDL_BUTTON_MIDDLE: {
+                    MOUSE.button_m=true;
+                    MOUSE.coords_mb_down.x=Event->button.x;
+                    MOUSE.coords_mb_down.y=Event->button.y;
+                    if(OnMButtonDown){
+                        OnMButtonDown(Event->button.x,Event->button.y);
+                    }
+                    break;
+                }
+            }
+            break;
+        case SDL_MOUSEBUTTONUP:
+            switch(Event->button.button) {
+                case SDL_BUTTON_LEFT: {
+                    MOUSE.button_l=false;
+                    MOUSE.coords_lb_up.x=Event->button.x;
+                    MOUSE.coords_lb_up.y=Event->button.y;
+                    if(OnLButtonUp){
+                        OnLButtonUp(Event->button.x,Event->button.y);
+                    }
+                    break;
+                }
+                case SDL_BUTTON_RIGHT: {
+                    MOUSE.button_r=false;
+                    MOUSE.coords_rb_up.x=Event->button.x;
+                    MOUSE.coords_rb_up.y=Event->button.y;
+                    if(OnRButtonUp){
+                        OnRButtonUp(Event->button.x,Event->button.y);
+                    }
+                    break;
+                }
+                case SDL_BUTTON_MIDDLE: {
+                    MOUSE.button_m=false;
+                    MOUSE.coords_mb_up.x=Event->button.x;
+                    MOUSE.coords_mb_up.y=Event->button.y;
+                    if(OnMButtonUp){
+                        OnMButtonUp(Event->button.x,Event->button.y);
+                    }
+                    break;
+                }
+            }
+            break;
     }
     // mouse events
     // check gui
