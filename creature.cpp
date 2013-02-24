@@ -13,7 +13,7 @@ bool CCreature::Move(int dx, int dy, CDungeonLevel *dungeon){
     if(dungeon->IsCanMove(m_x+dx,m_y+dy)){
         SetPosition(m_x+dx, m_y+dy);
         dungeon->SetViewportToTarget(m_x,m_y);
-        dungeon->CalculateLOS(m_x,m_y);
+        dungeon->CalculateFOV(m_x,m_y);
         return true;
     }
     return false;
@@ -80,7 +80,7 @@ bool CCreature::OpenDoor(CDungeonLevel *dungeon, eDirections direction){
     if(dungeon->OpenDoor(map_coord.x, map_coord.y)){ // Door opened
         // Open door
         Log->puts("Door opened!\n");
-        dungeon->CalculateLOS(m_x,m_y);
+        dungeon->CalculateFOV(m_x,m_y);
         return true;
     }else{
         Log->puts("Not founded closed door in this direction\n");

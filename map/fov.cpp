@@ -51,7 +51,7 @@ void CFOV::Calculate(int x_pos, int y_pos, CLevelMap *m_Map, int set_distance){
             if(m_Map->LineOfSight(vp_x, vp_y, x_pos, y_pos)){
                 SetDistance(vp_x, vp_y, x_pos, y_pos, set_distance);
                 m_fov_field[fov_index].is_visible=true;
-                m_Map->SetViewed(vp_x, vp_y, true);
+                //m_Map->SetViewed(vp_x, vp_y, true);
             }
         }
     }
@@ -64,9 +64,9 @@ void CFOV::Calculate(int x_pos, int y_pos, CLevelMap *m_Map, int set_distance){
             if(!m_Map->IsSkipLight(vp_x, vp_y) && !IsVisible(vp_x, vp_y)){ // invisible blocked tile
                 // north - empty field
                 y = vp_y - 1;
-                if(y>=0){
+                if(y >= 0){
                     if(m_Map->IsSkipLight(vp_x,y) && IsVisible(vp_x,y)){
-                        m_Map->SetViewed(vp_x,vp_y,true);
+                        //m_Map->SetViewed(vp_x,vp_y,true);
                         SetDistance(vp_x, vp_y, x_pos, y_pos, set_distance);
                         m_fov_field[fov_index].is_visible=true;
                         m_fov_field[fov_index].north=true;
@@ -75,9 +75,9 @@ void CFOV::Calculate(int x_pos, int y_pos, CLevelMap *m_Map, int set_distance){
                 }
                 // south - empty visible field
                 y = vp_y + 1;
-                if(y<map_height){
+                if(y < map_height){
                     if(m_Map->IsSkipLight(vp_x,y) && IsVisible(vp_x,y)){
-                        m_Map->SetViewed(vp_x,vp_y,true);
+                        //m_Map->SetViewed(vp_x,vp_y,true);
                         SetDistance(vp_x, vp_y, x_pos, y_pos, set_distance);
                         m_fov_field[fov_index].is_visible=true;
                         m_fov_field[fov_index].south=true;
@@ -86,9 +86,8 @@ void CFOV::Calculate(int x_pos, int y_pos, CLevelMap *m_Map, int set_distance){
                 }
                 // west - empty visible field
                 x = vp_x - 1;
-                if(x>=0){
+                if(x >= 0){
                     if(m_Map->IsSkipLight(x,vp_y) && IsVisible(x,vp_y)){
-                        m_Map->SetViewed(vp_x,vp_y,true);
                         SetDistance(vp_x, vp_y, x_pos, y_pos, set_distance);
                         m_fov_field[fov_index].is_visible=true;
                         m_fov_field[fov_index].west=true;
@@ -97,9 +96,8 @@ void CFOV::Calculate(int x_pos, int y_pos, CLevelMap *m_Map, int set_distance){
                 }
                 // east - empty visible field
                 x = vp_x + 1;
-                if(x<map_width){
+                if(x < map_width){
                     if(m_Map->IsSkipLight(x,vp_y) && IsVisible(x,vp_y)){
-                        m_Map->SetViewed(vp_x,vp_y,true);
                         SetDistance(vp_x, vp_y, x_pos, y_pos, set_distance);
                         m_fov_field[fov_index].is_visible=true;
                         m_fov_field[fov_index].east=true;
@@ -108,55 +106,73 @@ void CFOV::Calculate(int x_pos, int y_pos, CLevelMap *m_Map, int set_distance){
                 }
 
                 // nort-west
-                x = vp_x - 1;
-                y = vp_y - 1;
-                if( x >= 0 && y >= 0){
-                    if(m_Map->IsSkipLight(x,y) && IsVisible(x,y)){
-                        m_Map->SetViewed(vp_x,vp_y,true);
-                        SetDistance(vp_x, vp_y, x_pos, y_pos, set_distance);
-                        m_fov_field[fov_index].is_visible=true;
-                        m_fov_field[fov_index].north_west=true;
+                if(x_pos < vp_x && y_pos < vp_y){
+                    x = vp_x - 1;
+                    y = vp_y - 1;
+                    if( x >= 0 && y >= 0){
+                        if(m_Map->IsSkipLight(x,y) && IsVisible(x,y)){
+                            SetDistance(vp_x, vp_y, x_pos, y_pos, set_distance);
+                            m_fov_field[fov_index].is_visible=true;
+                            m_fov_field[fov_index].north_west=true;
                         //continue;
+                        }
                     }
                 }
                 // nort-east
-                x = vp_x + 1;
-                y = vp_y - 1;
-                if( x < map_width && y >= 0){
-                    if(m_Map->IsSkipLight(x,y) && IsVisible(x,y)){
-                        m_Map->SetViewed(vp_x,vp_y,true);
-                        SetDistance(vp_x, vp_y, x_pos, y_pos, set_distance);
-                        m_fov_field[fov_index].is_visible=true;
-                        m_fov_field[fov_index].north_east=true;
+                if(x_pos > vp_x && y_pos < vp_y){
+                    x = vp_x + 1;
+                    y = vp_y - 1;
+                    if( x < map_width && y >= 0){
+                        if(m_Map->IsSkipLight(x,y) && IsVisible(x,y)){
+                            SetDistance(vp_x, vp_y, x_pos, y_pos, set_distance);
+                            m_fov_field[fov_index].is_visible=true;
+                            m_fov_field[fov_index].north_east=true;
                         //continue;
+                        }
                     }
                 }
                 // south-west
-                x = vp_x - 1;
-                y = vp_y + 1;
-                if( x >= 0 && y <= map_height ){
-                    if(m_Map->IsSkipLight(x,y) && IsVisible(x,y)){
-                        m_Map->SetViewed(vp_x,vp_y,true);
-                        SetDistance(vp_x, vp_y, x_pos, y_pos, set_distance);
-                        m_fov_field[fov_index].is_visible=true;
-                        m_fov_field[fov_index].south_west=true;
+                if(x_pos < vp_x && y_pos > vp_y){
+                    x = vp_x - 1;
+                    y = vp_y + 1;
+                    if( x >= 0 && y < map_height ){
+                        if(m_Map->IsSkipLight(x,y) && IsVisible(x,y)){
+                            SetDistance(vp_x, vp_y, x_pos, y_pos, set_distance);
+                            m_fov_field[fov_index].is_visible=true;
+                            m_fov_field[fov_index].south_west=true;
                         //continue;
+                        }
                     }
                 }
                 // south-east
-                x = vp_x + 1;
-                y = vp_y + 1;
-                if( x < map_width && y <= map_height ){
-                    if(m_Map->IsSkipLight(x,y) && IsVisible(x,y)){
-                        m_Map->SetViewed(vp_x,vp_y,true);
-                        SetDistance(vp_x, vp_y, x_pos, y_pos, set_distance);
-                        m_fov_field[fov_index].is_visible=true;
-                        m_fov_field[fov_index].south_east=true;
+                if(x_pos > vp_x && y_pos > vp_y){
+                    x = vp_x + 1;
+                    y = vp_y + 1;
+                    if( x < map_width && y < map_height ){
+                        if(m_Map->IsSkipLight(x,y) && IsVisible(x,y)){
+                            SetDistance(vp_x, vp_y, x_pos, y_pos, set_distance);
+                            m_fov_field[fov_index].is_visible=true;
+                            m_fov_field[fov_index].south_east=true;
                         //continue;
+                        }
                     }
                 }
+
             }
         }
     }
-//    Log->puts("FOV calculated\n");
 }
+
+// apply current visible field to map viewed
+void CFOV::ApplyOnMap(CLevelMap *map){
+    int index;
+    for(int y=m_left_top.y;  y<=m_right_bottom.y; y++ ){
+        for(int x=m_left_top.x; x<=m_right_bottom.x; x++){
+            index=(y-m_left_top.y)*m_fov_size+(x-m_left_top.x);
+            if(m_fov_field[index].is_visible){
+                map->SetViewed(x,y,true);
+            }
+        }
+    }
+}
+

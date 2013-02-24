@@ -101,11 +101,10 @@ class CDungeonLevel{
         void SetTileset(CTileset *tileset){ m_tileset=tileset;};
         void NewGridDungeon(int grid_w, int grid_h, int rooms);
         //int GetRoomIdByCoords(unsigned int x, unsigned int y);
-        void CalculateLight();
         void SetGlobalLight(unsigned int light_index){ m_global_light=light_index;m_light_changed=true;};
         unsigned int GetGlobalLight(void){ return m_global_light;};
         void Render(void);
-        void CalculateLOS(int x, int y, int distance=0);
+        void CalculateFOV(int x, int y, int distance=0);
         unsigned int GetWidth(){ return m_map_width;};
         unsigned int GetHeight(){ return m_map_height;};
 
@@ -125,7 +124,6 @@ class CDungeonLevel{
             return m_Map->GetMapFiled(x,y);
         }
 
-
         void DebugMapLight(){
             // debug visible field
             for(int dy=m_ViewPort.top; dy<m_ViewPort.top+m_ViewPort.height; dy++){
@@ -135,9 +133,6 @@ class CDungeonLevel{
                 }
                 printf("\n");
             }
-
-            m_fov->debug_visible_sides();
-            m_fov->debug_distance();
         }
 };
 

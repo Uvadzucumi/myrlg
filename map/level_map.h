@@ -139,6 +139,8 @@ class CLevelMap{
             }
             DynamicTilesList.clear();
         };
+        void CalculateAllLights();
+
 
         bool LineOfSight(int x1, int y1, int x2, int y2); // line on sight between x1,y1 and x2,y2
         void AddMapTile(eTileTypes TileType, int x, int y, void *tile_data=NULL);

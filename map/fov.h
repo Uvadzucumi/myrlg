@@ -71,10 +71,15 @@ class CFOV{
         void SetDistance(int tile_x, int tile_y, int x_pos, int y_pos, int set_distance);
 
         void Calculate(int x, int y, CLevelMap *map, int set_light_distane=0);
+        void ApplyOnMap(CLevelMap *map);    // apply vieved field on map array
 
         int GetDistance(int x, int y){
             if(x < m_left_top.x || x > m_right_bottom.x || y < m_left_top.y || y > m_right_bottom.y){
-                MyOGL::Log->puts("ERROR (CFOV.GetDistance): get wrong x,y (%d,%d)\n",x,y);
+                /*
+                MyOGL::Log->puts("ERROR (CFOV.GetDistance): get wrong x,y (%d,%d)",x,y);
+                MyOGL::Log->puts(" left-top: %d %d ",m_left_top.x, m_left_top.y);
+                                MyOGL::Log->puts(" right-bottom: %d %d\n",m_right_bottom.x, m_right_bottom.y);
+                                */
                 return 0;
             }
             return m_fov_field[x-m_left_top.x+(y-m_left_top.y)*m_fov_size].distance;
@@ -103,55 +108,7 @@ class CFOV{
             return &m_fov_field[x-m_left_top.x+(y-m_left_top.y)*m_fov_size];
         }
 
-        // debug distance from look point
-        void debug_distance(){
-            for(int y=0; y<m_fov_size; y++){
-                for(int x=0; x<m_fov_size; x++){
-                    printf("%d ",m_fov_field[x+y*m_fov_size].distance);
-                }
-                printf("\n");
-            }
-        }
-
-        // debug visible sides field
-        void debug_visible_sides(){
-            int index;
-            for(int y=0; y<m_fov_size; y++){
-                for(int x=0; x<m_fov_size; x++){
-                    index=x+m_fov_size*y;
-                    if(m_fov_field[index].north && m_fov_field[index].west){
-                        printf("|`"); continue;
-                    }
-                    if(m_fov_field[index].north && m_fov_field[index].east){
-                        printf("`|"); continue;
-                    }
-                    if(m_fov_field[index].south && m_fov_field[index].west){
-                        printf("|_"); continue;
-                    }
-                    if(m_fov_field[index].south && m_fov_field[index].east){
-                        printf("_|"); continue;
-                    }
-                    if(m_fov_field[index].north){
-                        printf("``"); continue;
-                    }
-                    if(m_fov_field[index].south){
-                        printf("__"); continue;
-                    }
-                    if(m_fov_field[index].west){
-                        printf("| "); continue;
-                    }
-                    if(m_fov_field[index].east){
-                        printf(" |"); continue;
-                    }
-                    printf("  ");
-                }
-                printf("\n");
-            }
-
-        }
-
         int get_size(){ return m_fov_size; }
-
 };
 
 

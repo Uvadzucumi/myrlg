@@ -10,13 +10,11 @@ void CDungeonLevel::NewGridDungeon(int grid_w, int grid_h, int rooms){
     dlg.Generate(m_Map);
 };
 
-void CDungeonLevel::CalculateLOS(int x_pos, int y_pos, int distance){
+void CDungeonLevel::CalculateFOV(int x_pos, int y_pos, int distance){
     m_fov->Calculate(x_pos, y_pos, m_Map, 3); // 3 - herro light size
-}
-// set global light to ViewPort,TODO: add normal light calculation
-void CDungeonLevel::CalculateLight(){
-    // check viewport and set global light
-       m_Map->CalculateMapLight(m_fov,m_ViewPort.left, m_ViewPort.top, m_ViewPort.width, m_ViewPort.height);
+    m_Map->CalculateMapLight(m_fov,m_ViewPort.left, m_ViewPort.top, m_ViewPort.width, m_ViewPort.height);
+    // apply viewed fields (vieved+light)
+    m_fov->ApplyOnMap(m_Map);
 }
 
 // Update map. change animated tiles and etc.
@@ -28,7 +26,7 @@ void CDungeonLevel::Render(){
     int dy,dx;
     int pos_x, pos_y;
     pos_y=0, pos_x=0;
-    CalculateLight();
+    //CalculateLight();
     int vp_y,vp_x;
     unsigned int tile_light;
     for(vp_y=0,dy=m_ViewPort.top; dy<m_ViewPort.top+m_ViewPort.height; dy++, pos_y+=32,vp_y++){

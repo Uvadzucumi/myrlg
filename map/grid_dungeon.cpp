@@ -273,6 +273,8 @@ void CDungeonGeneration::Generate(CLevelMap *Map){
 
     m_Map->SetStartPosition(rand()%m_rooms[0].width+m_rooms[0].left, rand()%m_rooms[0].height+m_rooms[0].top);
 
+    m_Map->CalculateAllLights();
+
 };
 
 int CDungeonGeneration::GetRoomIdByCoords(unsigned int x, unsigned int y){

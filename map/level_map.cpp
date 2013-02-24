@@ -210,6 +210,8 @@ bool CLevelMap::OpenDoor(int x, int y){
                 m_Map[x][y].can_move=true;
                 m_Map[x][y].skip_light=true;
                 m_Map[x][y].layer[1]=tnDoorOpenedDungeon;
+                // recalculate light
+                CalculateAllLights();
                 return true;
         }else{
             return false;
@@ -218,12 +220,19 @@ bool CLevelMap::OpenDoor(int x, int y){
     return false;
 }
 
+// need call after map generation
+void CLevelMap::CalculateAllLights(){
+    for(unsigned int i=0; i < LightSourcesList.size(); i++){
+        LightSourcesList[i]->Calculate(this);
+    }
+}
+
 // calculate light in map part, light_array - result array, left,top, width, height - map part coords
 void CLevelMap::CalculateMapLight(CFOV *fov, int left, int top, int width, int height){
     //printf("calculate light: x:%d, y:%d\n",left,top);
     int dx, dy;
     int max_x=left+width, max_y=top+height;
-    int light_map_index;    // posiont in light map
+
     int new_light;          // calculated light in field
     if(max_x>=m_width) max_x=m_width-1;
     if(max_y>=m_height) max_y=m_height-1;
@@ -239,14 +248,10 @@ void CLevelMap::CalculateMapLight(CFOV *fov, int left, int top, int width, int h
 
             for(dy=top; dy<max_y; dy++){
                 for(dx=left; dx<max_x; dx++){
-                    //light_map_index=(dx-left)+(dy-top)*width;   // view port coordinates index
-                    if( fov->IsVisible(dx,dy) &&
-                        LineOfSight(light_pos.x, light_pos.y, dx, dy)
-                       ){
 
+                    if( fov->IsVisible(dx,dy)){
                         // get fov field
                         sMapFovField *fld=fov->GetFovField(dx,dy);
-
                         // check loock side
                         if( m_Map[dx][dy].skip_light ||
                             (fld->north && light_pos.y<dy) ||

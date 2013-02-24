@@ -41,6 +41,47 @@ void OnRender(double dt){
     glTranslatef((herro->GetPosX()-dungeon->GetViewportLeft())*32,(herro->GetPosY()-dungeon->GetViewportTop())*32,0);
     herro->Render();
     glPopMatrix();
+
+    if(ActiveWindow==gwInventory){
+        herro->inventory->Render();
+    }else if(ActiveWindow==gwInventoryItemDescription){
+        herro->inventory->RenderItemDetail();
+    }
+
+//    for(unsigned int i = 0;i < MyOGL::EntityList.size();i++) {
+//        if(!MyOGL::EntityList[i]) continue;
+//        MyOGL::EntityList[i]->OnRender();
+//    }
+
+    glLoadIdentity();       // for hud - need set default matrix
+
+//    font_color.r=0;font_color.g=1;font_color.b=0;font_color.a=1;
+//    text->PrintAt(300,10,font_color);
+
+// set new viewport
+/*
+        glViewport(0,400,100,100);
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        //  x left, y top
+        // left, right, bottom, top
+        glOrtho(0, 100, 100, 0, 1, -1);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+*/
+
+    font_color.r=0; font_color.g=1,font_color.b=0, font_color.a=1;
+    sprintf(tmp,"FPS: ^ffff00%d",(int)App->GetFPS());
+    font->PrintAt(1,1,tmp,font_color);
+
+    sprintf(tmp,"Координаты героя: [^ffffff%d^ff0000,^ffffff%d^ff0000]",herro->GetPosX(), herro->GetPosY());
+    font_color.r=1; font_color.g=0,font_color.b=0;
+    font->PrintAt(1,14,tmp,font_color);
+
+    // set white color
+    font_color.r=1; font_color.g=1,font_color.b=1;
+    messages->Render(font_color);
+
     // show selected tile
     if(mouse_on_tile && ActiveWindow==gwMain){
         int box_coord_x=mouse_on_tile_x*32, box_coord_y=mouse_on_tile_y*32;
@@ -110,48 +151,7 @@ void OnRender(double dt){
             }
         }
 
-
-    }
-
-    if(ActiveWindow==gwInventory){
-        herro->inventory->Render();
-    }else if(ActiveWindow==gwInventoryItemDescription){
-        herro->inventory->RenderItemDetail();
-    }
-
-//    for(unsigned int i = 0;i < MyOGL::EntityList.size();i++) {
-//        if(!MyOGL::EntityList[i]) continue;
-//        MyOGL::EntityList[i]->OnRender();
-//    }
-
-    glLoadIdentity();       // for hud - need set default matrix
-
-//    font_color.r=0;font_color.g=1;font_color.b=0;font_color.a=1;
-//    text->PrintAt(300,10,font_color);
-
-// set new viewport
-/*
-        glViewport(0,400,100,100);
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        //  x left, y top
-        // left, right, bottom, top
-        glOrtho(0, 100, 100, 0, 1, -1);
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-*/
-
-    font_color.r=0; font_color.g=1,font_color.b=0, font_color.a=1;
-    sprintf(tmp,"FPS: ^ffff00%d",(int)App->GetFPS());
-    font->PrintAt(1,1,tmp,font_color);
-
-    sprintf(tmp,"Координаты героя: [^ffffff%d^ff0000,^ffffff%d^ff0000]",herro->GetPosX(), herro->GetPosY());
-    font_color.r=1; font_color.g=0,font_color.b=0;
-    font->PrintAt(1,14,tmp,font_color);
-
-    // set white color
-    font_color.r=1; font_color.g=1,font_color.b=1;
-    messages->Render(font_color);
+    }// end show tile info window
 
 /*
 
@@ -306,7 +306,7 @@ void OnWindowResize(unsigned int Width, unsigned int Height){
     int new_vp_h=(Height - Height % 32)/32;
     dungeon->SetViewportSize(new_vp_h, new_vp_h);
     dungeon->SetViewportToTarget(herro->GetPosX(), herro->GetPosY());
-    dungeon->CalculateLOS(herro->GetPosX(), herro->GetPosY());
+    dungeon->CalculateFOV(herro->GetPosX(), herro->GetPosY());
     // change message viewport
     messages->SetViewPort(dungeon->GetViewportWidth()*32,50,MyOGL::Render->GetWidth()-dungeon->GetViewportWidth()*32,MyOGL::Render->GetHeight()-50);
 
@@ -411,12 +411,16 @@ int main(int argc, char **argv){
     messages=new MyOGL::CTextBox(font);
     // right from dungeon vievport
     messages->SetViewPort(dungeon->GetViewportWidth()*32, 50, Render->GetWidth()-dungeon->GetViewportWidth()*32, Render->GetHeight()-50);
-    messages->AddString("First Test string!!!");
-    messages->AddString("Second string!!!");
-    messages->AddString("Next string! Строка может быть очень длинной, тогда будет работать перенос на новую!!!");
+    messages->AddString("^ffff00MyRLG");
+    messages->AddString("Это тест строкового окна со скролом.");
+    messages->AddString("Можно прямо в тексте ^00ff00менять цвет^ffffff на лету.\nДля этого есть пец символы: ^^^ff0000rr^00ff00gg^0000ffbb^ffff00, где:\n^ff0000rr^ffffff - красная состаляющая цвета,\n^00ff00gg^ffffff - зкленая, \n^0000ffbb^ffffff - синяя.");
+    messages->AddString("Строка может быть ^ffff00ну очень^ffffff длинной, тогда будет работать ^00ffffавтоматический перенос^ffffff на новую строку!");
+    messages->AddString(".");
+    messages->AddString("..");
+    messages->AddString("...");
 
     dungeon->SetViewportToTarget(herro->GetPosX(),herro->GetPosY());
-    dungeon->CalculateLOS(herro->GetPosX(),herro->GetPosY());
+    dungeon->CalculateFOV(herro->GetPosX(),herro->GetPosY());
 
     Log->puts("Dungeond Created\n");
 
