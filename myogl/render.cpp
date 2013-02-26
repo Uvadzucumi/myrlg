@@ -133,11 +133,19 @@ bool CRender::Init(int width, int height, int bpp, bool full_screen, const char 
 //    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES,  2);
 #endif
     window_flags = SDL_HWSURFACE | SDL_OPENGL;
-    #ifdef MYOGL_DOUBLE_BUFFER
+    #ifdef __WIN32__
+        // Enable double buffering in windows (scip config.h MYOGL_DOUBLE_BUFFER parameter)
         window_flags |= SDL_GL_DOUBLEBUFFER;
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     #else
-        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 0);
+
+        #ifdef MYOGL_DOUBLE_BUFFER
+            window_flags |= SDL_GL_DOUBLEBUFFER;
+            SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+        #else
+            SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 0);
+        #endif
+
     #endif
 
     #ifdef MYOGL_RESIZABLE_WINDOW

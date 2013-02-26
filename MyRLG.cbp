@@ -75,6 +75,7 @@
 				</Linker>
 			</Target>
 		</Build>
+		<Unit filename="TODO.txt" />
 		<Unit filename="creature.cpp" />
 		<Unit filename="creature.h" />
 		<Unit filename="dungeon_map.cpp" />

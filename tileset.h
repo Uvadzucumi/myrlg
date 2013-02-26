@@ -17,20 +17,31 @@ enum eTileNames{
     tnDoorBrokenDungeon,
     tnBonfire=48,
     tnHerro=64,
-
+// Prison walls
+    tnWallVertical=128,
+    tnWallLeftTop,
+    tnWallRightTop,
+    tnWallVerticalRight,
+    tnWallVerticalLeft,
+    tnWallHorizontal=144,
+    tnWallLeftBottom,
+    tnWallRightBottom,
+    tnWallHorizontalUp,
+    tnWallHorizontalDown,
+// Weapons
     tnDagger=80,
     tnSword=82,
     tnSpear=84,
     tnStaff=86,
     tnMace=88,
-
+// Items
     tnBread=96,
     tnSlime,
     tnMeat,
     tnBootleEmpty,
     tnBootleWater,
     tnBootleBeer,
-
+// Potions
     tnPotionAqua=112,
     tnPotionBlack,
     tnPotionBlue,

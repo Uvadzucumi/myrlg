@@ -277,6 +277,107 @@ void CLevelMap::CalculateMapLight(CFOV *fov, int left, int top, int width, int h
     //printf("---\n");
 }
 
+// return true if wall tile tupe (walls, doors, windows etc...)
+bool CLevelMap::IsWall(int x, int y){
+    if(x < 0 || x >= m_width || y < 0 || y >= m_height || !m_Map[x][y].viewed){
+        return false;
+    }
+    if(m_Map[x][y].tile_type==ttWall || m_Map[x][y].tile_type==ttDoor){
+        return true;
+    }
+    return false;
+}
+
+sTileDataDoor CLevelMap::GetDoorData(int x, int y){
+    if(m_Map[x][y].tile_type==ttDoor){
+        if(m_Map[x][y].p_tile_data!=NULL){
+            sTileDataDoor *tmp;
+            tmp=(sTileDataDoor* )m_Map[x][y].p_tile_data;
+            return *tmp;
+        }else{
+            Log->puts("ERROR: CLevelMap::GetDoorData() - empty door data!\n");
+        }
+    }else{
+        Log->puts("ERROR: CLevelMap::GetDoorData() not found door in %d,%d coords\n",x,y);
+    }
+    // return error data
+    sTileDataDoor tmp;
+    return tmp;
+}
+
+void CLevelMap::LandPostprocessing(CFOV *fov, int x, int y){
+    // update one tile
+    if(fov->IsVisible(x,y)){ // only visible
+        // only walls
+        if(IsWall(x,y)){
+            // skip not hidden doors
+            if(m_Map[x][y].tile_type==ttDoor){
+                if(!(GetDoorData(x,y).hidden)){
+                    return; // skip normal doors
+                }
+            }
+            // vertical wall
+            if(!IsWall(x+1,y) && !IsWall(x-1,y)){ // left & right empty
+                m_Map[x][y].layer[0]=tnWallVertical;
+            }else
+            // horisontal wall
+            if(!IsWall(x,y+1) && !IsWall(x,y-1)){
+                m_Map[x][y].layer[0]=tnWallHorizontal;
+            }else
+            // left top corner
+            if(/*!IsWall(x+1,y+1) &&*/ IsWall(x+1,y) && IsWall(x,y+1)){
+                if(IsWall(x,y-1)){
+                    m_Map[x][y].layer[0]=tnWallVerticalRight;
+                }else{
+                    if(IsWall(x-1,y)){
+                        m_Map[x][y].layer[0]=tnWallHorizontalDown;
+                    }else{
+                        m_Map[x][y].layer[0]=tnWallLeftTop;
+                    }
+                }
+            }else
+            // right top corner
+            if(/*!IsWall(x-1,y+1) &&*/ IsWall(x-1,y) && IsWall(x,y+1)){
+                if(IsWall(x,y-1)){
+                    m_Map[x][y].layer[0]=tnWallVerticalLeft;
+                }else{
+                    if(IsWall(x+1,y)){
+                        m_Map[x][y].layer[0]=tnWallHorizontalDown;
+                    }else{
+                        m_Map[x][y].layer[0]=tnWallRightTop;
+                    }
+                }
+            }else
+            // left bottom corner
+            if(/*!IsWall(x+1,y-1) &&*/ IsWall(x+1,y) && IsWall(x,y-1)){
+                if(IsWall(x,y+1)){
+                    m_Map[x][y].layer[0]=tnWallVerticalLeft;
+                }else{
+                    if(IsWall(x-1,y)){
+                        m_Map[x][y].layer[0]=tnWallHorizontalUp;
+                    }else{
+                        m_Map[x][y].layer[0]=tnWallLeftBottom;
+                    }
+                }
+            }else
+            // right bottom
+            if(/*!IsWall(x-1,y-1) &&*/ IsWall(x-1,y) && IsWall(x,y-1)){
+                if(IsWall(x,y+1)){
+                    m_Map[x][y].layer[0]=tnWallVerticalRight;
+                }else{
+                    if(IsWall(x+1,y)){
+                        m_Map[x][y].layer[0]=tnWallHorizontalUp;
+                    }else{
+                        m_Map[x][y].layer[0]=tnWallRightBottom;
+                    }
+                }
+            }
+
+        }
+    }
+}
+
+
 bool CLevelMap::CloseDoor(int x, int y){
 
     return false;

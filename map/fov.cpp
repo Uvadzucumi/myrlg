@@ -174,5 +174,10 @@ void CFOV::ApplyOnMap(CLevelMap *map){
             }
         }
     }
+    for(int y=m_left_top.y;  y<=m_right_bottom.y; y++ ){
+        for(int x=m_left_top.x; x<=m_right_bottom.x; x++){
+            map->LandPostprocessing(this, x,y);
+        }
+    }
 }
 

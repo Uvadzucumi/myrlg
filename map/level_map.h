@@ -94,6 +94,8 @@ class CLevelMap{
         std::vector <CMapLightSource*> LightSourcesList;
         // map player position
         MyOGL::Vector2i m_UnitPosition;
+        bool IsWall(int x, int y);  // return true if wall tile type, walls, doors, windows etc...
+        sTileDataDoor GetDoorData(int x, int y); // return door data from map coords x, y
     public:
         CLevelMap(int Width, int Height){
 
@@ -140,6 +142,7 @@ class CLevelMap{
             DynamicTilesList.clear();
         };
         void CalculateAllLights();
+        void LandPostprocessing(CFOV *fov, int x, int y);
 
 
         bool LineOfSight(int x1, int y1, int x2, int y2); // line on sight between x1,y1 and x2,y2

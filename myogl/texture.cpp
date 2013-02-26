@@ -61,10 +61,16 @@ bool CTexture::CreateFromMemory(void){
 
     if (nOfColors == 4){     // contains an alpha channel
         textureAlpha=true;
-        if (m_data->format->Rmask == 0x000000ff)
+        if (m_data->format->Rmask == 0x0000ff)
             texture_format = GL_RGBA;
-        else
+        else if( m_data->format->Rmask == 0xff0000){
             texture_format = GL_BGRA;
+        }else{
+            Log->puts("ERROR! CTexture::CreateFromMemory() Wrong texture format. using GL_RGBA\n");
+            printf("BitsPerPixel: %d\nRMASK: 0x%x\nGMASK: 0x%x\nBMASK: 0x%x\nAMASK: 0x%x\n",m_data->format->BitsPerPixel, m_data->format->Rmask,m_data->format->Gmask,m_data->format->Bmask,m_data->format->Amask);
+            texture_format=GL_RGBA;
+        }
+        //texture_format = GL_RGBA;
         Log->puts("Found 4 Color in texture. Format: %s\n",(texture_format==GL_RGBA)?"RGBA":"BGRA");
     } else if (nOfColors == 3) {    // no alpha channel
                 textureAlpha=false;
@@ -90,7 +96,7 @@ bool CTexture::CreateFromMemory(void){
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, this->minFilter );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, this->magFilter );
 
-	// Edit the texture object's image data using the information SDL_Surface gives us
+	// Create 2D texture
     glTexImage2D( GL_TEXTURE_2D, 0, nOfColors, m_data->w, m_data->h, 0,
                       texture_format, GL_UNSIGNED_BYTE, m_data->pixels );
     return true;
@@ -101,8 +107,10 @@ bool CTexture::CreateFromMemory(void){
 // create texture in video memory
 bool CTexture::LoadFromFile(const char *file_name){
     strcpy(m_file_name,file_name);
+    //SDL_Surface *tmp;
     if ( (m_data = SDL_LoadBMP(file_name)) ) {
-
+        //m_data = SDL_DisplayFormat(tmp);
+        //SDL_FreeSurface(tmp);
         CreateFromMemory();
 
     } else {

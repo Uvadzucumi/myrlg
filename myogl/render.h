@@ -22,8 +22,8 @@
 
 #ifdef __WIN32__
     #define GL_MAX_TEXTURE_UNITS                    0x84E2
-    #define GL_BGR                                  0x80E0
-    #define GL_BGRA                                 0x80E1
+//    #define GL_BGR                                  0x80E0
+//    #define GL_BGRA                                 0x80E1
 #endif
 
 //typedef void (*GLfunction)();
