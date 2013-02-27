@@ -4,6 +4,8 @@
 #include "../myogl/vector_types.h"
 #include "../myogl/log.h"
 
+class CLevelMap;
+
 struct sMapFovField{
     bool is_visible: 1;
     bool north: 1;
@@ -16,8 +18,6 @@ struct sMapFovField{
     bool south_west: 1;
     unsigned char distance;
 };
-
-class CLevelMap;
 
 class CFOV{
 
@@ -75,11 +75,11 @@ class CFOV{
 
         int GetDistance(int x, int y){
             if(x < m_left_top.x || x > m_right_bottom.x || y < m_left_top.y || y > m_right_bottom.y){
-                /*
+
                 MyOGL::Log->puts("ERROR (CFOV.GetDistance): get wrong x,y (%d,%d)",x,y);
                 MyOGL::Log->puts(" left-top: %d %d ",m_left_top.x, m_left_top.y);
                                 MyOGL::Log->puts(" right-bottom: %d %d\n",m_right_bottom.x, m_right_bottom.y);
-                                */
+
                 return 0;
             }
             return m_fov_field[x-m_left_top.x+(y-m_left_top.y)*m_fov_size].distance;
@@ -91,7 +91,8 @@ class CFOV{
             }
             m_fov_field[x-m_left_top.x+(y-m_left_top.y)*m_fov_size].distance=distance;
         };
-
+        MyOGL::Vector2i GetLeftTop(){ return m_left_top; }
+        MyOGL::Vector2i GetRightBottom(){ return m_right_bottom; }
         bool IsVisible(int x, int y){
             if(x < m_left_top.x || x > m_right_bottom.x || y < m_left_top.y || y > m_right_bottom.y){
           //      MyOGL::Log->puts("ERROR (IsVisible): get wrong x,y (%d,%d)\n",x,y);
@@ -99,10 +100,10 @@ class CFOV{
             }
             return m_fov_field[x-m_left_top.x+(y-m_left_top.y)*m_fov_size].is_visible;
         };
-        // temporary fuull data array access
+        // temporary full data array access
         sMapFovField *GetFovField(int x, int y){
             if(x < m_left_top.x || x > m_right_bottom.x || y < m_left_top.y || y > m_right_bottom.y){
-                MyOGL::Log->puts("ERROR (CFOV.GetFovField): get wrong x,y for light (%d,%d)\n",x,y);
+                MyOGL::Log->puts("ERROR (CFOV.GetFovField): get wrong x,y for point (%d,%d)\n",x,y);
                 return NULL;
             }
             return &m_fov_field[x-m_left_top.x+(y-m_left_top.y)*m_fov_size];

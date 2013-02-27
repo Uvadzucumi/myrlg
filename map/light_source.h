@@ -1,8 +1,9 @@
 #ifndef LIGHT_SOURCE_H_INCLUDED
 #define LIGHT_SOURCE_H_INCLUDED
 
-#include "level_map.h"
 #include <math.h>
+#include "../myogl/vector_types.h"
+#include "fov.h"
 
 class CMapLightSource{
         MyOGL::Vector2i m_position;
@@ -27,19 +28,10 @@ class CMapLightSource{
 
     int GetIntesivity(int x, int y){    // return light intensivity in coords x,y
         return m_light_fov->GetDistance(x,y);
-        /*
-        // calculate distance
-        int distance = sqrt(((x - m_position.x) * (x - m_position.x)) + ((y - m_position.y) * (y - m_position.y)));
-        //int ret=strength-distance-1+dynamic_tile->GetCurrentFrame()%2;
-        //int ret=strength-distance-dynamic_tile->GetCurrentFrame();
-        int ret=m_strength-distance;
-        if(ret<=0){
-            return 0;
-        }else{
-            return ret;
-        }
-        */
     };
+    // apply light fo FOV area
+    void ApplyToFOV(CFOV *fov, CLevelMap *map);
+
 };// sMapLightSource;
 
 #endif // LIGHT_SOURCE_H_INCLUDED

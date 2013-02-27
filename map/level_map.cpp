@@ -229,52 +229,23 @@ void CLevelMap::CalculateAllLights(){
 
 // calculate light in map part, light_array - result array, left,top, width, height - map part coords
 void CLevelMap::CalculateMapLight(CFOV *fov, int left, int top, int width, int height){
-    //printf("calculate light: x:%d, y:%d\n",left,top);
-    int dx, dy;
-    int max_x=left+width, max_y=top+height;
 
-    int new_light;          // calculated light in field
-    if(max_x>=m_width) max_x=m_width-1;
-    if(max_y>=m_height) max_y=m_height-1;
-    // create light sorce list in current coords
+    Vector2i left_top=fov->GetLeftTop();
+    Vector2i right_bottom=fov->GetRightBottom();
+
+    // search nearest light sources
     for(unsigned int i=0; i < LightSourcesList.size(); i++){
         MyOGL::Vector2i light_pos=LightSourcesList[i]->GetPosition();
         int strength=LightSourcesList[i]->GetStrength();
-        if( light_pos.x > left-strength &&
-            light_pos.x<left+width+strength &&
-            light_pos.y>top-strength &&
-            light_pos.y<top+height+strength
-        ){
-
-            for(dy=top; dy<max_y; dy++){
-                for(dx=left; dx<max_x; dx++){
-
-                    if( fov->IsVisible(dx,dy)){
-                        // get fov field
-                        sMapFovField *fld=fov->GetFovField(dx,dy);
-                        // check loock side
-                        if( m_Map[dx][dy].skip_light ||
-                            (fld->north && light_pos.y<dy) ||
-                            (fld->south && light_pos.y>dy) ||
-                            (fld->east && light_pos.x>dx) ||
-                            (fld->west && light_pos.x<dx) ||
-                            (fld->north_east && light_pos.y<dy && light_pos.x>dx) ||
-                            (fld->north_west && light_pos.y<dy && light_pos.x<dx) ||
-                            (fld->south_east && light_pos.y>dy && light_pos.x>dx) ||
-                            (fld->south_west && light_pos.y>dy && light_pos.x<dx)
-                           ){ // add light
-                            new_light=LightSourcesList[i]->GetIntesivity(dx,dy);
-                            if(fov->GetDistance(dx,dy) < new_light){
-                               fov->SetDistance(dx,dy,new_light);
-                            }
-                        }
-                    }
-                }
-                //printf("\n");
+        if( light_pos.x+strength>=left_top.x &&
+            light_pos.x-strength<=right_bottom.x &&
+            light_pos.y+strength>=left_top.y &&
+            light_pos.y-strength<=right_bottom.y ){
+                // need apply light to FOV
+                LightSourcesList[i]->ApplyToFOV(fov, this);
             }
-        }
     }
-    //printf("---\n");
+
 }
 
 // return true if wall tile tupe (walls, doors, windows etc...)
