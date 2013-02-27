@@ -64,9 +64,9 @@ void CFOV::Calculate(int x_pos, int y_pos, CLevelMap *m_Map, int set_distance){
             if(!m_Map->IsSkipLight(vp_x, vp_y) && !IsVisible(vp_x, vp_y)){ // invisible blocked tile
                 // north - empty field
                 y = vp_y - 1;
-                if(y >= 0){
+                //if(y >= 0){
+                if(y >= m_left_top.y){
                     if(m_Map->IsSkipLight(vp_x,y) && IsVisible(vp_x,y)){
-                        //m_Map->SetViewed(vp_x,vp_y,true);
                         SetDistance(vp_x, vp_y, x_pos, y_pos, set_distance);
                         m_fov_field[fov_index].is_visible=true;
                         m_fov_field[fov_index].north=true;
@@ -75,9 +75,9 @@ void CFOV::Calculate(int x_pos, int y_pos, CLevelMap *m_Map, int set_distance){
                 }
                 // south - empty visible field
                 y = vp_y + 1;
-                if(y < map_height){
+                //if(y < map_height){
+                if(y <= m_right_bottom.y){
                     if(m_Map->IsSkipLight(vp_x,y) && IsVisible(vp_x,y)){
-                        //m_Map->SetViewed(vp_x,vp_y,true);
                         SetDistance(vp_x, vp_y, x_pos, y_pos, set_distance);
                         m_fov_field[fov_index].is_visible=true;
                         m_fov_field[fov_index].south=true;
@@ -86,7 +86,8 @@ void CFOV::Calculate(int x_pos, int y_pos, CLevelMap *m_Map, int set_distance){
                 }
                 // west - empty visible field
                 x = vp_x - 1;
-                if(x >= 0){
+                //if(x >= 0){
+                if(x >= m_left_top.x){
                     if(m_Map->IsSkipLight(x,vp_y) && IsVisible(x,vp_y)){
                         SetDistance(vp_x, vp_y, x_pos, y_pos, set_distance);
                         m_fov_field[fov_index].is_visible=true;
@@ -96,7 +97,8 @@ void CFOV::Calculate(int x_pos, int y_pos, CLevelMap *m_Map, int set_distance){
                 }
                 // east - empty visible field
                 x = vp_x + 1;
-                if(x < map_width){
+                //if(x < map_width){
+                if(x <= m_right_bottom.x){
                     if(m_Map->IsSkipLight(x,vp_y) && IsVisible(x,vp_y)){
                         SetDistance(vp_x, vp_y, x_pos, y_pos, set_distance);
                         m_fov_field[fov_index].is_visible=true;
@@ -109,7 +111,8 @@ void CFOV::Calculate(int x_pos, int y_pos, CLevelMap *m_Map, int set_distance){
                 if(x_pos < vp_x && y_pos < vp_y){
                     x = vp_x - 1;
                     y = vp_y - 1;
-                    if( x >= 0 && y >= 0){
+                    //if( x >= 0 && y >= 0){
+                    if( x >= m_left_top.x && y >= m_left_top.y){
                         if(m_Map->IsSkipLight(x,y) && IsVisible(x,y)){
                             SetDistance(vp_x, vp_y, x_pos, y_pos, set_distance);
                             m_fov_field[fov_index].is_visible=true;
@@ -122,7 +125,8 @@ void CFOV::Calculate(int x_pos, int y_pos, CLevelMap *m_Map, int set_distance){
                 if(x_pos > vp_x && y_pos < vp_y){
                     x = vp_x + 1;
                     y = vp_y - 1;
-                    if( x < map_width && y >= 0){
+                    //if( x < map_width && y >= 0){
+                    if(x <= m_right_bottom.x && y >= m_left_top.y){
                         if(m_Map->IsSkipLight(x,y) && IsVisible(x,y)){
                             SetDistance(vp_x, vp_y, x_pos, y_pos, set_distance);
                             m_fov_field[fov_index].is_visible=true;
@@ -135,7 +139,8 @@ void CFOV::Calculate(int x_pos, int y_pos, CLevelMap *m_Map, int set_distance){
                 if(x_pos < vp_x && y_pos > vp_y){
                     x = vp_x - 1;
                     y = vp_y + 1;
-                    if( x >= 0 && y < map_height ){
+                    //if( x >= 0 && y < map_height ){
+                    if( x >= m_left_top.x && y <= m_right_bottom.y ){
                         if(m_Map->IsSkipLight(x,y) && IsVisible(x,y)){
                             SetDistance(vp_x, vp_y, x_pos, y_pos, set_distance);
                             m_fov_field[fov_index].is_visible=true;
@@ -148,7 +153,8 @@ void CFOV::Calculate(int x_pos, int y_pos, CLevelMap *m_Map, int set_distance){
                 if(x_pos > vp_x && y_pos > vp_y){
                     x = vp_x + 1;
                     y = vp_y + 1;
-                    if( x < map_width && y < map_height ){
+//                    if( x < map_width && y < map_height ){
+                    if( x <= m_right_bottom.x && y <= m_right_bottom.y ){
                         if(m_Map->IsSkipLight(x,y) && IsVisible(x,y)){
                             SetDistance(vp_x, vp_y, x_pos, y_pos, set_distance);
                             m_fov_field[fov_index].is_visible=true;

@@ -93,12 +93,15 @@ class CFOV{
         };
         MyOGL::Vector2i GetLeftTop(){ return m_left_top; }
         MyOGL::Vector2i GetRightBottom(){ return m_right_bottom; }
+        bool IsInArea(int x, int y){
+            return x >= m_left_top.x && x <=m_right_bottom.x && y >= m_left_top.y && y<= m_right_bottom.y;
+        }
         bool IsVisible(int x, int y){
-            if(x < m_left_top.x || x > m_right_bottom.x || y < m_left_top.y || y > m_right_bottom.y){
-          //      MyOGL::Log->puts("ERROR (IsVisible): get wrong x,y (%d,%d)\n",x,y);
-                return false;
+            if(IsInArea(x, y)){
+                return m_fov_field[x-m_left_top.x+(y-m_left_top.y)*m_fov_size].is_visible;
             }
-            return m_fov_field[x-m_left_top.x+(y-m_left_top.y)*m_fov_size].is_visible;
+            MyOGL::Log->puts("ERROR (IsVisible): get wrong x,y (%d,%d)\n",x,y);
+            return false;
         };
         // temporary full data array access
         sMapFovField *GetFovField(int x, int y){

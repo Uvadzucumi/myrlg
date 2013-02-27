@@ -77,8 +77,9 @@ class CMapDynamicTile{
             }
             m_animation->FramesCount=TileNamesList.size();
         }
-        void Update(double DeltaTime){
-            m_animation->OnAnimate(DeltaTime);
+        // return true if frame changed
+        bool Update(double DeltaTime){
+            return m_animation->OnAnimate(DeltaTime);
         };
         short GetCurrentTile(){ return TileNamesList[m_animation->GetCurrentFrame()]; };
         int GetCurrentFrame(){ return m_animation->GetCurrentFrame(); };
@@ -163,7 +164,7 @@ class CLevelMap{
         bool CloseDoor(int x, int y);
         void SetViewed(int x, int y, bool flag){
             if(x<0 || y< 0 || x>=m_width || y>=m_height){
-                MyOGL::Log->puts("RANGE ERROR (SetViewed): x: %d y: %d\n",x,y);
+                MyOGL::Log->puts("RANGE ERROR CLevelMap::SetViewed(): x: %d y: %d\n",x,y);
                 return;
             }
             m_Map[x][y].viewed=flag;

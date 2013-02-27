@@ -33,10 +33,6 @@ void CDungeonLevel::Render(){
         glTranslatef(-pos_x,0,0);
         for(vp_x=0,dx=m_ViewPort.left, pos_x=0;dx<m_ViewPort.left+m_ViewPort.width;dx++,pos_x+=32,vp_x++){
             if(m_Map->IsViewed(dx,dy)){
-            //if(m_Map[dx][dy].layer[0]!=255){
-                //m_tileset->RenderAt(pos_x,pos_y,m_Map[dx][dy].layer[0],&LightMaterials[m_Map[dx][dy].light]);
-                //if(m_light_vp[vp_x+vp_y*m_ViewPort.width].is_visible){
-                //m_fov->GetDistance(dx, dy);
                 if(m_fov->IsVisible(dx,dy)){
                     // get light
                     tile_light=m_fov->GetDistance(dx,dy);
@@ -68,4 +64,3 @@ void CDungeonLevel::Render(){
     }
     glTranslatef(-pos_x,-pos_y,0);
 };
-

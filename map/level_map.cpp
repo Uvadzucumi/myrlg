@@ -168,14 +168,15 @@ void CLevelMap::AddBonfire(unsigned int x, unsigned int y, unsigned char strengt
 void CLevelMap::Update(CFOV *fov, double DeltaTime){
     // update animated sprites
     for(unsigned i=0;i<DynamicTilesList.size();i++){
-        // update animations
-        DynamicTilesList[i]->Update(DeltaTime);
-
         // if in visible field, may be need change animated tile
-        if(fov->IsVisible(DynamicTilesList[i]->position.x,DynamicTilesList[i]->position.y)){
-            if(m_Map[DynamicTilesList[i]->position.x][DynamicTilesList[i]->position.y].layer[DynamicTilesList[i]->layer]!=DynamicTilesList[i]->GetCurrentTile()){
+        if( fov->IsInArea(DynamicTilesList[i]->position.x, DynamicTilesList[i]->position.y) &&
+            fov->IsVisible(DynamicTilesList[i]->position.x,DynamicTilesList[i]->position.y)){
+            // update animations
+            if(DynamicTilesList[i]->Update(DeltaTime)){
+//            if(m_Map[DynamicTilesList[i]->position.x][DynamicTilesList[i]->position.y].layer[DynamicTilesList[i]->layer]!=DynamicTilesList[i]->GetCurrentTile()){
                 m_Map[DynamicTilesList[i]->position.x][DynamicTilesList[i]->position.y].layer[DynamicTilesList[i]->layer]=DynamicTilesList[i]->GetCurrentTile();
-            };
+//            };
+            }
         }
     }
 }
@@ -278,7 +279,7 @@ sTileDataDoor CLevelMap::GetDoorData(int x, int y){
 
 void CLevelMap::LandPostprocessing(CFOV *fov, int x, int y){
     // update one tile
-    if(fov->IsVisible(x,y)){ // only visible
+    if(fov->IsInArea(x,y) && fov->IsVisible(x,y)){ // only visible
         // only walls
         if(IsWall(x,y)){
             // skip not hidden doors
@@ -296,7 +297,7 @@ void CLevelMap::LandPostprocessing(CFOV *fov, int x, int y){
                 m_Map[x][y].layer[0]=tnWallHorizontal;
             }else
             // left top corner
-            if(/*!IsWall(x+1,y+1) &&*/ IsWall(x+1,y) && IsWall(x,y+1)){
+            if(IsWall(x+1,y) && IsWall(x,y+1)){
                 if(IsWall(x,y-1)){
                     m_Map[x][y].layer[0]=tnWallVerticalRight;
                 }else{
@@ -308,7 +309,7 @@ void CLevelMap::LandPostprocessing(CFOV *fov, int x, int y){
                 }
             }else
             // right top corner
-            if(/*!IsWall(x-1,y+1) &&*/ IsWall(x-1,y) && IsWall(x,y+1)){
+            if(IsWall(x-1,y) && IsWall(x,y+1)){
                 if(IsWall(x,y-1)){
                     m_Map[x][y].layer[0]=tnWallVerticalLeft;
                 }else{
@@ -320,7 +321,7 @@ void CLevelMap::LandPostprocessing(CFOV *fov, int x, int y){
                 }
             }else
             // left bottom corner
-            if(/*!IsWall(x+1,y-1) &&*/ IsWall(x+1,y) && IsWall(x,y-1)){
+            if(IsWall(x+1,y) && IsWall(x,y-1)){
                 if(IsWall(x,y+1)){
                     m_Map[x][y].layer[0]=tnWallVerticalLeft;
                 }else{
