@@ -13,12 +13,12 @@ CAnimation::CAnimation() {
     Oscillate       = false;
 }
 
-void CAnimation::OnAnimate(double DeltaTime){
+// return true if frame changed
+bool CAnimation::OnAnimate(double DeltaTime){
     OldTime+=DeltaTime;
     if(OldTime<FrameRate){
-        return;
+        return false;
     }
-    //printf("Frame: %d Oscillate: %d Increment: %d Frames: %d OldTime: %f\n",CurrentFrame, (int)Oscillate, FrameInc, FramesCount, OldTime);
     OldTime-=FrameRate;
     CurrentFrame += FrameInc;
     if(Oscillate) {
@@ -36,7 +36,7 @@ void CAnimation::OnAnimate(double DeltaTime){
             CurrentFrame = 0;
         }
     }
-//    printf("Frame: %d Oscillate: %d Increment: %d MaxFrames: %d OldTime: %f\n\n",CurrentFrame, (int)Oscillate, FrameInc, FramesCount, OldTime);
+    return true;
 }
 
 void CAnimation::SetFrameRate(double Rate) {

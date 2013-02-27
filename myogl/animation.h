@@ -18,7 +18,7 @@ namespace MyOGL{
             bool    Oscillate;
 
             CAnimation();
-            void OnAnimate(double DeltaTime);
+            bool OnAnimate(double DeltaTime);
 
             void SetFrameRate(double Rate);
             void SetCurrentFrame(int Frame);
