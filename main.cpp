@@ -385,7 +385,8 @@ int main(int argc, char **argv){
     dungeon=new CDungeonLevel(200,200);
     dungeon->SetTileset(Tileset);
     dungeon->NewGridDungeon(20,20,150);
-
+    dungeon->SetSeeOnlyWithLight(cfg_file->GetParamValue("see_only_with_light",1));
+    dungeon->SetDiffuseLight(cfg_file->GetParamValue("enable_diffuse_light",1));
     // create herro
 
     MyOGL::Vector2i pos=dungeon->GetStartPosition();
@@ -413,7 +414,7 @@ int main(int argc, char **argv){
     messages->SetViewPort(dungeon->GetViewportWidth()*32, 50, Render->GetWidth()-dungeon->GetViewportWidth()*32, Render->GetHeight()-50);
     messages->AddString("^ffff00MyRLG");
     messages->AddString("Это тест окна текстовых строк со скролом.");
-    messages->AddString("Можно прямо в тексте ^00ff00менять цвет^ffffff на лету.\nДля этого есть пец символы: ^^^ff0000rr^00ff00gg^0000ffbb^ffffff, где:\n^ff0000rr^ffffff - красная состаляющая цвета,\n^00ff00gg^ffffff - зеленая, \n^0000ffbb^ffffff - синяя.");
+    messages->AddString("Можно прямо в тексте ^00ff00менять цвет^ffffff на лету.\nДля этого есть пец символы: ^^^ff0000rr^00ff00gg^0000ffbb^ffffff, где:\n^ff0000rr^ffffff - красная составляющая цвета,\n^00ff00gg^ffffff - зеленая, \n^0000ffbb^ffffff - синяя.");
     messages->AddString("Строка может быть ^ffff00ну очень^ffffff длинной, тогда будет работать ^00ffffавтоматический перенос^ffffff на новую строку!");
     messages->AddString(".");
     messages->AddString("..");

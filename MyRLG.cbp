@@ -93,6 +93,7 @@
 		<Unit filename="map/grid_dungeon.h" />
 		<Unit filename="map/level_map.cpp" />
 		<Unit filename="map/level_map.h" />
+		<Unit filename="map/light_source.cpp" />
 		<Unit filename="map/light_source.h" />
 		<Unit filename="myogl/animation.cpp" />
 		<Unit filename="myogl/animation.h" />
@@ -126,6 +127,7 @@
 		<Unit filename="myogl/ui/text_box.cpp" />
 		<Unit filename="myogl/ui/text_box.h" />
 		<Unit filename="myogl/vector_types.h" />
+		<Unit filename="myrlg.conf" />
 		<Unit filename="tileset.cpp" />
 		<Unit filename="tileset.h" />
 		<Extensions>

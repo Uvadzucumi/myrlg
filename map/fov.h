@@ -71,21 +71,19 @@ class CFOV{
         void SetDistance(int tile_x, int tile_y, int x_pos, int y_pos, int set_distance);
 
         void Calculate(int x, int y, CLevelMap *map, int set_light_distane=0);
-        void ApplyOnMap(CLevelMap *map);    // apply vieved field on map array
+        void ApplyOnMap(CLevelMap *map, bool only_light_visible=true);    // apply vieved field on map array
 
         int GetDistance(int x, int y){
-            if(x < m_left_top.x || x > m_right_bottom.x || y < m_left_top.y || y > m_right_bottom.y){
-
-                MyOGL::Log->puts("ERROR (CFOV.GetDistance): get wrong x,y (%d,%d)",x,y);
-                MyOGL::Log->puts(" left-top: %d %d ",m_left_top.x, m_left_top.y);
-                                MyOGL::Log->puts(" right-bottom: %d %d\n",m_right_bottom.x, m_right_bottom.y);
-
-                return 0;
+            if(IsInArea(x, y)){
+                return m_fov_field[x-m_left_top.x+(y-m_left_top.y)*m_fov_size].distance;
             }
-            return m_fov_field[x-m_left_top.x+(y-m_left_top.y)*m_fov_size].distance;
+            MyOGL::Log->puts("ERROR (CFOV.GetDistance): get wrong x,y (%d,%d)",x,y);
+            MyOGL::Log->puts(" left-top: %d %d ",m_left_top.x, m_left_top.y);
+            MyOGL::Log->puts(" right-bottom: %d %d\n",m_right_bottom.x, m_right_bottom.y);
+            return 0;
         };
         void SetDistance(int x, int y, int distance){
-            if(x < m_left_top.x || x > m_right_bottom.x || y < m_left_top.y || y > m_right_bottom.y){
+            if(!IsInArea(x, y)){
                 MyOGL::Log->puts("ERROR (CFOV.SetDistance): get wrong x,y (%d,%d)\n",x,y);
                 return;
             }
@@ -100,16 +98,18 @@ class CFOV{
             if(IsInArea(x, y)){
                 return m_fov_field[x-m_left_top.x+(y-m_left_top.y)*m_fov_size].is_visible;
             }
-            MyOGL::Log->puts("ERROR (IsVisible): get wrong x,y (%d,%d)\n",x,y);
+            MyOGL::Log->puts("ERROR (IsVisible): get wrong x,y (%d,%d)",x,y);
+            MyOGL::Log->puts(" left-top: %d %d ",m_left_top.x, m_left_top.y);
+            MyOGL::Log->puts(" right-bottom: %d %d\n",m_right_bottom.x, m_right_bottom.y);
             return false;
         };
         // temporary full data array access
         sMapFovField *GetFovField(int x, int y){
-            if(x < m_left_top.x || x > m_right_bottom.x || y < m_left_top.y || y > m_right_bottom.y){
-                MyOGL::Log->puts("ERROR (CFOV.GetFovField): get wrong x,y for point (%d,%d)\n",x,y);
-                return NULL;
+            if(IsInArea(x, y)){
+                return &m_fov_field[x-m_left_top.x+(y-m_left_top.y)*m_fov_size];
             }
-            return &m_fov_field[x-m_left_top.x+(y-m_left_top.y)*m_fov_size];
+            MyOGL::Log->puts("ERROR (CFOV.GetFovField): get wrong x,y for point (%d,%d)\n",x,y);
+            return NULL;
         }
 
         int get_size(){ return m_fov_size; }

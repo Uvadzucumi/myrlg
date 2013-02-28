@@ -20,13 +20,15 @@ class CDungeonLevel{
 
         unsigned int m_global_light;
         bool m_light_changed;
+        bool m_diffuse_light;
         Vector4i m_ViewPort;
-        //sMapFovField *m_light_vp; // light strength in viewport coords
-
+        bool m_see_only_with_light;
     public:
 
         CDungeonLevel(int width, int height){
 
+            m_see_only_with_light=false;
+            m_diffuse_light=false;
             m_map_height=height; m_map_width=width;
 
             m_Map=new CLevelMap(m_map_width, m_map_height);
@@ -54,6 +56,9 @@ class CDungeonLevel{
 //            for(unsigned int i=0;i<m_ViewPort.width;i++) delete LOS[i];
 //            delete LOS;
         };
+        void SetSeeOnlyWithLight(bool light_see){ m_see_only_with_light=light_see; }
+        void SetDiffuseLight(bool diffuse_light){ m_diffuse_light=diffuse_light; }
+
         void Update(double DeltaTime);  // update map animated tiles (TODO: lights and etc.)
         void SetViewportPosition(unsigned int x, unsigned int y){ m_ViewPort.left=x; m_ViewPort.top=y; m_light_changed=true;};
         void SetViewportToTarget(unsigned int x, unsigned int y){

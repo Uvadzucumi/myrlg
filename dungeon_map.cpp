@@ -14,7 +14,7 @@ void CDungeonLevel::CalculateFOV(int x_pos, int y_pos, int distance){
     m_fov->Calculate(x_pos, y_pos, m_Map, 3); // 3 - herro light size
     m_Map->CalculateMapLight(m_fov,m_ViewPort.left, m_ViewPort.top, m_ViewPort.width, m_ViewPort.height);
     // apply viewed fields (vieved+light)
-    m_fov->ApplyOnMap(m_Map);
+    m_fov->ApplyOnMap(m_Map, m_see_only_with_light);
 }
 
 // Update map. change animated tiles and etc.
@@ -26,14 +26,12 @@ void CDungeonLevel::Render(){
     int dy,dx;
     int pos_x, pos_y;
     pos_y=0, pos_x=0;
-    //CalculateLight();
-    int vp_y,vp_x;
     unsigned int tile_light;
-    for(vp_y=0,dy=m_ViewPort.top; dy<m_ViewPort.top+m_ViewPort.height; dy++, pos_y+=32,vp_y++){
+    for(dy=m_ViewPort.top; dy<m_ViewPort.top+m_ViewPort.height; dy++, pos_y+=32){
         glTranslatef(-pos_x,0,0);
-        for(vp_x=0,dx=m_ViewPort.left, pos_x=0;dx<m_ViewPort.left+m_ViewPort.width;dx++,pos_x+=32,vp_x++){
+        for(dx=m_ViewPort.left, pos_x=0;dx<m_ViewPort.left+m_ViewPort.width;dx++,pos_x+=32){
             if(m_Map->IsViewed(dx,dy)){
-                if(m_fov->IsVisible(dx,dy)){
+                if(m_fov->IsInArea(dx, dy) && m_fov->IsVisible(dx,dy)){
                     // get light
                     tile_light=m_fov->GetDistance(dx,dy);
                     m_tileset->Tile(m_Map->GetTileID(dx,dy,0))->Render(&LightMaterials[9-tile_light]);
