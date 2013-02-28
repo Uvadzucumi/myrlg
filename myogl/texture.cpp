@@ -48,12 +48,12 @@ bool CTexture::CreateFromMemory(void){
     }
 	// Check that the image's width is a power of 2
     if ( (m_data->w & (m_data->w - 1)) != 0 ) {
-        Log->puts("warning: %s's width is not a power of 2\n", m_file_name);
+        Log->printf("warning: %s's width is not a power of 2\n", m_file_name);
     }
 
 	// Also check if the height is a power of 2
     if ( (m_data->h & (m_data->h - 1)) != 0 ) {
-        Log->puts("warning: %s's height is not a power of 2\n", m_file_name);
+        Log->printf("warning: %s's height is not a power of 2\n", m_file_name);
     }
 
     // get the number of channels in the SDL surface
@@ -71,16 +71,16 @@ bool CTexture::CreateFromMemory(void){
             texture_format=GL_RGBA;
         }
         //texture_format = GL_RGBA;
-        Log->puts("Found 4 Color in texture. Format: %s\n",(texture_format==GL_RGBA)?"RGBA":"BGRA");
+        Log->printf("Found 4 Color in texture. Format: %s\n",(texture_format==GL_RGBA)?"RGBA":"BGRA");
     } else if (nOfColors == 3) {    // no alpha channel
                 textureAlpha=false;
                 if (m_data->format->Rmask == 0x000000ff)
                         texture_format = GL_RGB;
                 else
                         texture_format = GL_BGR;
-                Log->puts("Found 3 Color in texture. Format: %s\n",(texture_format==GL_RGB)?"RGB":"BGR");
+                Log->printf("Found 3 Color in texture. Format: %s\n",(texture_format==GL_RGB)?"RGB":"BGR");
     } else {
-                Log->puts("warning: the image %s is not truecolor..  this will probably break\n",m_file_name);
+                Log->printf("warning: the image %s is not truecolor..  this will probably break\n",m_file_name);
                 // this error should not go unhandled
                 return false;
     }
@@ -114,10 +114,10 @@ bool CTexture::LoadFromFile(const char *file_name){
         CreateFromMemory();
 
     } else {
-        Log->puts("SDL could not load image.bmp: %s\n", SDL_GetError());
+        Log->printf("SDL could not load image.bmp: %s\n", SDL_GetError());
         return false;
     }
-    Log->puts("Created Texture %d (%s)\n",TextureID, file_name);
+    Log->printf("Created Texture %d (%s)\n",TextureID, file_name);
     TexturesList.push_back(this);   // add to global texture ids list (for autoclean)
     return true;
 }

@@ -39,13 +39,6 @@ void CLog::puts(const char *str){
     }
 }
 
-void CLog::puts(const char *str, const char *str2){
-    if(open_file()){
-        fprintf(fp,str,str2);
-        close_file();
-    }
-}
-
 void CLog::puts(const char *str, int num){
     if(open_file()){
         fprintf(fp,str,num);
@@ -60,64 +53,20 @@ void CLog::puts(const char *str, int num, int num2){
     }
 }
 
-void CLog::puts(const char *str, int num, const char *str2){
-    if(open_file()){
-        fprintf(fp,str,num, str2);
-        close_file();
-    }
-}
-
 void CLog::puts(const char *str, Vector4f *color){
     if(open_file()){
         fprintf(fp,str,color->r, color->g, color->b, color->a);
         close_file();
     }
 }
-/*
-void CLog::printf(char *format, ...){
-    FILE *fp;
-    puts("Запись в log.txt, printf ");
-    if(!(fp=fopen("log.txt","w+"))){
-       puts("Ошибка открытия log.txt\n");
-    }else{
-        va_list ap;
-        char *p, *sval;
-        int ival;
-        double dval;
 
-        va_start(ap, format);
-        for (p = format; *p; p++) {
-            if (*p != '%') {
-            putchar(*p);
-            //    fputc(*p,fp);
-                continue;
-            }
-            switch (*++p) {
-                case 'd':
-                    ival = va_arg(ap, int);
-            printf("%d", ival);
-            //        fprintf(fp,"%d",ival);
-                    break;
-                case 'f':
-                    dval = va_arg(ap, double);
-            printf("%f", dval);
-            //        fprintf(fp,"%f", dval);
-                    break;
-                case 's':
-            for (sval = va_arg(ap, char *); *sval; sval++)
-                putchar(*sval);
-            //        sval = va_arg(ap, char *);
-            //        fputs(sval,fp);
-                    break;
-                default:
-            putchar(*p);
-            //        fputc(*p,fp);
-                    break;
-            }
-        }
-        va_end(ap);
-        puts("wite success\n");
-        fclose(fp);
+void CLog::printf(const char *format, ...){
+    if(open_file()){
+        va_list vargs;
+        va_start(vargs, format);
+        vfprintf(fp, format, vargs);
+        va_end(vargs);
+        close_file();
     }
 }
-*/
+

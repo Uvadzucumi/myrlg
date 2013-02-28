@@ -328,8 +328,6 @@ int main(int argc, char **argv){
     }
 #endif
 
-    printf("FOV size: %d %d %d\n",sizeof(sMapFovField),sizeof(int),sizeof(char));
-
     srand(time(NULL));
 
     // get user directory
@@ -347,6 +345,8 @@ int main(int argc, char **argv){
         delete App;
         return -1;
     };
+
+    Log->printf("FOV size: %d Int Size: %d CharSize: %d\n",sizeof(sMapFovField),sizeof(int),sizeof(char));
 
     App->SetWinIcon("data/ico.bmp");
     // set callback functions

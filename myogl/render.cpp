@@ -168,9 +168,9 @@ bool CRender::Init(int width, int height, int bpp, bool full_screen, const char 
     printf("Double Buffering: %s\n",(tmp)?"Enabled":"Disabled");
     // show Opengl Info
     this->gl_vendor = (char *) glGetString(GL_VENDOR);
-    Log->puts("OpenGL Vendor: %s\n",gl_vendor);
+    Log->printf("OpenGL Vendor: %s\n",gl_vendor);
     gl_version = (char *) glGetString(GL_VERSION);
-    Log->puts("OpenGL Version: %s\n",gl_version);
+    Log->printf("OpenGL Version: %s\n",gl_version);
     if(!strcmp(gl_vendor,"Microsoft Corporation")){
        Log->puts("Need install Video Driver!\n");
 //        return false;
@@ -238,7 +238,7 @@ bool CRender::SetWinIcon(const char *file_name){
     SDL_Surface* surface;
 //Load Bitmap
     if(!(surface = SDL_LoadBMP(file_name))) {
-        Log->puts("Error load icon file name: %s\n",file_name);
+        Log->printf("Error load icon file name: %s\n",file_name);
         return false;
     }
     SDL_WM_SetIcon(surface, NULL);
@@ -550,11 +550,11 @@ void RenderStates::GetCurrentStates(){
 
 void RenderStates::Debug(void){
     Log->puts("---[ OpenGL states Debug ]---\n");
-    Log->puts("GL_COLOR_MATERIAL: %s\n",(ColorMaterial)?"true":"false");
-    Log->puts("GL_TEXTURE_2D: %s\n",(Texture2D)?"true":"false");
-    Log->puts("GL_DEPTH_TEST: %s\n",(DepthTest)?"true":"false");
-    Log->puts("GL_LIGHTING: %s\n",(Lighting)?"true":"false");
-    Log->puts("GL_BLEND: %s\n",(Blend)?"true":"false");
+    Log->printf("GL_COLOR_MATERIAL: %s\n",(ColorMaterial)?"true":"false");
+    Log->printf("GL_TEXTURE_2D: %s\n",(Texture2D)?"true":"false");
+    Log->printf("GL_DEPTH_TEST: %s\n",(DepthTest)?"true":"false");
+    Log->printf("GL_LIGHTING: %s\n",(Lighting)?"true":"false");
+    Log->printf("GL_BLEND: %s\n",(Blend)?"true":"false");
 //    Log->puts("GL_BLEND_COLOR: (%f,%f,%f,%f)\n",&BlendColor);
     Log->puts("GL_CURRENT_COLOR: (%f,%f,%f,%f)\n",&Color);
     Log->puts("GL_COLOR_CLEAR_VALUE: (%f,%f,%f,%f)\n",&ClearColor);

@@ -29,7 +29,7 @@ bool CFont::LoadGlyphData(const char *file_name, CTexture *texture){
     m_texture=texture;
 
     if(!(fp=fopen(file_name,"rt"))){
-        Log->puts("CFont::LoadGlyphData() - Error: Not opened font description file '%s'\n",file_name);
+        Log->printf("CFont::LoadGlyphData() - Error: Not opened font description file '%s'\n",file_name);
         return false;
     };
     int char_count=0;
@@ -44,7 +44,7 @@ bool CFont::LoadGlyphData(const char *file_name, CTexture *texture){
             }else{ // font founded - read glyph
                 i=sscanf(tmp,"%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n",&CharCode, &Xpos, &Ypos, &Width, &Height, &Xoffset, &Yoffset, &OrigW, &OrigH);
                 if(i!=9){   // wrong gliph string
-                    Log->puts("CFont::LoadGlyphData() - Warning: Wrong glyph string '%s'",tmp);
+                    Log->printf("CFont::LoadGlyphData() - Warning: Wrong glyph string '%s'",tmp);
                     break;
                 }
                 glyph.code=CharCode;
