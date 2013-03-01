@@ -7,7 +7,7 @@ void CMapLightSource::ApplyToFOV(CFOV *fov, CLevelMap *map){
     MyOGL::Vector2i left_top, right_bottom;   // map coords
     MyOGL::Vector2i fov_lt, fov_rb, light_lt, light_rb;
 
-    sMapFovField *fov_fld;
+    sMapFovField *fov_fld, *light_fld;
     int new_light;
 // get fov and light areas
     fov_lt=fov->GetLeftTop();
@@ -26,8 +26,19 @@ void CMapLightSource::ApplyToFOV(CFOV *fov, CLevelMap *map){
                 new_light=m_light_fov->GetDistance(dx,dy);
                 if(fov->IsVisible(dx,dy) && m_light_fov->GetDistance(dx,dy)){
                     // compare light & view vectors
+
                     fov_fld=fov->GetFovField(dx,dy);
+                    light_fld=m_light_fov->GetFovField(dx,dy);
                     if(  map->IsSkipLight(dx,dy) ||
+                        (fov_fld->north && light_fld->north) ||
+                        (fov_fld->south && light_fld->south) ||
+                        (fov_fld->east && light_fld->east) ||
+                        (fov_fld->west && light_fld->west) ||
+                        (fov_fld->north_east && light_fld->north_east) ||
+                        (fov_fld->north_west && light_fld->north_west) ||
+                        (fov_fld->south_east && light_fld->south_east) ||
+                        (fov_fld->south_west && light_fld->south_west)){
+                       /*
                         (fov_fld->north && m_position.y<dy) ||
                         (fov_fld->south && m_position.y>dy) ||
                         (fov_fld->east && m_position.x>dx) ||
@@ -36,6 +47,7 @@ void CMapLightSource::ApplyToFOV(CFOV *fov, CLevelMap *map){
                         (fov_fld->north_west && m_position.y<dy && m_position.x<dx) ||
                         (fov_fld->south_east && m_position.y>dy && m_position.x>dx) ||
                         (fov_fld->south_west && m_position.y>dy && m_position.x<dx)){
+                        */
                         // compared, add light if needed
                             if(fov->GetDistance(dx,dy) < new_light){
                                fov->SetDistance(dx,dy,new_light);

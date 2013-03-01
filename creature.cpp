@@ -101,6 +101,8 @@ bool CHero::Move(int dx, int dy, CDungeonLevel *dungeon){
         if(dungeon->IsDoor(m_x+dx, m_y+dy)){
             if(dungeon->IsDoorClosed(m_x+dx, m_y+dy)){
                 dungeon->OpenDoor(m_x+dx,m_y+dy);
+                Log->puts("Door opened!\n");
+                dungeon->CalculateFOV(m_x,m_y);
                 m_last_mov_tick=SDL_GetTicks();
                 return false;   // not moved
             }

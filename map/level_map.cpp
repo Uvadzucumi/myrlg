@@ -211,7 +211,8 @@ bool CLevelMap::OpenDoor(int x, int y){
                 m_Map[x][y].can_move=true;
                 m_Map[x][y].skip_light=true;
                 m_Map[x][y].layer[1]=tnDoorOpenedDungeon;
-                // recalculate light
+                // recalculate lighs
+                //CalculateNearesLights();
                 CalculateAllLights();
                 return true;
         }else{
@@ -228,11 +229,26 @@ void CLevelMap::CalculateAllLights(){
     }
 }
 
+// update light near FOV
+void CLevelMap::CalculateNearesLights(){
+// update saved lights
+    Log->printf("Nearest lights: %d\n",LightsNearFOV.size());
+    for(unsigned int i; i<LightsNearFOV.size(); i++){
+        MyOGL::Vector2i light_pos=LightSourcesList[LightsNearFOV[i]]->GetPosition();
+        Log->printf("recalculate light in pos: %d, %d\n", light_pos.x, light_pos.y );
+        LightSourcesList[LightsNearFOV[i]]->Calculate(this);
+    }
+}
+
+
 // calculate light in map part, light_array - result array, left,top, width, height - map part coords
-void CLevelMap::CalculateMapLight(CFOV *fov, int left, int top, int width, int height){
+void CLevelMap::CalculateMapLight(CFOV *fov){
 
     Vector2i left_top=fov->GetLeftTop();
     Vector2i right_bottom=fov->GetRightBottom();
+
+    // clear old lights list
+    LightsNearFOV.clear();
 
     // search nearest light sources
     for(unsigned int i=0; i < LightSourcesList.size(); i++){
@@ -242,6 +258,8 @@ void CLevelMap::CalculateMapLight(CFOV *fov, int left, int top, int width, int h
             light_pos.x-strength<=right_bottom.x &&
             light_pos.y+strength>=left_top.y &&
             light_pos.y-strength<=right_bottom.y ){
+                // save nearest lights indexes
+                LightsNearFOV.push_back(i);
                 // need apply light to FOV
                 LightSourcesList[i]->ApplyToFOV(fov, this);
             }

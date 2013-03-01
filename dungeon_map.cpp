@@ -11,9 +11,11 @@ void CDungeonLevel::NewGridDungeon(int grid_w, int grid_h, int rooms){
 };
 
 void CDungeonLevel::CalculateFOV(int x_pos, int y_pos, int distance){
+    // hero FOV
     m_fov->Calculate(x_pos, y_pos, m_Map, 3); // 3 - herro light size
-    m_Map->CalculateMapLight(m_fov,m_ViewPort.left, m_ViewPort.top, m_ViewPort.width, m_ViewPort.height);
-    // apply viewed fields (vieved+light)
+    // Apply lights to Hero FOV
+    m_Map->CalculateMapLight(m_fov);
+    // Apply Viewed fields from Hero FOV to Map Array
     m_fov->ApplyOnMap(m_Map, m_see_only_with_light);
 }
 

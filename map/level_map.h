@@ -93,6 +93,7 @@ class CLevelMap{
         sMapField **m_Map;
         std::vector <CMapDynamicTile*> DynamicTilesList;
         std::vector <CMapLightSource*> LightSourcesList;
+        std::vector <int> LightsNearFOV; // lights index near FOV
         // map player position
         MyOGL::Vector2i m_UnitPosition;
         bool IsWall(int x, int y);  // return true if wall tile type, walls, doors, windows etc...
@@ -142,7 +143,8 @@ class CLevelMap{
             }
             DynamicTilesList.clear();
         };
-        void CalculateAllLights();
+        void CalculateAllLights();  // recalculate all light
+        void CalculateNearesLights(); // recalculate lights neares hero FOV
         void LandPostprocessing(CFOV *fov, int x, int y);
 
 
@@ -186,8 +188,8 @@ class CLevelMap{
             error_fld.tile_type=ttNone;
             return error_fld;
         }
-        // calculate light in map part, light_array - result array, left,top, width, height - map part coords
-        void CalculateMapLight(CFOV *light_array, int left, int top, int width, int height);
+        // apply light from light sources to FOV & create lights near FOV list
+        void CalculateMapLight(CFOV *fov);
 };
 
 #endif // LEVEL_MAP_H_INCLUDED

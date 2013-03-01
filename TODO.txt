@@ -1,11 +1,10 @@
 TODO LIST:
 
-- Change CalculateAllLights() after Door open, need use CalculateNearestLights(changed field_x, changed field_y)
-  for best perfomance.
-- Add diffuse Light
-- Display normal field information (current showed debug info, view vector, light strength and etc.)
-  Display Tile info moved to separate module
-- Add Animated Water tiles
-- Add display Dungeon Map (may be using FBO)
+- add diffuse Light
+- display normal field information (current showed debug info, view vector, light strength and etc.)
+  display Tile info moved to separate module
+- add Animated Water tiles
+- add display Dungeon Map (may be using FBO)
+- add text world wrap in text render functions, add fast text render (without special symbols, wordwrap, etc...)
 - revrite inventory class
 - add mobs (BIG FAT RATs)
