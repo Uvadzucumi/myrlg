@@ -88,7 +88,7 @@ bool CCreature::OpenDoor(CDungeonLevel *dungeon, eDirections direction){
     }
 }
 // Herro movement
-bool CHerro::Move(int dx, int dy, CDungeonLevel *dungeon){
+bool CHero::Move(int dx, int dy, CDungeonLevel *dungeon){
 // movement delay
     unsigned int tick=SDL_GetTicks();
     if(m_last_mov_tick && (tick-m_last_mov_tick)<m_movement_delay){
@@ -96,17 +96,29 @@ bool CHerro::Move(int dx, int dy, CDungeonLevel *dungeon){
     }
     m_last_mov_tick=tick;
 
+    // if enabled autoopen
+    if(m_autoopen_doors){
+        if(dungeon->IsDoor(m_x+dx, m_y+dy)){
+            if(dungeon->IsDoorClosed(m_x+dx, m_y+dy)){
+                dungeon->OpenDoor(m_x+dx,m_y+dy);
+                m_last_mov_tick=SDL_GetTicks();
+                return false;   // not moved
+            }
+        }
+    }
+
+
     return CCreature::Move(dx, dy, dungeon);
 
 }
 
 // Pick up items from floor
-void CHerro::PikUp(CDungeonLevel *dungeon){
+void CHero::PikUp(CDungeonLevel *dungeon){
     dungeon->SearchItemsIn(m_x, m_y);
 }
 
 
-void CHerro::Render(){
+void CHero::Render(){
     CCreature::Render(); // rener sprite
     // render equipped items
     inventory->RenderEquipped();

@@ -13,7 +13,7 @@ MyOGL::CText *text; // need delete
 CTileset *Tileset;
 
 // Player
-CHerro *herro;
+CHero *hero;
 // Dungeon level
 CDungeonLevel *dungeon;
 // mouse on tile

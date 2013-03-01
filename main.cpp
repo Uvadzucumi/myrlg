@@ -18,7 +18,7 @@
 
 //#include "myogl/frame_buffer.h"
 
-CHudSprite *herro_sprite;
+CHudSprite *hero_sprite;
 CTextBox *messages;
 CUIPanel *ui_panel;
 
@@ -38,14 +38,14 @@ void OnRender(double dt){
     //
     // herro render
     glPushMatrix();
-    glTranslatef((herro->GetPosX()-dungeon->GetViewportLeft())*32,(herro->GetPosY()-dungeon->GetViewportTop())*32,0);
-    herro->Render();
+    glTranslatef((hero->GetPosX()-dungeon->GetViewportLeft())*32,(hero->GetPosY()-dungeon->GetViewportTop())*32,0);
+    hero->Render();
     glPopMatrix();
 
     if(ActiveWindow==gwInventory){
-        herro->inventory->Render();
+        hero->inventory->Render();
     }else if(ActiveWindow==gwInventoryItemDescription){
-        herro->inventory->RenderItemDetail();
+        hero->inventory->RenderItemDetail();
     }
 
 //    for(unsigned int i = 0;i < MyOGL::EntityList.size();i++) {
@@ -69,16 +69,12 @@ void OnRender(double dt){
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
 */
-
+    // show FPS
     font_color.r=0; font_color.g=1,font_color.b=0, font_color.a=1;
     sprintf(tmp,"FPS: ^ffff00%d",(int)App->GetFPS());
     font->PrintAt(1,1,tmp,font_color);
 
-    sprintf(tmp,"Координаты героя: [^ffffff%d^ff0000,^ffffff%d^ff0000]",herro->GetPosX(), herro->GetPosY());
-    font_color.r=1; font_color.g=0,font_color.b=0;
-    font->PrintAt(1,14,tmp,font_color);
-
-    // set white color
+    // render messages
     font_color.r=1; font_color.g=1,font_color.b=1;
     messages->Render(font_color);
 
@@ -174,28 +170,28 @@ void OnLoop(double DeltaTime){
 //    float speed=100;
     if(ActiveWindow==gwMain){
         if(App->IsKeyPressed(SDLK_LEFT) || App->IsKeyPressed(SDLK_KP4)){
-            herro->Move(-1,0, dungeon);
+            hero->Move(-1,0, dungeon);
         }
         if(App->IsKeyPressed(SDLK_RIGHT)|| App->IsKeyPressed(SDLK_KP6)){
-            herro->Move(1,0, dungeon);
+            hero->Move(1,0, dungeon);
         }
         if(App->IsKeyPressed(SDLK_UP)|| App->IsKeyPressed(SDLK_KP8)){
-            herro->Move(0,-1, dungeon);
+            hero->Move(0,-1, dungeon);
         }
         if(App->IsKeyPressed(SDLK_DOWN)|| App->IsKeyPressed(SDLK_KP2)){
-            herro->Move(0,1, dungeon);
+            hero->Move(0,1, dungeon);
         }
         if(App->IsKeyPressed(SDLK_KP7)){
-            herro->Move(-1,-1, dungeon);
+            hero->Move(-1,-1, dungeon);
         }
         if(App->IsKeyPressed(SDLK_KP9)){
-            herro->Move(1,-1, dungeon);
+            hero->Move(1,-1, dungeon);
         }
         if(App->IsKeyPressed(SDLK_KP1)){
-            herro->Move(-1,1, dungeon);
+            hero->Move(-1,1, dungeon);
         }
         if(App->IsKeyPressed(SDLK_KP3)){
-            herro->Move(1,1, dungeon);
+            hero->Move(1,1, dungeon);
         }
         if(App->IsKeyPressed(SDLK_i)){  // goto inventory window
             ActiveWindow=gwInventory;
@@ -231,10 +227,10 @@ void OnEvent(SDL_Event *Event, double DeltaTime){
                     dungeon->DebugMapLight();
                     break;
                 case SDLK_o:
-                    herro->OpenDoor(dungeon);
+                    hero->OpenDoor(dungeon);
                     break;
                 case SDLK_g:
-                    herro->PikUp(dungeon);
+                    hero->PikUp(dungeon);
                     break;
                 default:
 //                    printf("Pressed key: %d\n",Event->key.keysym.sym);
@@ -245,7 +241,7 @@ void OnEvent(SDL_Event *Event, double DeltaTime){
                 ActiveWindow=gwMain;
             }else{
                 // get items from pressed button
-                if(herro->inventory->SelectItemByKey(Event->key.keysym.sym)){
+                if(hero->inventory->SelectItemByKey(Event->key.keysym.sym)){
                     ActiveWindow=gwInventoryItemDescription;
                 }else{
                     MyOGL::Log->puts("Pressed %d key in Inventory Window\n",Event->key.keysym.sym);
@@ -258,13 +254,13 @@ void OnEvent(SDL_Event *Event, double DeltaTime){
                 // TODO - equip, drop item(s)
                 switch(Event->key.keysym.sym){
                     case 'w':
-                            herro->inventory->Equip();
+                            hero->inventory->Equip();
                         break;
                     case 'e':
                             MyOGL::Log->puts("Eat/Drink action!\n");
                         break;
                     case 't':
-                        herro->inventory->Unequip(); // UnEquip current selected item
+                        hero->inventory->Unequip(); // UnEquip current selected item
                         break;
                     case 'd':
                         MyOGL::Log->puts("Drop action!\n");
@@ -305,8 +301,8 @@ void OnWindowResize(unsigned int Width, unsigned int Height){
 //    printf("w: %d h: %d\n",Width, Height);
     int new_vp_h=(Height - Height % 32)/32;
     dungeon->SetViewportSize(new_vp_h, new_vp_h);
-    dungeon->SetViewportToTarget(herro->GetPosX(), herro->GetPosY());
-    dungeon->CalculateFOV(herro->GetPosX(), herro->GetPosY());
+    dungeon->SetViewportToTarget(hero->GetPosX(), hero->GetPosY());
+    dungeon->CalculateFOV(hero->GetPosX(), hero->GetPosY());
     // change message viewport
     messages->SetViewPort(dungeon->GetViewportWidth()*32,50,MyOGL::Render->GetWidth()-dungeon->GetViewportWidth()*32,MyOGL::Render->GetHeight()-50);
 
@@ -391,21 +387,22 @@ int main(int argc, char **argv){
 
     MyOGL::Vector2i pos=dungeon->GetStartPosition();
 
-    herro=new CHerro();
-    herro->SetMovementDelay(cfg_file->GetParamValue("movement_delay",50));
-    herro->SetPosition(pos.x, pos.y);
-    herro_sprite=new CHudSprite(tiles_texture);
-    herro_sprite->SetUVPixelCoords(0,128,32,32);
-    herro_sprite->SetSize(32,32);
-    herro->SetSprite(herro_sprite);
+    hero=new CHero();
+    hero->SetMovementDelay(cfg_file->GetParamValue("movement_delay",50));
+    hero->SetAutoopenDoors(cfg_file->GetParamValue("autoopen_doors",1));
+    hero->SetPosition(pos.x, pos.y);
+    hero_sprite=new CHudSprite(tiles_texture);
+    hero_sprite->SetUVPixelCoords(0,128,32,32);
+    hero_sprite->SetSize(32,32);
+    hero->SetSprite(hero_sprite);
 
-    herro->inventory->SetItemTileset(Tileset); // Items tileset
-    herro->inventory->SetFont(font);
-    herro->inventory->AddItem(100,1);
-    herro->inventory->AddItem(101,1);
-    herro->inventory->AddItem(102,1);
-    herro->inventory->AddItem(103,1);
-    herro->inventory->AddItem(104,1);
+    hero->inventory->SetItemTileset(Tileset); // Items tileset
+    hero->inventory->SetFont(font);
+    hero->inventory->AddItem(100,1);
+    hero->inventory->AddItem(101,1);
+    hero->inventory->AddItem(102,1);
+    hero->inventory->AddItem(103,1);
+    hero->inventory->AddItem(104,1);
 
     Log->puts("Minimum map tile size: %d Bytes\n",sizeof(sMapField));
 
@@ -420,8 +417,8 @@ int main(int argc, char **argv){
     messages->AddString("..");
     messages->AddString("...");
 
-    dungeon->SetViewportToTarget(herro->GetPosX(),herro->GetPosY());
-    dungeon->CalculateFOV(herro->GetPosX(),herro->GetPosY());
+    dungeon->SetViewportToTarget(hero->GetPosX(),hero->GetPosY());
+    dungeon->CalculateFOV(hero->GetPosX(),hero->GetPosY());
 
     Log->puts("Dungeond Created\n");
 
@@ -437,8 +434,8 @@ int main(int argc, char **argv){
     delete messages;
     delete font;
     delete App; // required
-    delete herro_sprite;
-    delete herro;
+    delete hero_sprite;
+    delete hero;
 
     printf("Normal Exit\n");
     return 0;

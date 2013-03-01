@@ -64,20 +64,23 @@ class CCreature{
 };
 
 // herro class
-class CHerro : public CCreature{
+class CHero : public CCreature{
             unsigned int m_last_mov_tick;   // for movement delay
             unsigned int m_movement_delay;    // only for herro
+            bool m_autoopen_doors;
         public:
             CInventory *inventory;
-            CHerro(){
+            CHero(){
                 m_last_mov_tick=0;
                 m_movement_delay=10;
+                m_autoopen_doors=false;
                 inventory=new CInventory;
             };
-            ~CHerro(){
+            ~CHero(){
                 delete inventory;
             }
             void SetMovementDelay(unsigned int delay){ m_movement_delay=delay;};
+            void SetAutoopenDoors(bool auto_open){ m_autoopen_doors=auto_open;}
             void Render();
             // Commands
             void PikUp(CDungeonLevel *dungeon);

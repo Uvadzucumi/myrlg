@@ -29,7 +29,7 @@ extern MyOGL::CFont *font; // need delete
 extern MyOGL::CText *text; // need delete
 
 extern CTileset *Tileset;
-extern CHerro *herro;
+extern CHero *hero;
 
 extern bool mouse_on_tile;  // mouse cursor in tile area?
 extern int mouse_on_tile_x, mouse_on_tile_y; // selected tile coords in tile area
