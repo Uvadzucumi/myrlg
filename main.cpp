@@ -22,6 +22,8 @@ CHudSprite *hero_sprite;
 CTextBox *messages;
 CUIPanel *ui_panel;
 
+bool diffuse_light;
+
 void OnRender(double dt){
 
 //    static unsigned int savedTime=0;
@@ -215,6 +217,7 @@ void OnEvent(SDL_Event *Event, double DeltaTime){
                     App->OnExit();
                     break;
                 case SDLK_SPACE:
+                /*
                     if(dungeon->GetGlobalLight()<9){
                         dungeon->SetGlobalLight(dungeon->GetGlobalLight()+1);
                     }else{
@@ -225,6 +228,15 @@ void OnEvent(SDL_Event *Event, double DeltaTime){
                     messages->AddString(str);
                     // show map light
                     dungeon->DebugMapLight();
+                    */
+                    diffuse_light=!diffuse_light;
+                    dungeon->SetDiffuseLight(diffuse_light);
+                    dungeon->CalculateFOV(hero->GetPosX(), hero->GetPosY());
+                    if(diffuse_light){
+                        messages->AddString("Diffuse light: ^00ff00Enabled");
+                    }else{
+                        messages->AddString("Diffuse light: ^ffff00Disabled");
+                    }
                     break;
                 case SDLK_o:
                     hero->OpenDoor(dungeon);
@@ -383,6 +395,7 @@ int main(int argc, char **argv){
     dungeon->NewGridDungeon(20,20,150);
     dungeon->SetSeeOnlyWithLight(cfg_file->GetParamValue("see_only_with_light",1));
     dungeon->SetDiffuseLight(cfg_file->GetParamValue("enable_diffuse_light",1));
+    diffuse_light=cfg_file->GetParamValue("enable_diffuse_light",1);
     // create herro
 
     MyOGL::Vector2i pos=dungeon->GetStartPosition();

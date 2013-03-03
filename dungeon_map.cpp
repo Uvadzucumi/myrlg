@@ -15,6 +15,10 @@ void CDungeonLevel::CalculateFOV(int x_pos, int y_pos, int distance){
     m_fov->Calculate(x_pos, y_pos, m_Map, 3); // 3 - herro light size
     // Apply lights to Hero FOV
     m_Map->CalculateMapLight(m_fov);
+    // calculate diffuse lights (if need)
+    if(m_diffuse_light){
+        m_fov->CalculateDiffuse(1); // number of diffyse steps
+    }
     // Apply Viewed fields from Hero FOV to Map Array
     m_fov->ApplyOnMap(m_Map, m_see_only_with_light);
 }

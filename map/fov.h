@@ -22,6 +22,7 @@ struct sMapFovField{
 class CFOV{
 
         sMapFovField *m_fov_field;
+        sMapFovField *m_fov_field_diffuse;
         int m_distance, m_fov_size;
         MyOGL::Vector2i m_left_top, m_right_bottom;    // last calculated FOV position in map coords
 
@@ -71,6 +72,7 @@ class CFOV{
         void SetDistance(int tile_x, int tile_y, int x_pos, int y_pos, int set_distance);
 
         void Calculate(int x, int y, CLevelMap *map, int set_light_distane=0);
+        void CalculateDiffuse(int depth);
         void ApplyOnMap(CLevelMap *map, bool only_light_visible=true);    // apply vieved field on map array
 
         int GetDistance(int x, int y){

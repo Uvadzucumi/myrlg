@@ -171,3 +171,75 @@ void CFOV::ApplyOnMap(CLevelMap *map, bool only_light_visible){
     }
 }
 
+void CFOV::CalculateDiffuse(int depth){
+  // check all fov fields and add lights in nearest field
+    int dx, dy;
+    depth=3;
+    for(int n=0; n<depth; n++){
+    for(int y=m_left_top.y;  y<=m_right_bottom.y; y++ ){
+        for(int x=m_left_top.x; x<=m_right_bottom.x; x++){
+            int light=GetDistance(x,y)/2;
+            if(!light) continue;
+            if(IsVisible(x,y)){
+
+                if(x!=m_left_top.x){
+                    // west
+                    dx=x-1; dy=y;
+                    if(IsVisible(dx,dy) && light>GetDistance(dx,dy)){
+                    SetDistance(dx,dy,light);
+                    }
+                    if(y!=m_left_top.y){
+                        // north-west
+                        dx=x-1; dy=y-1;
+                        if(IsVisible(dx,dy) && light>GetDistance(dx,dy)){
+                            SetDistance(dx,dy,light);
+                        }
+                    }
+                    if(y!=m_right_bottom.y){
+                    // south-west
+                        dx=x-1; dy=y+1;
+                        if(IsVisible(dx,dy) && light>GetDistance(dx,dy)){
+                            SetDistance(dx,dy,light);
+                        }
+                    }
+                }
+                if(x!=m_right_bottom.x){
+                    // east
+                    dx=x+1; dy=y;
+                    if(IsVisible(dx,dy) && light>GetDistance(dx,dy)){
+                        SetDistance(dx,dy,light);
+                    }
+                    if(y!=m_left_top.y){
+                        // north-east
+                        dx=x+1; dy=y-1;
+                        if(IsVisible(dx,dy) && light>GetDistance(dx,dy)){
+                            SetDistance(dx,dy,light);
+                        }
+                    }
+                    if(y!=m_right_bottom.y){
+                        // south-east
+                        dx=x+1; dy=y+1;
+                        if(IsVisible(dx,dy) && light>GetDistance(dx,dy)){
+                            SetDistance(dx,dy,light);
+                        }
+                    }
+                }
+                // north
+                if(y!=m_left_top.y){
+                    dx=x; dy=y-1;
+                    if(IsVisible(dx,dy) && light>GetDistance(dx,dy)){
+                        SetDistance(dx,dy,light);
+                    }
+                }
+                // south
+                if(y!=m_right_bottom.y){
+                    dx=x; dy=y+1;
+                    if(IsVisible(dx,dy) && light>GetDistance(dx,dy)){
+                        SetDistance(dx,dy,light);
+                    }
+                }
+            }
+        }
+    }
+    }
+}
