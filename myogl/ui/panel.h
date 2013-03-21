@@ -2,6 +2,7 @@
 #define PANEL_H_INCLUDED
 
 #include "base_ui_class.h"
+#include "../render.h"
 
 namespace MyOGL{
 
@@ -11,6 +12,12 @@ namespace MyOGL{
             Vector4f m_border_color;
             Vector4f m_bg_color;
         public:
+            CUIPanel():CUIBase(0,0,10,10){ // defaul constructor
+                m_border=true;
+                m_background=true;
+                m_border_color.Set(1,1,0,1);  // yellow
+                m_bg_color.Set(0,0,0,0.8);    // black with 80% alfa
+            };
             CUIPanel(int x, int y, int w, int h):CUIBase(x,y,w,h){
                 m_border=true;
                 m_background=true;

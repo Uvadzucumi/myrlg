@@ -130,6 +130,8 @@
 		<Unit filename="myrlg.conf" />
 		<Unit filename="tileset.cpp" />
 		<Unit filename="tileset.h" />
+		<Unit filename="uiwin/cell_info.cpp" />
+		<Unit filename="uiwin/cell_info.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />

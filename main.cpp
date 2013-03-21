@@ -14,19 +14,17 @@
 #include "game.h"
 #include "myogl/config_file.h"
 #include "myogl/ui/text_box.h"
-#include "myogl/ui/panel.h"
+#include "uiwin/cell_info.h"
 
 //#include "myogl/frame_buffer.h"
 
 CHudSprite *hero_sprite;
 CTextBox *messages;
-CUIPanel *ui_panel;
+CUICellInfo *ui_tile_info_panel;
 
 bool diffuse_light;
 
 void OnRender(double dt){
-
-//    static unsigned int savedTime=0;
 
     MyOGL::Vector4f font_color;
     static char tmp[400];
@@ -50,27 +48,8 @@ void OnRender(double dt){
         hero->inventory->RenderItemDetail();
     }
 
-//    for(unsigned int i = 0;i < MyOGL::EntityList.size();i++) {
-//        if(!MyOGL::EntityList[i]) continue;
-//        MyOGL::EntityList[i]->OnRender();
-//    }
-
     glLoadIdentity();       // for hud - need set default matrix
 
-//    font_color.r=0;font_color.g=1;font_color.b=0;font_color.a=1;
-//    text->PrintAt(300,10,font_color);
-
-// set new viewport
-/*
-        glViewport(0,400,100,100);
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        //  x left, y top
-        // left, right, bottom, top
-        glOrtho(0, 100, 100, 0, 1, -1);
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-*/
     // show FPS
     font_color.r=0; font_color.g=1,font_color.b=0, font_color.a=1;
     sprintf(tmp,"FPS: ^ffff00%d",(int)App->GetFPS());
@@ -98,73 +77,16 @@ void OnRender(double dt){
         // info mouse cursor coords
         Vector2i mouse_pos;
         mouse_pos=App->GetMousePos();
-        // get tile info
+        // get tile coords for display tile info
         int map_tile_x=dungeon->GetViewportLeft()+mouse_on_tile_x;
         int map_tile_y=dungeon->GetViewportTop()+mouse_on_tile_y;
-        sMapField field=dungeon->GetMapFiled(map_tile_x, map_tile_y);
         // display tile information box
-        if(!field.viewed){
-            ui_panel=new CUIPanel(mouse_pos.x+10, mouse_pos.y+10, 200, 35);
-        }else{
-            ui_panel=new CUIPanel(mouse_pos.x+10, mouse_pos.y+10, 280, 180);
-        }
-        ui_panel->Render();
-        delete ui_panel;
+        ui_tile_info_panel->SetPosition(mouse_pos.x+10, mouse_pos.y+10);
+        ui_tile_info_panel->SetMapTileCoords(map_tile_x, map_tile_y);
+        ui_tile_info_panel->Render();
 
-        font_color.r=0; font_color.g=1,font_color.b=0, font_color.a=1;
-        sprintf(tmp,"Координаты: ^ffffff%d, %d", map_tile_x, map_tile_y);
-        font->PrintAt(mouse_pos.x+12,mouse_pos.y+10,tmp,font_color);
-        if(!field.viewed){ // unknown field
-            sprintf(tmp,"Местность: ^ffffffНеизвестная");
-            font->PrintAt(mouse_pos.x+12,mouse_pos.y+24,tmp,font_color);
-        }else{
-            sprintf(tmp,"Местность: ^ffffff%s",GetTileNameByType(field.tile_type));
-            font->PrintAt(mouse_pos.x+12,mouse_pos.y+24,tmp,font_color);
-            CFOV *fov=dungeon->GetFOV();
-            sMapFovField *fov_field=fov->GetFovField(map_tile_x, map_tile_y);
-            if(fov_field){
-                sprintf(tmp,"Интенсивность света: ^ffffff%d",fov_field->distance);
-                font->PrintAt(mouse_pos.x+12,mouse_pos.y+24+14,tmp,font_color);
-                font->PrintAt(mouse_pos.x+12,mouse_pos.y+24+14*2,"Вектор взгляда:",font_color);
-                font_color.Set(0,1,1,1);
-                sprintf(tmp,"north: ^ffffff%d",fov_field->north);
-                font->PrintAt(mouse_pos.x+32,mouse_pos.y+24+14*3,tmp,font_color);
-                sprintf(tmp,"south: ^ffffff%d",fov_field->south);
-                font->PrintAt(mouse_pos.x+32,mouse_pos.y+24+14*4,tmp,font_color);
-                sprintf(tmp,"east: ^ffffff%d",fov_field->east);
-                font->PrintAt(mouse_pos.x+32,mouse_pos.y+24+14*5,tmp,font_color);
-                sprintf(tmp,"west: ^ffffff%d",fov_field->west);
-                font->PrintAt(mouse_pos.x+32,mouse_pos.y+24+14*6,tmp,font_color);
-                sprintf(tmp,"north-east: ^ffffff%d",fov_field->north_east);
-                font->PrintAt(mouse_pos.x+32,mouse_pos.y+24+14*7,tmp,font_color);
-                sprintf(tmp,"north-west: ^ffffff%d",fov_field->north_west);
-                font->PrintAt(mouse_pos.x+32,mouse_pos.y+24+14*8,tmp,font_color);
-                sprintf(tmp,"south-east: ^ffffff%d",fov_field->south_east);
-                font->PrintAt(mouse_pos.x+32,mouse_pos.y+24+14*9,tmp,font_color);
-                sprintf(tmp,"south-west: ^ffffff%d",fov_field->south_west);
-                font->PrintAt(mouse_pos.x+32,mouse_pos.y+24+14*10,tmp,font_color);
-
-            }else{
-                font->PrintAt(mouse_pos.x+12,mouse_pos.y+24+14,"FOV field: ^ffffffNULL",font_color);
-            }
-        }
-
-    }// end show tile info window
-
-/*
-
-    // Display FPS evry 5 seconds
-
-    if(savedTime==0){
-        savedTime=SDL_GetTicks();
-    }else{
-        unsigned int tmp=SDL_GetTicks();
-        if((tmp-savedTime)>5000){
-            savedTime=tmp;
-            printf("FPS: %f\n",App->GetFPS());
-        }
     }
-*/
+
 }
 
 // Update objects
@@ -205,7 +127,7 @@ void OnLoop(double DeltaTime){
 }
 
 void OnEvent(SDL_Event *Event, double DeltaTime){
-    char str[100];
+    //char str[100];
     // change camera position if button pressed
     switch(Event->type) {
         case SDL_KEYDOWN:
@@ -419,6 +341,8 @@ int main(int argc, char **argv){
 
     Log->puts("Minimum map tile size: %d Bytes\n",sizeof(sMapField));
 
+    ui_tile_info_panel=new CUICellInfo(font);
+
     messages=new MyOGL::CTextBox(font);
     // right from dungeon vievport
     messages->SetViewPort(dungeon->GetViewportWidth()*32, 50, Render->GetWidth()-dungeon->GetViewportWidth()*32, Render->GetHeight()-50);
@@ -449,6 +373,7 @@ int main(int argc, char **argv){
     delete App; // required
     delete hero_sprite;
     delete hero;
+    delete ui_tile_info_panel;
 
     printf("Normal Exit\n");
     return 0;

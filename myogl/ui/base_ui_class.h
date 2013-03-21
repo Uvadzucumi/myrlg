@@ -17,12 +17,12 @@ namespace MyOGL{
                 m_right_bottom.y=y+h;
             };
             void SetPosition(int x, int y){
-                m_right_bottom.x=m_right_bottom.x-m_left_top.x+x;
-                m_right_bottom.y=m_right_bottom.y-m_left_top.y+y;
+                m_left_top.x=x;
+                m_left_top.y=y;
             };
             void SetDimension(int w, int h){
                 m_right_bottom.x=m_left_top.x+w;
-                m_right_bottom.y=m_left_top.y+w;
+                m_right_bottom.y=m_left_top.y+h;
             };
     };
 
