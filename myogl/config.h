@@ -12,6 +12,9 @@
 // if defined - used vbo for render text, else - display list
 #define MYOGL_VBO_TEXT
 
+// if not defined - used internal loader for bmp files
+//#define USE_SDL_BMP_LOADER
+
 // window widt, height
 #define WWIDTH 800
 #define WHEIGHT 600

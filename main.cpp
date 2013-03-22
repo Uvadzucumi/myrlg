@@ -276,7 +276,7 @@ int main(int argc, char **argv){
         return -1;
     };
 
-    Log->printf("FOV size: %d Int Size: %d CharSize: %d\n",sizeof(sMapFovField),sizeof(int),sizeof(char));
+    //Log->printf("FOV size: %d Int Size: %d CharSize: %d\n",sizeof(sMapFovField),sizeof(int),sizeof(char));
 
     App->SetWinIcon("data/ico.bmp");
     // set callback functions

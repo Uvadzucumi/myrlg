@@ -2,6 +2,8 @@
 #include "texture.h"
 #include "log.h"
 
+#include "fileformats/bmpimage.h"
+
 using namespace MyOGL;
 
 std::vector<CTexture*> MyOGL::TexturesList;
@@ -15,7 +17,8 @@ void CTexture::Free(){
     }
     // clear memory
     if(m_data!=NULL){
-        SDL_FreeSurface(m_data);
+//        SDL_FreeSurface(m_data);
+        free(m_data);
         m_data=NULL;
     }
 }
@@ -39,50 +42,19 @@ void CTexture::Bind(){
 
 // create texture in video memory
 bool CTexture::CreateFromMemory(void){
-    GLuint texture_format;
-    GLuint nOfColors;   // Texture butes per pixel
 
     if(!m_data){
         Log->puts("CTexture::CreateFromMemory() Error: texture data = NULL\n");
         return false;
     }
 	// Check that the image's width is a power of 2
-    if ( (m_data->w & (m_data->w - 1)) != 0 ) {
+    if ( (m_width & (m_width - 1)) != 0 ) {
         Log->printf("warning: %s's width is not a power of 2\n", m_file_name);
     }
 
 	// Also check if the height is a power of 2
-    if ( (m_data->h & (m_data->h - 1)) != 0 ) {
+    if ( (m_height & (m_height - 1)) != 0 ) {
         Log->printf("warning: %s's height is not a power of 2\n", m_file_name);
-    }
-
-    // get the number of channels in the SDL surface
-    nOfColors = m_data->format->BytesPerPixel;
-
-    if (nOfColors == 4){     // contains an alpha channel
-        textureAlpha=true;
-        if (m_data->format->Rmask == 0x0000ff)
-            texture_format = GL_RGBA;
-        else if( m_data->format->Rmask == 0xff0000){
-            texture_format = GL_BGRA;
-        }else{
-            Log->puts("ERROR! CTexture::CreateFromMemory() Wrong texture format. using GL_RGBA\n");
-            printf("BitsPerPixel: %d\nRMASK: 0x%x\nGMASK: 0x%x\nBMASK: 0x%x\nAMASK: 0x%x\n",m_data->format->BitsPerPixel, m_data->format->Rmask,m_data->format->Gmask,m_data->format->Bmask,m_data->format->Amask);
-            texture_format=GL_RGBA;
-        }
-        //texture_format = GL_RGBA;
-        Log->printf("Found 4 Color in texture. Format: %s\n",(texture_format==GL_RGBA)?"RGBA":"BGRA");
-    } else if (nOfColors == 3) {    // no alpha channel
-                textureAlpha=false;
-                if (m_data->format->Rmask == 0x000000ff)
-                        texture_format = GL_RGB;
-                else
-                        texture_format = GL_BGR;
-                Log->printf("Found 3 Color in texture. Format: %s\n",(texture_format==GL_RGB)?"RGB":"BGR");
-    } else {
-                Log->printf("warning: the image %s is not truecolor..  this will probably break\n",m_file_name);
-                // this error should not go unhandled
-                return false;
     }
 
 	// Have OpenGL generate a texture object handle for us
@@ -97,8 +69,13 @@ bool CTexture::CreateFromMemory(void){
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, this->magFilter );
 
 	// Create 2D texture
-    glTexImage2D( GL_TEXTURE_2D, 0, nOfColors, m_data->w, m_data->h, 0,
-                      texture_format, GL_UNSIGNED_BYTE, m_data->pixels );
+	#ifdef USE_SDL_BMP_LOADER
+    glTexImage2D( GL_TEXTURE_2D, 0, m_bytes_pp, m_width, m_height, 0,
+                      m_texture_format, GL_UNSIGNED_BYTE, m_data->pixels );
+    #else
+    glTexImage2D( GL_TEXTURE_2D, 0, m_bytes_pp, m_width, m_height, 0,
+                     m_texture_format, GL_UNSIGNED_BYTE, (void *)m_data );
+    #endif
     return true;
 }
 
@@ -107,17 +84,45 @@ bool CTexture::CreateFromMemory(void){
 // create texture in video memory
 bool CTexture::LoadFromFile(const char *file_name){
     strcpy(m_file_name,file_name);
-    //SDL_Surface *tmp;
-    if ( (m_data = SDL_LoadBMP(file_name)) ) {
-        //m_data = SDL_DisplayFormat(tmp);
-        //SDL_FreeSurface(tmp);
+#ifdef USE_SDL_BMP_LOADER
+    if( ( m_data = SDL_LoadBMP(m_file_name) ) ) {
+        // set width, height & bytes per pixel
+        m_width=m_data->w;
+        m_height=m_data->h;
+        m_bytes_pp=m_data->format->BytesPerPixel;
+        // set texture format
+        if (m_data->format->Rmask == 0x0000ff)
+            m_texture_format = GL_RGBA;
+        else if( m_data->format->Rmask == 0xff0000){
+            m_texture_format = GL_BGRA;
+        }else{
+            Log->puts("ERROR! CTexture::LoadFromFile() Wrong texture format. using default GL_RGBA\n");
+            printf("BitsPerPixel: %d\nRMASK: 0x%x\nGMASK: 0x%x\nBMASK: 0x%x\nAMASK: 0x%x\n",m_data->format->BitsPerPixel, m_data->format->Rmask,m_data->format->Gmask,m_data->format->Bmask,m_data->format->Amask);
+            m_texture_format=GL_RGBA;
+        }
+#else
+   if( ( m_data = LoadBitmap32(m_file_name) ) ) {
+#endif
+        // create texture
         CreateFromMemory();
-
     } else {
-        Log->printf("SDL could not load image.bmp: %s\n", SDL_GetError());
+        Log->printf("CTexture::LoadFromFile() could not load image %s",file_name);
         return false;
     }
     Log->printf("Created Texture %d (%s)\n",TextureID, file_name);
     TexturesList.push_back(this);   // add to global texture ids list (for autoclean)
     return true;
+}
+
+unsigned char* CTexture::LoadBitmap32(const char *file_name){
+    CBitMapImage image;
+    if(image.LoadFromFile(file_name)){
+        m_width=image.GetWidth();
+        m_height=image.GetHeight();
+        m_bytes_pp=image.GetBytesPerPixel();
+        m_texture_format=image.GetPixelFormat();
+        return image.GetPixelData(m_data);
+    }
+    // create pixel data array and return pointer
+    return NULL;
 }

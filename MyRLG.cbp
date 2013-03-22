@@ -106,6 +106,8 @@
 		<Unit filename="myogl/entity.h" />
 		<Unit filename="myogl/events.cpp" />
 		<Unit filename="myogl/events.h" />
+		<Unit filename="myogl/fileformats/bmpimage.cpp" />
+		<Unit filename="myogl/fileformats/bmpimage.h" />
 		<Unit filename="myogl/frame_buffer.cpp" />
 		<Unit filename="myogl/frame_buffer.h" />
 		<Unit filename="myogl/log.cpp" />
