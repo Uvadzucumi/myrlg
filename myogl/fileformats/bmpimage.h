@@ -11,7 +11,10 @@ namespace MyOGL{
         BI_RGB=0,
         BI_RLE4=1,
         BI_RLE8=2,
-        BI_BITFIELDS=3
+        BI_BITFIELDS=3,
+        BI_JPEG=4,
+        BI_PNG=5,
+        BI_ALPHABITFIELDS=6
     };
 
     struct sBitMapFileHeader{
@@ -50,10 +53,11 @@ namespace MyOGL{
             GLuint m_pixel_format; // GL_BGR, GL_BGRA
             int m_bytes_prer_pixel;
             // TODO: moved to CBaseImage?
-            long int RedMask, GreenMask, BlueMask;
-            short RedShift, GreenShift, BlueShift;
+            long int m_RedMask, m_GreenMask, m_BlueMask, m_AlphaMask;
+            short m_RedShift, m_GreenShift, m_BlueShift, m_AlphaShift;
 
-            short CountBits(unsigned char byte); // calculate & return coun of enabled bits in byte
+            void ConvertToBGRA(long int *pixel_data);
+            //short CountBits(unsigned char byte); // calculate & return coun of enabled bits in byte
             short ShiftCount(long int Mask); // calculate & return shift from mask
 
         public:

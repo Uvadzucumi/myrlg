@@ -6,6 +6,22 @@
 
 using namespace MyOGL;
 
+// convert pixel data to BGRA format
+// using colors Shift & Mask values
+void CBitMapImage::ConvertToBGRA(long int *pixel_data){
+    unsigned char red, green, blue, alpha;
+    // get color components
+    red=(*pixel_data & m_RedMask) >> m_RedShift;
+    green=(*pixel_data & m_GreenMask) >> m_GreenShift;
+    blue=(*pixel_data & m_BlueMask) >> m_BlueShift;
+    alpha=(*pixel_data & m_AlphaMask) >> m_AlphaShift;
+    // create bgra
+    ((unsigned char *)pixel_data)[3]=alpha;
+    ((unsigned char *)pixel_data)[2]=red;
+    ((unsigned char *)pixel_data)[1]=green;
+    ((unsigned char *)pixel_data)[0]=blue;
+}
+/*
 // calculate & return number of enabled bits in byte
 short CBitMapImage::CountBits(unsigned char byte){
     short bits=0;
@@ -17,7 +33,7 @@ short CBitMapImage::CountBits(unsigned char byte){
     }
     return bits;
 }
-
+*/
 // calculate & return Shift value from Mask Value
 short CBitMapImage::ShiftCount(long int Mask){
     if(!Mask) return 0;
@@ -26,7 +42,8 @@ short CBitMapImage::ShiftCount(long int Mask){
         tmp++;
         Mask>>=1;
     }
-    return tmp - (8 - CountBits(Mask && 0xFF));
+    //return tmp - (8 - CountBits(Mask && 0xFF));
+    return tmp;
 }
 
 // load bitmap image from file
@@ -71,8 +88,8 @@ bool CBitMapImage::LoadFromFile(const char *file_name){
         fclose(fp);
         return false;
     }
-    fseek( fp, sizeof(m_file_header)+m_info_header.size, SEEK_SET ); // if info header not 40 bytes
-// check compression
+
+    // check compression
     if(
        (m_info_header.compression==BI_RLE4 && m_info_header.bpp!=4) ||
        (m_info_header.compression==BI_RLE8 && m_info_header.bpp!=8) ||
@@ -93,21 +110,26 @@ bool CBitMapImage::LoadFromFile(const char *file_name){
 
     if(m_info_header.compression == BI_RGB && m_info_header.bpp==16){ // 5 bits per channel, fixed mask
         Log->puts("DEBUG: Fixed map BMP image (5 bits)\n");
-        RedMask = 0x7C00;
-        RedShift = 7;
-        GreenMask = 0x03E0;
-        GreenShift = 2;
-        BlueMask = 0x001F;
-        BlueShift = -3;
+        m_RedMask = 0x7C00;
+        m_RedShift = 7;
+        m_GreenMask = 0x03E0;
+        m_GreenShift = 2;
+        m_BlueMask = 0x001F;
+        m_BlueShift = -3;
     }else if(m_info_header.compression == BI_BITFIELDS && (m_info_header.bpp == 16 || m_info_header.bpp == 32)){ // arbitrary mask
         Log->puts("DEBUG: Arbitrary map BMP image\n");
         // read mask from file
-        fread(&RedMask,1,4,fp);
-        fread(&GreenMask,1,4,fp);
-        fread(&BlueMask,1,4,fp);
-        RedShift = ShiftCount(RedMask);
-        GreenShift = ShiftCount(GreenMask);
-        BlueShift = ShiftCount(BlueMask);
+        fread(&m_RedMask,1,4,fp);
+        fread(&m_GreenMask,1,4,fp);
+        fread(&m_BlueMask,1,4,fp);
+        if(m_info_header.bpp==32){ fread(&m_AlphaMask,1,4,fp); }
+
+        m_RedShift = ShiftCount(m_RedMask);
+        m_GreenShift = ShiftCount(m_GreenMask);
+        m_BlueShift = ShiftCount(m_BlueMask);
+        m_AlphaShift = ShiftCount(m_AlphaMask);
+        Log->printf("DEBUG: RMask: %x GMask: %x BMask: %x AMask: %x\n",m_RedMask, m_GreenMask, m_BlueMask, m_AlphaMask);
+        Log->printf("DEBUG: RShift: %d GShift: %x BShift: %d AShift: %d\n",m_RedShift, m_GreenShift, m_BlueShift, m_AlphaShift);
     }else if(m_info_header.bpp==1 || m_info_header.bpp==4 || m_info_header.bpp==8){
         Log->puts("DEBUG: BMP with palette\n");
         m_palette_size=1 << m_info_header.bpp;
@@ -121,11 +143,8 @@ bool CBitMapImage::LoadFromFile(const char *file_name){
             Log->printf("Warning: used calculated palette size!");
             fread(&m_palette,m_palette_size,sizeof(GLPixel32),fp);
         }
-    }else if(m_info_header.colors_used){ // skip palette
-        Log->printf("Warning: skip palette from BMP file. old pos: %d new pos: %d\n", ftell(fp), ftell(fp)+m_info_header.colors_used*3);
-        fseek(fp, ftell(fp)+m_info_header.colors_used*3, SEEK_SET);
     }
-
+    fseek(fp, m_file_header.offset, SEEK_SET); // go to start pixel data
 // file header debug
     Log->printf("DEBUG: file_name=%s file_size=%d\n", m_file_name, m_file_header.file_size);
     Log->printf("DEBUG: magic=%c%c offset=%d\n",m_file_header.magic[0],m_file_header.magic[1],m_file_header.offset);
@@ -140,7 +159,7 @@ bool CBitMapImage::LoadFromFile(const char *file_name){
     if(m_info_header.bpp==32){
         m_pixel_format=GL_BGRA;
         m_bytes_prer_pixel=4;
-        int scanline_size=m_bytes_prer_pixel*m_info_header.width;
+        unsigned int scanline_size=m_bytes_prer_pixel*m_info_header.width;
         int pixel_data_size=scanline_size*m_info_header.height;
     // allocate mem
         if(m_pixel_data){ // free mem from old data
@@ -154,8 +173,13 @@ bool CBitMapImage::LoadFromFile(const char *file_name){
             };
             //memcpy(&m_pixel_data[row*scanline_size], read_buffer, scanline_size);
         }
-        //memcpy(dest,src,read_bytes);
-        //delete read_buffer; // free line buffer
+        if(m_info_header.compression==BI_BITFIELDS){ // need convert to BGRA
+            for(int row=0;row<m_info_header.height;row++){
+                for(int pix=0;pix<m_info_header.width;pix++){
+                    ConvertToBGRA((long int *)(&m_pixel_data[row*scanline_size+pix*4]));
+                }
+            }
+        }
     }else{
         Log->printf("ERROR: CBitMapImage::LoadFromFile(\"%s\") Unsupported bitmap Format!\n",m_file_name);
         fclose(fp);

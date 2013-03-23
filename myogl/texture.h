@@ -36,7 +36,7 @@ namespace MyOGL{
             void Free();    // clear video memory and memory
             void Bind();
             bool LoadFromFile(const char *file_name);
-            unsigned char* LoadBitmap32(const char *file_name);
+            unsigned char* LoadBitmapImage(const char *file_name);
             bool CreateFromMemory(void);
             int GetWidth(){ if (m_data){return m_width;}else{return 0;}};
             int GetHeight(){ if(m_data){return m_height;}else{ return 0;}};

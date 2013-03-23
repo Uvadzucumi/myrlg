@@ -101,7 +101,7 @@ bool CTexture::LoadFromFile(const char *file_name){
             m_texture_format=GL_RGBA;
         }
 #else
-   if( ( m_data = LoadBitmap32(m_file_name) ) ) {
+   if( ( m_data = LoadBitmapImage(m_file_name) ) ) {
 #endif
         // create texture
         CreateFromMemory();
@@ -114,15 +114,15 @@ bool CTexture::LoadFromFile(const char *file_name){
     return true;
 }
 
-unsigned char* CTexture::LoadBitmap32(const char *file_name){
+unsigned char* CTexture::LoadBitmapImage(const char *file_name){
     CBitMapImage image;
     if(image.LoadFromFile(file_name)){
         m_width=image.GetWidth();
         m_height=image.GetHeight();
         m_bytes_pp=image.GetBytesPerPixel();
         m_texture_format=image.GetPixelFormat();
+        // create pixel data array and return pointer
         return image.GetPixelData(m_data);
     }
-    // create pixel data array and return pointer
     return NULL;
 }
