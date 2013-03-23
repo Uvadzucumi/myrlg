@@ -169,6 +169,7 @@ namespace MyOGL{
             void SetColor(Vector3i color, bool force=false);
 
             void SetClearColor(float r, float g, float b, float a=1.0);
+            bool CheckError(void);
             // check OpenGL Extension
             bool isExtensionSupported ( const char * ext );
             static void  * GetProcAddress ( const char * name ){
@@ -176,7 +177,7 @@ namespace MyOGL{
 #ifdef	__WIN32__
                 return wglGetProcAddress ( name );
 #else
-                return (void *)glXGetProcAddressARB ( (const GLubyte *)name );
+                return (void *) glXGetProcAddress ( (const GLubyte *)name );
 #endif
 */
                 return (void *)SDL_GL_GetProcAddress( name );

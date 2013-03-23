@@ -482,6 +482,39 @@ bool CRender::EnableShadersFunctions(){
     return false;
 }
 
+// Check OpenGL Errors and add to Log
+bool CRender::CheckError(void){
+    GLenum error;
+    if((error=glGetError()) != GL_NO_ERROR){
+        switch(error){
+            case GL_INVALID_ENUM:
+                Log->printf("OpenGL ERROR: %s\n","GL_OUT_OF_MEMORY");
+                break;
+            case GL_INVALID_VALUE:
+                Log->printf("OpenGL ERROR: %s\n","GL_OUT_OF_MEMORY");
+                break;
+            case GL_INVALID_OPERATION:
+                Log->printf("OpenGL ERROR: %s\n","GL_OUT_OF_MEMORY");
+                break;
+            case GL_STACK_OVERFLOW:
+                Log->printf("OpenGL ERROR: %s\n","GL_OUT_OF_MEMORY");
+                break;
+            case GL_STACK_UNDERFLOW:
+                Log->printf("OpenGL ERROR: %s\n","GL_OUT_OF_MEMORY");
+                break;
+            case GL_OUT_OF_MEMORY:
+                Log->printf("OpenGL ERROR: %s\n","GL_OUT_OF_MEMORY");
+                break;
+            default:
+                Log->printf("OpenGL ERROR: %x\n",error);
+                break;
+        }
+        return true;
+    }else{
+        return false;
+    }
+}
+
 // cashed OGL states
 void RenderStates::Enable(GLenum cap){
     bool *param;
