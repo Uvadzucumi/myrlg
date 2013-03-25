@@ -23,11 +23,19 @@ enum eTileNames{
     tnWallRightTop,
     tnWallVerticalRight,
     tnWallVerticalLeft,
+    // door vertical
+    tnDoorVerticalClosed,
+    tnDoorVerticalOpened,
+    tnDoorVerticalBroken,
     tnWallHorizontal=144,
     tnWallLeftBottom,
     tnWallRightBottom,
     tnWallHorizontalUp,
     tnWallHorizontalDown,
+    // door horizontal
+    tnDoorHorizontalClosed,
+    tnDoorHorizontalOpened,
+    tnDoorHorizontalBroken,
 // Weapons
     tnDagger=80,
     tnSword=82,

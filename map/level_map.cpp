@@ -96,6 +96,16 @@ void CLevelMap::AddMapTile(eTileTypes TileType, int x, int y, void *tile_data){
                 Log->puts("Error! Wrong door tile_data!\n");
                 return;
             }
+            // door need add only if (left & right) or (top & bottom) - wall
+            // check walls and sec coridor if not need add door
+            if( ( !IsWall(x-1,y,false) || !IsWall(x+1,y,false) ) && ( !IsWall(x,y-1,false) || !IsWall(x,y+1,false) )){
+                // set coridor
+                m_Map[x][y].tile_type=ttCoridor;
+                m_Map[x][y].layer[0]=tnFloorDungeonCoridor;
+                m_Map[x][y].skip_light=true;
+                m_Map[x][y].can_move=true;
+                break;
+            }
 
             m_Map[x][y].skip_light=false;
             m_Map[x][y].can_move=false;
@@ -268,8 +278,9 @@ void CLevelMap::CalculateMapLight(CFOV *fov){
 }
 
 // return true if wall tile tupe (walls, doors, windows etc...)
-bool CLevelMap::IsWall(int x, int y){
-    if(x < 0 || x >= m_width || y < 0 || y >= m_height || !m_Map[x][y].viewed){
+// if bool check_viewed=true - not viewed - empty field
+bool CLevelMap::IsWall(int x, int y, bool check_viewed){
+    if(x < 0 || x >= m_width || y < 0 || y >= m_height || (check_viewed && !m_Map[x][y].viewed)){
         return false;
     }
     if(m_Map[x][y].tile_type==ttWall || m_Map[x][y].tile_type==ttDoor){
@@ -302,7 +313,28 @@ void CLevelMap::LandPostprocessing(CFOV *fov, int x, int y){
         if(IsWall(x,y)){
             // skip not hidden doors
             if(m_Map[x][y].tile_type==ttDoor){
-                if(!(GetDoorData(x,y).hidden)){
+                sTileDataDoor door_data;
+                if(!((door_data=GetDoorData(x,y)).hidden)){ // if door hidden - same wall processing
+                    // set door tile & return
+                    if(IsWall(x+1,y) && IsWall(x-1,y)){ // left & right blocked
+                        // horizontal door
+                        if(door_data.broken){
+                            m_Map[x][y].layer[1]=tnDoorHorizontalBroken;
+                        }else if(door_data.opened){
+                            m_Map[x][y].layer[1]=tnDoorHorizontalOpened;
+                        }else{ // opened door
+                            m_Map[x][y].layer[1]=tnDoorHorizontalClosed;
+                        }
+                    }else{ // vertical door
+                        if(door_data.broken){
+                            m_Map[x][y].layer[1]=tnDoorVerticalBroken;
+                        }else if(door_data.opened){
+                            m_Map[x][y].layer[1]=tnDoorVerticalOpened;
+                        }else{ // opened door
+                            m_Map[x][y].layer[1]=tnDoorVerticalClosed;
+                        }
+                    }
+
                     return; // skip normal doors
                 }
             }

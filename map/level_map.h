@@ -96,7 +96,7 @@ class CLevelMap{
         std::vector <int> LightsNearFOV; // lights index near FOV
         // map player position
         MyOGL::Vector2i m_UnitPosition;
-        bool IsWall(int x, int y);  // return true if wall tile type, walls, doors, windows etc...
+        bool IsWall(int x, int y, bool check_viewed=true);  // return true if wall tile type, walls, doors, windows etc...
         sTileDataDoor GetDoorData(int x, int y); // return door data from map coords x, y
     public:
         CLevelMap(int Width, int Height){
