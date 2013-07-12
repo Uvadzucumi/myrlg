@@ -278,10 +278,8 @@ void CRender::SetBlendMode(MyGlBlendMode mode){
     }
 }
 
+// Resize Application Windows
 bool CRender::OnResize(int width, int height){
-//#ifdef __WIN32__
-//    Log->puts("Not supported Windoew resize in Windows\n");
-//#else
     SDL_Surface *old_context;
     old_context=Context;
     if((Context = SDL_SetVideoMode(width, height, m_bpp, window_flags)) == NULL) {
@@ -413,14 +411,14 @@ bool CRender::EnableFBOFunctions(){
 
 bool CRender::EnableVBOFunctions(){
     if ( isExtensionSupported ( "GL_ARB_vertex_buffer_object" ) ){
-        glGenBuffersARB = (PFNGLGENBUFFERSARBPROC)       GetProcAddress("glGenBuffersARB");
-        glBindBufferARB = (PFNGLBINDBUFFERARBPROC)       GetProcAddress("glBindBufferARB");
-        glMapBufferARB = (PFNGLMAPBUFFERARBPROC)        GetProcAddress("glMapBufferARB");
-        glUnmapBufferARB = (PFNGLUNMAPBUFFERARBPROC)      GetProcAddress("glUnmapBufferARB");
-        glBufferDataARB = (PFNGLBUFFERDATAARBPROC)       GetProcAddress("glBufferDataARB");
+        glGenBuffersARB = (PFNGLGENBUFFERSARBPROC)          GetProcAddress("glGenBuffersARB");
+        glBindBufferARB = (PFNGLBINDBUFFERARBPROC)          GetProcAddress("glBindBufferARB");
+        glMapBufferARB = (PFNGLMAPBUFFERARBPROC)            GetProcAddress("glMapBufferARB");
+        glUnmapBufferARB = (PFNGLUNMAPBUFFERARBPROC)        GetProcAddress("glUnmapBufferARB");
+        glBufferDataARB = (PFNGLBUFFERDATAARBPROC)          GetProcAddress("glBufferDataARB");
         glBufferSubDataARB = (PFNGLBUFFERSUBDATAARBPROC)    GetProcAddress("glBufferSubDataARB");
         glDeleteBuffersARB = (PFNGLDELETEBUFFERSARBPROC)    GetProcAddress("glDeleteBuffersARB");
-        glGetBufferSubDataARB = (PFNGLGETBUFFERSUBDATAARBPROC) GetProcAddress("glGetBufferSubDataARB");
+        glGetBufferSubDataARB = (PFNGLGETBUFFERSUBDATAARBPROC)  GetProcAddress("glGetBufferSubDataARB");
         if(glGenBuffersARB && glBindBufferARB && glMapBufferARB && glUnmapBufferARB &&
            glBufferDataARB && glBufferSubDataARB && glDeleteBuffersARB && glGetBufferSubDataARB){
                 Log->puts("VBO: OK\n");
@@ -522,11 +520,7 @@ void RenderStates::Enable(GLenum cap){
     if(param && !*param){
         *param=true;
         glEnable(cap);
-//        printf(" Enable\n");
     }
-//    else{
-//        printf(" Skip\n");
-//    }
 }
 
 // cashed OGL states
@@ -536,20 +530,14 @@ void RenderStates::Disable(GLenum cap){
     if(param && *param){
         *param=false;
         glDisable(cap);
-//        printf(" Disable\n");
     }
-//    else{
-//        printf(" Skip\n");
-//    }
 }
 
 bool *RenderStates::GetGLParam(GLenum cap){
     switch(cap){
         case GL_COLOR_MATERIAL:
-            //printf("color material: ");
             return &ColorMaterial;
         case GL_TEXTURE_2D:
-            //printf("texture2d: ");
             return &Texture2D;
         case GL_DEPTH_TEST:
             return &DepthTest;
@@ -562,10 +550,10 @@ bool *RenderStates::GetGLParam(GLenum cap){
             return NULL;
     }
 }
-//  Enabled:=Opengl1x.glisEnabled(GL_DEPTH_TEST);
+
 void RenderStates::GetCurrentStates(){
 //
-   ColorMaterial=glIsEnabled(GL_COLOR_MATERIAL);
+//   ColorMaterial=glIsEnabled(GL_COLOR_MATERIAL);
    Texture2D=glIsEnabled(GL_TEXTURE_2D);
    DepthTest=glIsEnabled(GL_DEPTH_TEST);
    Lighting=glIsEnabled(GL_LIGHTING);

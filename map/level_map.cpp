@@ -277,11 +277,20 @@ void CLevelMap::CalculateMapLight(CFOV *fov){
 
 }
 
+//#define NOT_VIEVEF_FILD_EMPTY
+
 // return true if wall tile tupe (walls, doors, windows etc...)
 // if bool check_viewed=true - not viewed - empty field
 bool CLevelMap::IsWall(int x, int y, bool check_viewed){
-    if(x < 0 || x >= m_width || y < 0 || y >= m_height || (check_viewed && !m_Map[x][y].viewed)){
+    if(x < 0 || x >= m_width || y < 0 || y >= m_height ){
         return false;
+    }
+    if(check_viewed && !m_Map[x][y].viewed){ // map not viewed
+        #ifdef NOT_VIEVEF_FILD_EMPTY
+        return false;
+        #else
+        return true;
+        #endif
     }
     if(m_Map[x][y].tile_type==ttWall || m_Map[x][y].tile_type==ttDoor){
         return true;
@@ -310,7 +319,7 @@ void CLevelMap::LandPostprocessing(CFOV *fov, int x, int y){
     // update one tile
     if(fov->IsInArea(x,y) && fov->IsVisible(x,y)){ // only visible
         // only walls
-        if(IsWall(x,y)){
+        if(IsWall(x,y,false)){
             // skip not hidden doors
             if(m_Map[x][y].tile_type==ttDoor){
                 sTileDataDoor door_data;
@@ -340,33 +349,121 @@ void CLevelMap::LandPostprocessing(CFOV *fov, int x, int y){
             }
             // vertical wall
             if(!IsWall(x+1,y) && !IsWall(x-1,y)){ // left & right empty
-                m_Map[x][y].layer[0]=tnWallVertical;
+                if(!IsWall(x,y+1)){ // down empty
+                    m_Map[x][y].layer[0]=tnWallEndDown;
+                }else if(!IsWall(x,y-1)){ // up empty
+                    m_Map[x][y].layer[0]=tnWallEndUp;
+                }else{ // ud and down tiles have walls
+                    m_Map[x][y].layer[0]=tnWallVertical;
+                }
             }else
             // horisontal wall
             if(!IsWall(x,y+1) && !IsWall(x,y-1)){
-                m_Map[x][y].layer[0]=tnWallHorizontal;
+                if(!IsWall(x+1,y)){ // right - empty
+                    m_Map[x][y].layer[0]=tnWallEndRight;
+                }else if(!IsWall(x-1,y)){
+                    m_Map[x][y].layer[0]=tnWallEndLeft;
+                }else{ // left and right - walls
+                    m_Map[x][y].layer[0]=tnWallHorizontal;
+                }
             }else
             // left top corner
             if(IsWall(x+1,y) && IsWall(x,y+1)){
                 if(IsWall(x,y-1)){
-                    m_Map[x][y].layer[0]=tnWallVerticalRight;
+                    if(IsWall(x+1,y+1) && IsWall(x+1,y-1)){
+                        if(IsWall(x-1,y)){
+                            if(IsWall(x-1,y+1)){
+                                m_Map[x][y].layer[0]=tnWallRightBottomFillOutside;
+                            }else{
+                                if(!IsWall(x-1,y-1)){
+                                    m_Map[x][y].layer[0]=tnWallVerticalLeftFillE;
+                                }else{
+                                    m_Map[x][y].layer[0]=tnWallRightTopFillOutside;
+                                }
+                            }
+                        }else{
+                            m_Map[x][y].layer[0]=tnWallVerticalFillRight;
+                        }
+                    }else{
+                        if(IsWall(x-1,y)){
+                            if(IsWall(x+1,y+1)){
+                                if(!IsWall(x-1,y-1)){
+                                    m_Map[x][y].layer[0]=tnWallHorizontalUpFillS;
+                                }else{
+                                    m_Map[x][y].layer[0]=tnWallLeftBottomFillOutside;
+                                }
+                            }else{
+                                if(!IsWall(x-1,y+1)){
+                                    m_Map[x][y].layer[0]=tnWallHorizontalDownFillN;
+                                }else{
+                                    if(!IsWall(x+1,y-1)){
+                                        m_Map[x][y].layer[0]=tnWallVerticalRightFillW;
+                                    }else{
+                                        m_Map[x][y].layer[0]=tnWallLeftTopFillOutside;
+                                    }
+                                }
+                            }
+                        }else{
+                            if(IsWall(x+1,y-1)){
+                                m_Map[x][y].layer[0]=tnWallVerticalRightFillNE;
+                            }else{
+                                if(IsWall(x+1,y+1)){
+                                    m_Map[x][y].layer[0]=tnWallVerticalRightFillSE;
+                                }else{
+                                    m_Map[x][y].layer[0]=tnWallVerticalRight;
+                                }
+                            }
+                        }
+                    }
                 }else{
                     if(IsWall(x-1,y)){
-                        m_Map[x][y].layer[0]=tnWallHorizontalDown;
+                        if(IsWall(x-1,y+1) && IsWall(x+1,y+1)){
+                            m_Map[x][y].layer[0]=tnWallHorizontalFillDown;
+                        }else{
+                            if(IsWall(x-1,y+1)){
+                                m_Map[x][y].layer[0]=tnWallHorizontalDownFillSW;
+                            }else{
+                                if(IsWall(x+1,y+1)){
+                                    m_Map[x][y].layer[0]=tnWallHorizontalDownFillSE;
+                                }else{
+                                    m_Map[x][y].layer[0]=tnWallHorizontalDown;
+                                }
+                            }
+                        }
                     }else{
-                        m_Map[x][y].layer[0]=tnWallLeftTop;
+                        if(IsWall(x+1,y+1)){
+                            m_Map[x][y].layer[0]=tnWallLeftTopFillInside;
+                        }else{
+                            m_Map[x][y].layer[0]=tnWallLeftTop;
+                        }
                     }
                 }
             }else
             // right top corner
             if(IsWall(x-1,y) && IsWall(x,y+1)){
                 if(IsWall(x,y-1)){
-                    m_Map[x][y].layer[0]=tnWallVerticalLeft;
+                    if(IsWall(x-1,y-1) && IsWall(x-1,y+1)){
+                        m_Map[x][y].layer[0]=tnWallVerticalFillLeft;
+                    }else{
+                        if(IsWall(x-1,y-1)){
+                            m_Map[x][y].layer[0]=tnWallVerticalLeftFillNW;
+                        }else{
+                            if(IsWall(x-1,y+1)){
+                                m_Map[x][y].layer[0]=tnWallVerticalLeftFillSW;
+                            }else{
+                                m_Map[x][y].layer[0]=tnWallVerticalLeft;
+                            }
+                        }
+                    }
                 }else{
                     if(IsWall(x+1,y)){
                         m_Map[x][y].layer[0]=tnWallHorizontalDown;
                     }else{
-                        m_Map[x][y].layer[0]=tnWallRightTop;
+                        if(IsWall(x-1,y+1)){
+                            m_Map[x][y].layer[0]=tnWallRightTopFillInside;
+                        }else{
+                            m_Map[x][y].layer[0]=tnWallRightTop;
+                        }
                     }
                 }
             }else
@@ -376,9 +473,25 @@ void CLevelMap::LandPostprocessing(CFOV *fov, int x, int y){
                     m_Map[x][y].layer[0]=tnWallVerticalLeft;
                 }else{
                     if(IsWall(x-1,y)){
-                        m_Map[x][y].layer[0]=tnWallHorizontalUp;
+                        if(IsWall(x-1,y-1) && IsWall(x+1,y-1)){
+                            m_Map[x][y].layer[0]=tnWallHorizontalFillUp;
+                        }else{
+                            if(IsWall(x-1,y-1)){
+                                m_Map[x][y].layer[0]=tnWallHorizontalUpFillNW;
+                            }else{
+                                if(IsWall(x+1,y-1)){
+                                    m_Map[x][y].layer[0]=tnWallHorizontalUpFillNE;
+                                }else{
+                                    m_Map[x][y].layer[0]=tnWallHorizontalUp;
+                                }
+                            }
+                        }
                     }else{
-                        m_Map[x][y].layer[0]=tnWallLeftBottom;
+                        if(IsWall(x+1,y-1)){
+                            m_Map[x][y].layer[0]=tnWallLeftBottomFillInside;
+                        }else{
+                            m_Map[x][y].layer[0]=tnWallLeftBottom;
+                        }
                     }
                 }
             }else
@@ -390,7 +503,11 @@ void CLevelMap::LandPostprocessing(CFOV *fov, int x, int y){
                     if(IsWall(x+1,y)){
                         m_Map[x][y].layer[0]=tnWallHorizontalUp;
                     }else{
-                        m_Map[x][y].layer[0]=tnWallRightBottom;
+                        if(IsWall(x-1,y-1)){
+                            m_Map[x][y].layer[0]=tnWallRightBottomFillInside;
+                        }else{
+                            m_Map[x][y].layer[0]=tnWallRightBottom;
+                        }
                     }
                 }
             }
