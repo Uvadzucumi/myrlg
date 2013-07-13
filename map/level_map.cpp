@@ -350,7 +350,11 @@ void CLevelMap::LandPostprocessing(CFOV *fov, int x, int y){
             // vertical wall
             if(!IsWall(x+1,y) && !IsWall(x-1,y)){ // left & right empty
                 if(!IsWall(x,y+1)){ // down empty
-                    m_Map[x][y].layer[0]=tnWallEndDown;
+                    if(!IsWall(x,y-1)){
+                        m_Map[x][y].layer[0]=tnWallAlone;
+                    }else{
+                        m_Map[x][y].layer[0]=tnWallEndDown;
+                    }
                 }else if(!IsWall(x,y-1)){ // up empty
                     m_Map[x][y].layer[0]=tnWallEndUp;
                 }else{ // ud and down tiles have walls
