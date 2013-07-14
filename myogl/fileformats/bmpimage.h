@@ -4,6 +4,8 @@
     #include <stdio.h>
     #include <GL/gl.h>
 
+    #include <vector>
+
 /* Load bmp image, return collor butes array */
 namespace MyOGL{
 
@@ -82,7 +84,7 @@ namespace MyOGL{
             GLuint GetPixelFormat(){ return m_pixel_format; };
             int GetBytesPerPixel(){ return m_bytes_prer_pixel; }
             // copy pixel data to pointer *data and return pointer address
-            unsigned char* GetPixelData(unsigned char *data);
+            int GetPixelData(std::vector<unsigned char>& data);
     };
 
 }

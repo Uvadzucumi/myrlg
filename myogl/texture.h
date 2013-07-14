@@ -3,6 +3,9 @@
 
 #include <SDL/SDL.h>
 #include <GL/gl.h>
+
+#include <iostream>
+#include <fstream>
 #include <vector>
 
 #include "render.h"
@@ -12,11 +15,7 @@ namespace MyOGL{
     class CTexture{
             GLuint TextureID;
 
-        #ifdef USE_SDL_BMP_LOADER
-            SDL_Surface *m_data;
-        #else
-            unsigned char *m_data;
-        #endif
+            std::vector<unsigned char> m_image_data;
             // texture parameters
             GLuint minFilter;
             GLuint magFilter;
@@ -25,10 +24,12 @@ namespace MyOGL{
             GLuint m_texture_format; // GL_RGBA, etc...
             bool m_alpha;
             char m_file_name[100];
+            void loadFile(std::vector<unsigned char>& buffer, const std::string& file_name); //designed for loading files from hard disk in an std::vector
+            int LoadPNGImage(const char *file_name);
+            int LoadBitmapImage(const char *file_name);
         public:
             CTexture(){
                 TextureID = 0;
-                m_data=NULL;
                 minFilter=GL_LINEAR; magFilter=GL_LINEAR;
                 m_alpha=false;
             }
@@ -36,10 +37,9 @@ namespace MyOGL{
             void Free();    // clear video memory and memory
             void Bind();
             bool LoadFromFile(const char *file_name);
-            unsigned char* LoadBitmapImage(const char *file_name);
             bool CreateFromMemory(void);
-            int GetWidth(){ if (m_data){return m_width;}else{return 0;}};
-            int GetHeight(){ if(m_data){return m_height;}else{ return 0;}};
+            int GetWidth(){ if (m_image_data.size()){return m_width;}else{return 0;}};
+            int GetHeight(){ if(m_image_data.size()){return m_height;}else{ return 0;}};
             bool IsAlpha(){ return m_alpha; }
             GLuint GetID(){ return TextureID; }
             char *GetFileName(){ return m_file_name;}

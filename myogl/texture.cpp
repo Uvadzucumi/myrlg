@@ -6,6 +6,9 @@
 
 using namespace MyOGL;
 
+// decodePNG function
+extern int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width, unsigned long& image_height, const unsigned char* in_png, size_t in_size, bool convert_to_rgba32 = true);
+
 std::vector<CTexture*> MyOGL::TexturesList;
 //CRender *MyOGL::Render=NULL;
 void CTexture::Free(){
@@ -16,11 +19,7 @@ void CTexture::Free(){
         TextureID=0;
     }
     // clear memory
-    if(m_data!=NULL){
-//        SDL_FreeSurface(m_data);
-        free(m_data);
-        m_data=NULL;
-    }
+    m_image_data.clear();
 }
 
 CTexture::~CTexture(){
@@ -43,7 +42,7 @@ void CTexture::Bind(){
 // create texture in video memory
 bool CTexture::CreateFromMemory(void){
 
-    if(!m_data){
+    if(!m_image_data.size()){
         Log->puts("CTexture::CreateFromMemory() Error: texture data = NULL\n");
         return false;
     }
@@ -69,13 +68,8 @@ bool CTexture::CreateFromMemory(void){
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, this->magFilter );
 
 	// Create 2D texture
-	#ifdef USE_SDL_BMP_LOADER
     glTexImage2D( GL_TEXTURE_2D, 0, m_bytes_pp, m_width, m_height, 0,
-                      m_texture_format, GL_UNSIGNED_BYTE, m_data->pixels );
-    #else
-    glTexImage2D( GL_TEXTURE_2D, 0, m_bytes_pp, m_width, m_height, 0,
-                     m_texture_format, GL_UNSIGNED_BYTE, (void *)m_data );
-    #endif
+                     m_texture_format, GL_UNSIGNED_BYTE, &m_image_data[0] );
     return true;
 }
 
@@ -84,29 +78,15 @@ bool CTexture::CreateFromMemory(void){
 // create texture in video memory
 bool CTexture::LoadFromFile(const char *file_name){
     strcpy(m_file_name,file_name);
-#ifdef USE_SDL_BMP_LOADER
-    if( ( m_data = SDL_LoadBMP(m_file_name) ) ) {
-        // set width, height & bytes per pixel
-        m_width=m_data->w;
-        m_height=m_data->h;
-        m_bytes_pp=m_data->format->BytesPerPixel;
-        // set texture format
-        if (m_data->format->Rmask == 0x0000ff)
-            m_texture_format = GL_RGBA;
-        else if( m_data->format->Rmask == 0xff0000){
-            m_texture_format = GL_BGRA;
-        }else{
-            Log->puts("ERROR! CTexture::LoadFromFile() Wrong texture format. using default GL_RGBA\n");
-            printf("BitsPerPixel: %d\nRMASK: 0x%x\nGMASK: 0x%x\nBMASK: 0x%x\nAMASK: 0x%x\n",m_data->format->BitsPerPixel, m_data->format->Rmask,m_data->format->Gmask,m_data->format->Bmask,m_data->format->Amask);
-            m_texture_format=GL_RGBA;
-        }
-#else
-   if( ( m_data = LoadBitmapImage(m_file_name) ) ) {
+#ifdef USE_PNG_IMAGE
+    if(!LoadPNGImage(m_file_name)){
+#else // locad bmp image
+    if( !LoadBitmapImage(m_file_name) ) {
 #endif
         // create texture
         CreateFromMemory();
     } else {
-        Log->printf("CTexture::LoadFromFile() could not load image %s",file_name);
+        Log->printf("CTexture::LoadFromFile() could not load image %s\n",file_name);
         return false;
     }
     Log->printf("Created Texture %d (%s)\n",TextureID, file_name);
@@ -114,7 +94,38 @@ bool CTexture::LoadFromFile(const char *file_name){
     return true;
 }
 
-unsigned char* CTexture::LoadBitmapImage(const char *file_name){
+// load file to vector buffer
+void CTexture::loadFile(std::vector<unsigned char>& buffer, const std::string& filename){
+  std::ifstream file(filename.c_str(), std::ios::in|std::ios::binary|std::ios::ate);
+
+  //get filesize
+  std::streamsize size = 0;
+  if(file.seekg(0, std::ios::end).good()) size = file.tellg();
+  if(file.seekg(0, std::ios::beg).good()) size -= file.tellg();
+
+  //read contents of the file into the vector
+  if(size > 0){
+    buffer.resize((size_t)size);
+    file.read((char*)(&buffer[0]), size);
+  }
+  else buffer.clear();
+}
+
+//load and decode PNG image
+int CTexture::LoadPNGImage(const char *file_name){
+    std::vector<unsigned char> buffer;
+    loadFile(buffer, file_name);
+    unsigned long w, h;
+    int error = decodePNG(m_image_data, w, h, buffer.empty() ? 0 : &buffer[0], (unsigned long)buffer.size());
+    if(!error){
+        m_width=w; m_height=h;
+        m_texture_format=GL_RGBA;
+        m_bytes_pp=4;
+    }
+    return error;
+}
+
+int CTexture::LoadBitmapImage(const char *file_name){
     CBitMapImage image;
     if(image.LoadFromFile(file_name)){
         m_width=image.GetWidth();
@@ -122,7 +133,7 @@ unsigned char* CTexture::LoadBitmapImage(const char *file_name){
         m_bytes_pp=image.GetBytesPerPixel();
         m_texture_format=image.GetPixelFormat();
         // create pixel data array and return pointer
-        return image.GetPixelData(m_data);
+        image.GetPixelData(m_image_data);
     }
-    return NULL;
+    return 0;
 }

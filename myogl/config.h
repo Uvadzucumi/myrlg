@@ -12,8 +12,8 @@
 // if defined - used vbo for render text, else - display list
 #define MYOGL_VBO_TEXT
 
-// if not defined - used internal loader for bmp files
-//#define USE_SDL_BMP_LOADER
+// if not defined - used internal loader for bmp files, else - loading textures from png files
+#define USE_PNG_IMAGE
 
 // window widt, height
 #define WWIDTH 800

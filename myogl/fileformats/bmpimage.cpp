@@ -191,14 +191,14 @@ bool CBitMapImage::LoadFromFile(const char *file_name){
 }
 
 // copy pixel data to data pointer and return address
-unsigned char* CBitMapImage::GetPixelData(unsigned char *data){
-    if(data!=NULL){
+int CBitMapImage::GetPixelData(std::vector<unsigned char>& data){
+    if(data.size()){
         Log->puts("Warning: CBitMapImage::GetPixelData() pinter not NULL, previous data deleted\n");
-        delete data;
+        data.clear();
     }
     int pixel_data_size=m_bytes_prer_pixel*m_info_header.width*m_info_header.height;
     // allocate mem
-    data=new unsigned char [pixel_data_size];
-    memcpy(data,m_pixel_data,pixel_data_size);
-    return data;
+    data.resize(pixel_data_size);
+    memcpy(&data[0],m_pixel_data,pixel_data_size);
+    return 0;
 }
