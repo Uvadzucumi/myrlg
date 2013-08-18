@@ -13,8 +13,9 @@ std::vector<CTexture*> MyOGL::TexturesList;
 //CRender *MyOGL::Render=NULL;
 void CTexture::Free(){
     // clear video memory
+    MyOGL::Render->BindTexture(0);
     if(TextureID){
-        Log->puts("unload texture %d\n",TextureID);
+        Log->printf("unload texture %d\n",TextureID);
         glDeleteTextures(1,&TextureID);
         TextureID=0;
     }
@@ -58,7 +59,7 @@ bool CTexture::CreateFromMemory(void){
 
 	// Have OpenGL generate a texture object handle for us
     glGenTextures( 1, &TextureID );
-    Log->puts("Gen texture ID=%d\n",TextureID);
+    Log->printf("Gen texture ID=%d\n",TextureID);
 
 	// force bind the texture object
     Render->BindTexture(TextureID,true);
@@ -68,8 +69,31 @@ bool CTexture::CreateFromMemory(void){
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, this->magFilter );
 
 	// Create 2D texture
-    glTexImage2D( GL_TEXTURE_2D, 0, m_bytes_pp, m_width, m_height, 0,
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, m_width, m_height, 0,
                      m_texture_format, GL_UNSIGNED_BYTE, &m_image_data[0] );
+    return true;
+}
+
+// create empty texture, (for attach to FBO)
+bool CTexture::CreateEmpty(int width, int height){
+    m_width=width;
+    m_height=height;
+    m_texture_format=GL_RGBA;
+    m_bytes_pp=GL_RGBA8;
+
+    glGenTextures( 1, &TextureID );
+    Log->printf("Gen texture ID=%d width:%d height:%d\n",TextureID, m_width, m_height);
+
+	// bind the texture
+    Render->BindTexture(TextureID);
+
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, this->minFilter );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, this->magFilter );
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	// Create 2D texture
+    glTexImage2D(GL_TEXTURE_2D, 0, m_bytes_pp, m_width, m_height, 0, m_texture_format, GL_UNSIGNED_BYTE, NULL);
+    Render->CheckError();
     return true;
 }
 
@@ -120,7 +144,7 @@ int CTexture::LoadPNGImage(const char *file_name){
     if(!error){
         m_width=w; m_height=h;
         m_texture_format=GL_RGBA;
-        m_bytes_pp=4;
+        m_bytes_pp=GL_RGBA8;
     }
     return error;
 }

@@ -69,7 +69,7 @@ sItemDescription* DBItemByID(unsigned int item_id){
             return &ItemsDB[i];
         }
     }
-    Log->puts("DBItemByID - not found item ID=%d, return item 0\n ",item_id);
+    Log->printf("DBItemByID - not found item ID=%d, return item 0\n ",item_id);
     return &ItemsDB[0];
 }
 
@@ -148,7 +148,7 @@ char CItemsContainer::GetFirstFreeButton(){
             node=node->next;
         }
         if(founded){
-            Log->puts("Found free button %c\n",LetterButtonsList[button_index]);
+            Log->printf("Found free button %c\n",LetterButtonsList[button_index]);
             return LetterButtonsList[button_index];
         }else{
             founded=true;
@@ -250,14 +250,14 @@ bool CItemsContainer::RemoveByIndex(int index){
         if(count==index){ // remove
             prev->next=node->next;   // connect prex and next
             delete node;            // delete current
-            Log->puts("Delete from index=%d\n",index);
+            Log->printf("Delete from index=%d\n",index);
             return true;
         }
         count++;
         prev=node;
         node=node->next;
     }
-    Log->puts("CItemsContainer::RemoveByIndex - item not removed, not founded by index %d\n", index);
+    Log->printf("CItemsContainer::RemoveByIndex - item not removed, not founded by index %d\n", index);
     return false;
 }
 

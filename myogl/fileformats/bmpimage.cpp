@@ -4,6 +4,10 @@
 #include "../log.h"
 #include <stdlib.h> // for abs()
 
+#ifdef __WIN32__
+#define GL_BGRA                           0x80E1
+#endif // __WIN32__
+
 using namespace MyOGL;
 
 // convert pixel data to BGRA format
@@ -133,7 +137,7 @@ bool CBitMapImage::LoadFromFile(const char *file_name){
     }else if(m_info_header.bpp==1 || m_info_header.bpp==4 || m_info_header.bpp==8){
         Log->puts("DEBUG: BMP with palette\n");
         m_palette_size=1 << m_info_header.bpp;
-        Log->puts("DEBUG: Palette seize=%d\n", m_palette_size);
+        Log->printf("DEBUG: Palette seize=%d\n", m_palette_size);
         m_palette=new GLPixel32 [m_palette_size];
         // read palette
         if(m_info_header.colors_used){

@@ -125,7 +125,7 @@ class CTileset{
             if(tile_num<TilesList.size()){
                 return TilesList[tile_num];
             }else{
-                MyOGL::Log->puts("CTileset::Tile(num) Warning! wrong tile number %d\n",tile_num);
+                MyOGL::Log->printf("CTileset::Tile(num) Warning! wrong tile number %d\n",tile_num);
                 return TilesList[0];
             }
         };

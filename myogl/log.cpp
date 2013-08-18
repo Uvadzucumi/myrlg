@@ -39,20 +39,6 @@ void CLog::puts(const char *str){
     }
 }
 
-void CLog::puts(const char *str, int num){
-    if(open_file()){
-        fprintf(fp,str,num);
-        close_file();
-    }
-}
-
-void CLog::puts(const char *str, int num, int num2){
-    if(open_file()){
-        fprintf(fp,str,num, num2);
-        close_file();
-    }
-}
-
 void CLog::puts(const char *str, Vector4f *color){
     if(open_file()){
         fprintf(fp,str,color->r, color->g, color->b, color->a);

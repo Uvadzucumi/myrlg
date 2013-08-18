@@ -1,6 +1,10 @@
 #ifndef MYOGL_H_INCLUDED
 #define MYOGL_H_INCLUDED
 
+#ifdef __WIN32__
+    #include <windows.h>
+#endif
+
 #include <stdio.h>
 
 #include "config.h"

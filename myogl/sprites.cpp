@@ -3,6 +3,9 @@
 using namespace MyOGL;
 
 void CHudSprite::Render(CMaterial *material){
+    if(!m_texture->GetID()){
+        Log->puts("CHudSprite::Render() Warning: TextureID=0\n");
+    }
     MyOGL::Render->Set2D();
     MyOGL::Render->BindTexture(m_texture->GetID());
     MyOGL::Render->SetBlendMode(this->BlendMode);

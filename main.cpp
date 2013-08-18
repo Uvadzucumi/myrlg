@@ -16,7 +16,9 @@
 #include "myogl/ui/text_box.h"
 #include "uiwin/cell_info.h"
 
-//#include "myogl/frame_buffer.h"
+#include "myogl/frame_buffer.h"
+
+CFBO *minimap;
 
 CHudSprite *hero_sprite;
 CTextBox *messages;
@@ -178,7 +180,7 @@ void OnEvent(SDL_Event *Event, double DeltaTime){
                 if(hero->inventory->SelectItemByKey(Event->key.keysym.sym)){
                     ActiveWindow=gwInventoryItemDescription;
                 }else{
-                    MyOGL::Log->puts("Pressed %d key in Inventory Window\n",Event->key.keysym.sym);
+                    MyOGL::Log->printf("Pressed %d key in Inventory Window\n",Event->key.keysym.sym);
                 }
             }
         }else if(ActiveWindow==gwInventoryItemDescription){
@@ -304,7 +306,7 @@ int main(int argc, char **argv){
     for(unsigned int i=0;i<10;i++){
         float l=i*0.1;
         LightMaterials[i].SetDiffuseColor(1-l,1-l,1-l,1.0);
-        Log->puts("Created light material %d\n",i);
+        Log->printf("Created light material %d\n",i);
     }
 
     // CreateTileset
@@ -347,7 +349,7 @@ int main(int argc, char **argv){
     hero->inventory->AddItem(103,1);
     hero->inventory->AddItem(104,1);
 
-    Log->puts("Minimum map tile size: %d Bytes\n",sizeof(sMapField));
+    Log->printf("Minimum map tile size: %d Bytes\n",sizeof(sMapField));
 
     ui_tile_info_panel=new CUICellInfo(font);
 
@@ -366,6 +368,9 @@ int main(int argc, char **argv){
     dungeon->CalculateFOV(hero->GetPosX(),hero->GetPosY());
 
     Log->puts("Dungeond Created\n");
+
+    // create minimap
+    minimap=new CFBO(200,200);
 
     ActiveWindow=gwMain;
 

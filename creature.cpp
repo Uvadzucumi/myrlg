@@ -7,7 +7,7 @@
 bool CCreature::Move(int dx, int dy, CDungeonLevel *dungeon){
 
     if(dx > 1 || dx < -1 || dy > 1 || dy < -1){
-        MyOGL::Log->puts("Wrong creature movement dx=%d dy=%d\n",dx,dy);
+        MyOGL::Log->printf("Wrong creature movement dx=%d dy=%d\n",dx,dy);
         return false;
     }
     if(dungeon->IsCanMove(m_x+dx,m_y+dy)){
@@ -58,13 +58,13 @@ bool CCreature::OpenDoor(CDungeonLevel *dungeon, eDirections direction){
             for(int i=dNorth; i<dDirectionsCount; i++){
                 Vector2i tmp_coord;
                 tmp_coord=GetMapCoords((eDirections)i);
-                Log->puts("Check [%d][%d]\n",tmp_coord.x,tmp_coord.y);
+                Log->printf("Check [%d][%d]\n",tmp_coord.x,tmp_coord.y);
                 if(dungeon->IsDoor(tmp_coord.x, tmp_coord.y)){
-                    Log->puts("Founded door in coords [%d][%d]\n",tmp_coord.x,tmp_coord.y);
+                    Log->printf("Founded door in coords [%d][%d]\n",tmp_coord.x,tmp_coord.y);
                     // founded door
                     if(dungeon->IsDoorClosed(tmp_coord.x, tmp_coord.y)){
                         map_coord=tmp_coord;
-                        Log->puts("Founded closed door in map coords [%d][%d]\n",map_coord.x, map_coord.y);
+                        Log->printf("Founded closed door in map coords [%d][%d]\n",map_coord.x, map_coord.y);
                         break;
                     }else{
                         Log->puts("Error: Door p_tile_data=NULL\n");
@@ -72,7 +72,7 @@ bool CCreature::OpenDoor(CDungeonLevel *dungeon, eDirections direction){
                 }
             }
             if(map_coord.x==-1){
-                Log->puts("Not founded closed Door near [%d][%d]\n",m_x,m_y);
+                Log->printf("Not founded closed Door near [%d][%d]\n",m_x,m_y);
                 return false;
             }
     }

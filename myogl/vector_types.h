@@ -1,14 +1,13 @@
 #ifndef VECTORS_H_INCLUDED
 #define VECTORS_H_INCLUDED
 
+
 namespace MyOGL{
 
     template <class Type>
     class Vector2{
         public:
         union{
-            //Position2f position;
-            //uv2f uv;
             struct{
                 Type x,y;
             };
@@ -29,8 +28,6 @@ namespace MyOGL{
     template <class Type>
     struct Vector3{
         union{
-            //Position2f position;
-            //uv2f uv;
             struct{
                 Type x,y,z;
             };
@@ -49,8 +46,6 @@ namespace MyOGL{
     template <class Type>
     struct Vector4{
         union{
-            //Position2f position;
-            //uv2f uv;
             struct{
                 Type left,top,width,height;
             };

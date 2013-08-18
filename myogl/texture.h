@@ -38,6 +38,7 @@ namespace MyOGL{
             void Bind();
             bool LoadFromFile(const char *file_name);
             bool CreateFromMemory(void);
+            bool CreateEmpty(int width, int height);
             int GetWidth(){ if (m_image_data.size()){return m_width;}else{return 0;}};
             int GetHeight(){ if(m_image_data.size()){return m_height;}else{ return 0;}};
             bool IsAlpha(){ return m_alpha; }

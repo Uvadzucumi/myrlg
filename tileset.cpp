@@ -16,7 +16,7 @@ CTileset::CTileset(CTexture *texture, int tile_x_size, int tile_y_size){
             sprite->SetSize(tile_x_size,tile_y_size);
         }
     }
-    Log->puts("Created %d tiles tileset\n",TilesList.size());
+    Log->printf("Created %d tiles tileset\n",TilesList.size());
 };
 
 CTileset::~CTileset(){

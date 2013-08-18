@@ -58,7 +58,7 @@ class CCreature{
         unsigned int GetPosX(){ return m_x; };
         unsigned int GetPosY(){ return m_y; };
         void SetSprite(MyOGL::CHudSprite *sprite){ m_sprite=sprite; };
-        void Render(){ if(m_sprite!=0) m_sprite->Render();};
+        void Render(){ if(m_sprite) m_sprite->Render();};
         bool Move(int dx, int dy, CDungeonLevel *dungeon);
         bool OpenDoor(CDungeonLevel *dungeon, eDirections direction=dNone);
 };

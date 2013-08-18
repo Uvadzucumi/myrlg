@@ -3,6 +3,13 @@
 
 #include "texture.h"
 #include "ui/bitmap_font.h"
+#include "vbo.h"
+
+#include <math.h>
+
+#ifdef __WIN32__
+PFNGLBLENDEQUATIONPROC              glBlendEquation = NULL;
+#endif // __WIN32__
 
 // FBO functions
 PFNGLGENFRAMEBUFFERSEXTPROC         glGenFramebuffersEXT      = NULL;
@@ -26,6 +33,12 @@ PFNGLBUFFERDATAARBPROC       glBufferDataARB         = NULL;
 PFNGLBUFFERSUBDATAARBPROC    glBufferSubDataARB      = NULL;
 PFNGLDELETEBUFFERSARBPROC    glDeleteBuffersARB      = NULL;
 PFNGLGETBUFFERSUBDATAARBPROC glGetBufferSubDataARB   = NULL;
+// VAO
+PFNGLBINDVERTEXARRAYPROC     glBindVertexArray      = NULL;
+PFNGLDELETEVERTEXARRAYSPROC  glDeleteVertexArrays   = NULL;
+PFNGLGENVERTEXARRAYSPROC     glGenVertexArrays      = NULL;
+PFNGLISVERTEXARRAYPROC       glIsVertexArray        = NULL;
+
 
 // Shaders
 PFNGLCREATEPROGRAMOBJECTARBPROC  glCreateProgramObjectARB   = NULL;
@@ -90,20 +103,24 @@ void CRender::Free(){
 
 // set start OpenGL states
 void CRender::InitGL(){
-    glColor3f(1,0,0);
+
+    glColor3f(1,1,1);
     glClearColor(0,0,0,1);
     glClearDepth(1.0f);
-    // now - not need - ViewPort cahgend in Set2D
-    //glViewport(0, 0, this->m_width, this->m_height);
+
     glEnable(GL_TEXTURE_2D);
-    glDepthFunc(GL_LEQUAL);
+    glShadeModel(GL_SMOOTH);
+
     glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
     //
     glColorMaterial(GL_FRONT, GL_DIFFUSE);
-    glEnable(GL_COLOR_MATERIAL);
-    glDisable(GL_LIGHTING);
+    glDisable(GL_COLOR_MATERIAL);
     glDisable(GL_BLEND);
-    //glBlendEquation(GL_FUNC_ADD);
+
+    glBlendEquation(GL_FUNC_ADD);
+
+    glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
 
     Set2D(true);    // Set2D projection
     GL.GetCurrentStates();
@@ -185,8 +202,13 @@ bool CRender::Init(int width, int height, int bpp, bool full_screen, const char 
         Log->puts(gl_extensions);
 
     }
+    // For Windows need get next ogl functions
+#ifdef __WIN32__
+    glBlendEquation = (PFNGLBLENDEQUATIONPROC)this->GetProcAddress("glBlendEquation");
+#endif // __WIN32__
     // if supported
     m_vbo=EnableVBOFunctions();
+    m_vao=EnableVAOFunctions();
     m_shaders=EnableShadersFunctions();
     m_fbo=EnableFBOFunctions();
     // Init OpenGL
@@ -206,7 +228,7 @@ void CRender::Set2D(bool force){
         glLoadIdentity();
         GL.mode3d=false;
         GL.Disable(GL_DEPTH_TEST);
-    //    Log->puts("Set 2D projection\n");
+        //Log->printf("Set 2D projection (%d,%d)\n",this->m_width,this->m_height);
     }
 }
 
@@ -220,10 +242,16 @@ void CRender::Set3D(bool force){
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
         GL.mode3d=true;
-        Log->puts("Set 3D projection\n");
+        GL.Enable(GL_DEPTH_TEST);
+        //Log->puts("Set 3D projection\n");
     }
 }
 
+// Clear ViewPort
+void CRender::ClearScreen(void){
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glLoadIdentity();
+}
 // Swap render buffers
 void CRender::SwapBuffers(){
     SDL_GL_SwapBuffers();
@@ -272,10 +300,12 @@ void CRender::SetBlendMode(MyGlBlendMode mode){
         case blAdditive:
             glBlendFunc(GL_SRC_ALPHA, GL_ONE);
             GL.Enable(GL_BLEND);
+            break;
         default:
             //printf("warnind: unknown blend mode %d\n",mode);
-            Log->puts("warnind: unknown blend mode %x\n",mode);
+            Log->printf("warnind: unknown blend mode %x\n",mode);
     }
+    GL.CurrentBlendMode=mode;
 }
 
 // Resize Application Windows
@@ -301,13 +331,26 @@ bool CRender::OnResize(int width, int height){
         //glDeleteTextures(1,&texture_id);
         // create new in video memory
         TexturesList[i]->CreateFromMemory();
-        Log->puts("texture %d recreated. ", TexturesList[i]->GetID());
-        Log->puts("file: %s\n", TexturesList[i]->GetFileName());
+        Log->printf("texture %d recreated. ", TexturesList[i]->GetID());
+        Log->printf("file: %s\n", TexturesList[i]->GetFileName());
     }
     // recreate text display lists
     for(unsigned int i=0;i<TextsList.size();i++){
         TextsList[i]->CreateDisplayList();
         Log->puts("CText object display list recreated\n");
+    }
+    // recreate vbo buffers
+    for(unsigned int i=0;i<VBOFloatBuffersList.size();i++){
+        VBOFloatBuffersList[i]->BuildVBO();
+        Log->puts("CVBO object recreated\n");
+    }
+    for(unsigned int i=0;i<VBOByteBuffersList.size();i++){
+        VBOByteBuffersList[i]->BuildVBO();
+        Log->puts("CVBO object recreated\n");
+    }
+    for(unsigned int i=0;i<VAOList.size();i++){
+        VAOList[i]->BuildVAO();
+        Log->puts("CVAO object recreated\n");
     }
 #else
     // in normal OS need only resize Viewport
@@ -351,15 +394,6 @@ void CRender::SetClearColor(float r, float g, float b, float a){
     }
 }
 
-/*
-// Set Blend color
-void CRender::SetBlendColor(float r, float g, float b, float a, bool force){
-    if(GL.BlendColor.r!=r || GL.BlendColor.g!=g || GL.BlendColor.b != b || GL.BlendColor.a!=a || force){
-        GL.BlendColor.r=r; GL.BlendColor.g=g; GL.BlendColor.b=b; GL.BlendColor.a=a;
-        glBlendColor(r,g,b,a);
-    }
-}
-*/
 // Check OpenGL extension
 bool CRender::isExtensionSupported ( const char * ext ){
 
@@ -406,6 +440,21 @@ bool CRender::EnableFBOFunctions(){
 
     }
     Log->puts("FBO: none!\n");
+    return false;
+}
+
+bool CRender::EnableVAOFunctions(){
+    if( isExtensionSupported( "GL_ARB_vertex_array_object" )){
+        glBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)          GetProcAddress("glBindVertexArray");
+        glDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC)    GetProcAddress("glDeleteVertexArrays");
+        glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)          GetProcAddress("glGenVertexArrays");
+        glIsVertexArray = (PFNGLISVERTEXARRAYPROC)              GetProcAddress("glIsVertexArray");
+        if(glBindVertexArray && glDeleteVertexArrays && glGenVertexArrays && glIsVertexArray){
+            Log->puts("VAO: OK\n");
+            return true;
+        }
+    }
+    Log->puts("VAO: none!\n");
     return false;
 }
 
@@ -486,19 +535,19 @@ bool CRender::CheckError(void){
     if((error=glGetError()) != GL_NO_ERROR){
         switch(error){
             case GL_INVALID_ENUM:
-                Log->printf("OpenGL ERROR: %s\n","GL_OUT_OF_MEMORY");
+                Log->printf("OpenGL ERROR: %s\n","GL_INVALID_ENUM");
                 break;
             case GL_INVALID_VALUE:
-                Log->printf("OpenGL ERROR: %s\n","GL_OUT_OF_MEMORY");
+                Log->printf("OpenGL ERROR: %s\n","GL_INVALID_VALUE");
                 break;
             case GL_INVALID_OPERATION:
-                Log->printf("OpenGL ERROR: %s\n","GL_OUT_OF_MEMORY");
+                Log->printf("OpenGL ERROR: %s\n","GL_INVALID_OPERATION");
                 break;
             case GL_STACK_OVERFLOW:
-                Log->printf("OpenGL ERROR: %s\n","GL_OUT_OF_MEMORY");
+                Log->printf("OpenGL ERROR: %s\n","GL_STACK_OVERFLOW");
                 break;
             case GL_STACK_UNDERFLOW:
-                Log->printf("OpenGL ERROR: %s\n","GL_OUT_OF_MEMORY");
+                Log->printf("OpenGL ERROR: %s\n","GL_STACK_UNDERFLOW");
                 break;
             case GL_OUT_OF_MEMORY:
                 Log->printf("OpenGL ERROR: %s\n","GL_OUT_OF_MEMORY");
@@ -512,6 +561,65 @@ bool CRender::CheckError(void){
         return false;
     }
 }
+
+void CRender::RenderScreenQuad(GLuint texture_id){
+   // const GLuint target=GL_TEXTURE_2D;
+    MyOGL::Render->Set2D();
+    glClear ( GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT );
+    GL.Enable(GL_TEXTURE_2D);
+    MyOGL::Render->BindTexture(texture_id);
+    glBegin( GL_QUADS );//glOrtho(0, this->m_width, this->m_height, 0, 1, -1);
+        glTexCoord2f ( 0, 0 ); glVertex2i( 0, 0 );
+        glTexCoord2f ( 1, 0 ); glVertex2i( this->m_width, 0 );
+        glTexCoord2f ( 1, 1 ); glVertex2i( this->m_width, this->m_height );
+        glTexCoord2f ( 0, 1 ); glVertex2i( 0, this->m_height );
+    glEnd();
+
+/*
+    glMatrixMode   ( GL_PROJECTION );
+    glPushMatrix   ();
+    glLoadIdentity ();
+
+    glOrtho        ( 0, 1, 0, 1, -1, 1 );
+    glMatrixMode   ( GL_MODELVIEW );
+    glPushMatrix   ();
+    glLoadIdentity ();
+
+    glClear ( GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT );
+    //GL.Disable(GL_LIGHTING);
+
+    this->BindTexture(texture_id);
+    GL.Enable(GL_TEXTURE_2D);
+    glBegin       ( GL_QUADS );
+        glTexCoord2f ( 0, 0 ); glVertex2f   ( 0, 0 );
+        glTexCoord2f ( 1, 0 ); glVertex2f   ( 1, 0 );
+        glTexCoord2f ( 1, 1 ); glVertex2f   ( 1, 1 );
+        glTexCoord2f ( 0, 1 ); glVertex2f   ( 0, 1 );
+    glEnd;
+    this->BindTexture(0);
+    GL.Disable(GL_TEXTURE_2D);
+    glMatrixMode ( GL_PROJECTION );
+    glPopMatrix  ();
+    glMatrixMode ( GL_MODELVIEW );
+    glPopMatrix  ();
+
+    GL.Enable(GL_LIGHTING);
+    */
+};
+
+// Create ProjectionMatrix
+void CRender::Matrix4Perspective(float *M, float fovy, float aspect, float znear, float zfar){
+        // convert fovy from degreases to radian
+        float f = 1 / tanf(fovy * M_PI / 360),
+              A = (zfar + znear) / (znear - zfar),
+              B = (2 * zfar * znear) / (znear - zfar);
+
+        M[ 0] = f / aspect; M[ 1] =  0; M[ 2] =  0; M[ 3] =  0;
+        M[ 4] = 0;          M[ 5] =  f; M[ 6] =  0; M[ 7] =  0;
+        M[ 8] = 0;          M[ 9] =  0; M[10] =  A; M[11] =  B;
+        M[12] = 0;          M[13] =  0; M[14] = -1; M[15] =  0;
+};
+
 
 // cashed OGL states
 void RenderStates::Enable(GLenum cap){
@@ -543,20 +651,44 @@ bool *RenderStates::GetGLParam(GLenum cap){
             return &DepthTest;
         case GL_LIGHTING:
             return &Lighting;
+        case GL_LIGHT0:
+            return &Light0;
+        case GL_LIGHT1:
+            return &Light1;
+        case GL_LIGHT2:
+            return &Light2;
+        case GL_LIGHT3:
+            return &Light3;
+        case GL_LIGHT4:
+            return &Light4;
+        case GL_LIGHT5:
+            return &Light5;
+        case GL_LIGHT6:
+            return &Light6;
+        case GL_LIGHT7:
+            return &Light7;
         case GL_BLEND:
             return &Blend;
         default:
-            Log->puts("Wrong GL.Enable parameter: %x\n",cap);
+            Log->printf("Wrong GL.Enable parameter: %x\n",cap);
             return NULL;
     }
 }
 
 void RenderStates::GetCurrentStates(){
 //
-//   ColorMaterial=glIsEnabled(GL_COLOR_MATERIAL);
+   ColorMaterial=glIsEnabled(GL_COLOR_MATERIAL);
    Texture2D=glIsEnabled(GL_TEXTURE_2D);
    DepthTest=glIsEnabled(GL_DEPTH_TEST);
    Lighting=glIsEnabled(GL_LIGHTING);
+   Light0=glIsEnabled(GL_LIGHT0);
+   Light1=glIsEnabled(GL_LIGHT1);
+   Light2=glIsEnabled(GL_LIGHT2);
+   Light3=glIsEnabled(GL_LIGHT3);
+   Light4=glIsEnabled(GL_LIGHT4);
+   Light5=glIsEnabled(GL_LIGHT5);
+   Light6=glIsEnabled(GL_LIGHT6);
+   Light7=glIsEnabled(GL_LIGHT7);
    Blend=glIsEnabled(GL_BLEND);
    // blend color
    //glGetFloatv(GL_BLEND_COLOR, BlendColor.data);
@@ -575,11 +707,20 @@ void RenderStates::Debug(void){
     Log->printf("GL_TEXTURE_2D: %s\n",(Texture2D)?"true":"false");
     Log->printf("GL_DEPTH_TEST: %s\n",(DepthTest)?"true":"false");
     Log->printf("GL_LIGHTING: %s\n",(Lighting)?"true":"false");
+    Log->printf("GL_LIGHT0: %s\n",(Light0)?"true":"false");
+    Log->printf("GL_LIGHT1: %s\n",(Light1)?"true":"false");
+    Log->printf("GL_LIGHT2: %s\n",(Light2)?"true":"false");
+    Log->printf("GL_LIGHT3: %s\n",(Light3)?"true":"false");
+    Log->printf("GL_LIGHT4: %s\n",(Light4)?"true":"false");
+    Log->printf("GL_LIGHT5: %s\n",(Light5)?"true":"false");
+    Log->printf("GL_LIGHT6: %s\n",(Light6)?"true":"false");
+    Log->printf("GL_LIGHT7: %s\n",(Light7)?"true":"false");
     Log->printf("GL_BLEND: %s\n",(Blend)?"true":"false");
 //    Log->puts("GL_BLEND_COLOR: (%f,%f,%f,%f)\n",&BlendColor);
     Log->puts("GL_CURRENT_COLOR: (%f,%f,%f,%f)\n",&Color);
     Log->puts("GL_COLOR_CLEAR_VALUE: (%f,%f,%f,%f)\n",&ClearColor);
-    Log->puts("GL_MAX_TEXTURE_UNITS: %d\n",MaxTextureUnits);
+    Log->printf("GL_MAX_TEXTURE_UNITS: %d\n",MaxTextureUnits);
     Log->puts("----------------------------\n");
 }
+
 

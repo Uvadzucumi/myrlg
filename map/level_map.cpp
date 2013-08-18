@@ -80,13 +80,13 @@ void CLevelMap::AddMapTile(eTileTypes TileType, int x, int y, void *tile_data){
     //void *data;
     // default values
     if(x>=m_width || y>=m_height){
-        Log->puts("CLevelMap::AddMapTile() Error. Wrong coordinates [%d,%d]. Skipped\n",x,y);
+        Log->printf("CLevelMap::AddMapTile() Error. Wrong coordinates [%d,%d]. Skipped\n",x,y);
     }
     m_Map[x][y].tile_type=TileType;
     m_Map[x][y].layer[1]=255;
     m_Map[x][y].layer[2]=255;
     if(m_Map[x][y].p_tile_data!=NULL){
-        Log->puts("Error: CLevelMap::AddMapTile() tile_data!=NULL\n",x,y);
+        Log->printf("Error: CLevelMap::AddMapTile() tile_data!=NULL\n",x,y);
     }
     m_Map[x][y].p_tile_data=NULL;
     switch(TileType){
@@ -151,7 +151,7 @@ void CLevelMap::AddMapTile(eTileTypes TileType, int x, int y, void *tile_data){
             m_Map[x][y].can_move=false;
             break;
         default:
-            MyOGL::Log->puts("Warning: unknow AddMapTile(TileType) = [%d]\n",(int)TileType);
+            MyOGL::Log->printf("Warning: unknow AddMapTile(TileType) = [%d]\n",(int)TileType);
     }
 }
 
@@ -308,7 +308,7 @@ sTileDataDoor CLevelMap::GetDoorData(int x, int y){
             Log->puts("ERROR: CLevelMap::GetDoorData() - empty door data!\n");
         }
     }else{
-        Log->puts("ERROR: CLevelMap::GetDoorData() not found door in %d,%d coords\n",x,y);
+        Log->printf("ERROR: CLevelMap::GetDoorData() not found door in %d,%d coords\n",x,y);
     }
     // return error data
     sTileDataDoor tmp;

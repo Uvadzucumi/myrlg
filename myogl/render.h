@@ -4,16 +4,15 @@
 #include <stdio.h>
 #include <SDL/SDL.h>
 
-//#include <GL/gl.h>
-//#include <GL/glu.h>
-//#include <GL/glext.h>
-
 #ifdef __ANDROID_API__
     #define GL_GLEXT_PROTOTYPES
     #include <GLES2/gl2.h>
     #include <GLES2/gl2ext.h>
 #else
-    #include <SDL/SDL_opengl.h>
+    //#include <SDL/SDL_opengl.h>
+    #include <GL/gl.h>
+    #include <GL/glu.h>
+    #include <GL/glext.h>
 #endif
 
 #include "config.h"
@@ -22,8 +21,18 @@
 
 #ifdef __WIN32__
     #define GL_MAX_TEXTURE_UNITS                    0x84E2
-//    #define GL_BGR                                  0x80E0
-//    #define GL_BGRA                                 0x80E1
+    #define GL_BGR                                  0x80E0
+    #define GL_BGRA                                 0x80E1
+
+    #define GL_FUNC_ADD                       0x8006
+    #define GL_MIN                            0x8007
+    #define GL_MAX                            0x8008
+    #define GL_BLEND_EQUATION                 0x8009
+    #define GL_FUNC_SUBTRACT                  0x800A
+    #define GL_FUNC_REVERSE_SUBTRACT          0x800B
+
+    typedef void (APIENTRY * PFNGLBLENDEQUATIONPROC) (GLenum mode);
+    extern PFNGLBLENDEQUATIONPROC          glBlendEquation;
 #endif
 
 //typedef void (*GLfunction)();
@@ -53,7 +62,11 @@ extern PFNGLBUFFERDATAARBPROC       glBufferDataARB;
 extern PFNGLBUFFERSUBDATAARBPROC    glBufferSubDataARB;
 extern PFNGLDELETEBUFFERSARBPROC    glDeleteBuffersARB;
 extern PFNGLGETBUFFERSUBDATAARBPROC glGetBufferSubDataARB;
-
+// VAO (GL_ARB_vertex_array_object)
+extern PFNGLBINDVERTEXARRAYPROC     glBindVertexArray;
+extern PFNGLDELETEVERTEXARRAYSPROC  glDeleteVertexArrays;
+extern PFNGLGENVERTEXARRAYSPROC     glGenVertexArrays;
+extern PFNGLISVERTEXARRAYPROC       glIsVertexArray;
 // GL_ARB_shading_language_100, GL_ARB_shader_objects, GL_ARB_fragment_shader, GL_ARB_vertex_shader
 extern PFNGLCREATEPROGRAMOBJECTARBPROC  glCreateProgramObjectARB;
 extern PFNGLDELETEOBJECTARBPROC         glDeleteObjectARB;
@@ -108,6 +121,14 @@ namespace MyOGL{
             bool Texture2D;
             bool DepthTest;
             bool Lighting;
+            bool Light0;
+            bool Light1;
+            bool Light2;
+            bool Light3;
+            bool Light4;
+            bool Light5;
+            bool Light6;
+            bool Light7;
             bool Blend;
 // methods
             void Enable(GLenum cap);
@@ -136,6 +157,7 @@ namespace MyOGL{
             char *gl_extensions;
             bool m_fbo;
             bool m_vbo;
+            bool m_vao;
             bool m_shaders;
        //     CWindow *win;
             float zNearPlane, zFarPlane;
@@ -151,6 +173,7 @@ namespace MyOGL{
         // set 2D/3D Projection
             void Set2D(bool force=false);
             void Set3D(bool force=false);
+            void ClearScreen(void);
         // swap render buffers (if needed)
             void SwapBuffers();
             void SetWinCaption(const char *title);
@@ -172,6 +195,9 @@ namespace MyOGL{
             bool CheckError(void);
             // check OpenGL Extension
             bool isExtensionSupported ( const char * ext );
+            const bool isVBO(){ return m_vbo; };
+            const bool isFBO(){ return m_fbo; };
+            const bool isShaders(){ return m_shaders; };
             static void  * GetProcAddress ( const char * name ){
 /*
 #ifdef	__WIN32__
@@ -184,7 +210,13 @@ namespace MyOGL{
             };
             bool EnableFBOFunctions(); // Enable FBO Extension functions
             bool EnableVBOFunctions();  // Enable VBO Extension functions
+            bool EnableVAOFunctions(); // Enable VAO Extension functions
             bool EnableShadersFunctions(); // Enable Shader Extension functions
+
+            void RenderScreenQuad(GLuint texture_id); // render texture image to full screen
+
+            // create projection matrix
+            void Matrix4Perspective(float *M, float fovy, float aspect, float znear, float zfar);
     };
 
     extern CRender *Render;

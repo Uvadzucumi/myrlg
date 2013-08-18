@@ -67,7 +67,7 @@ bool CFont::LoadGlyphData(const char *file_name, CTexture *texture){
             } // READ GLYPH
         } // IF READED
     } // while EOF
-    Log->puts("CFont::LoadGlyphData() - loaded %d glyphs\n",char_count);
+    Log->printf("CFont::LoadGlyphData() - loaded %d glyphs\n",char_count);
     fclose(fp);
     return true;
 }
@@ -76,12 +76,12 @@ bool CFont::LoadGlyphData(const char *file_name, CTexture *texture){
 void CFont::debug(void){
 // show all glyph
     unsigned int i;
-    Log->puts("chars: %d\n",m_chars.size());
+    Log->printf("chars: %d\n",m_chars.size());
     for(i=0;i<m_chars.size();i++){
-        Log->puts("code: %d x_off: %d ",m_chars[i].code, m_chars[i].x_offset);
-        Log->puts("y_offs: %d width: %d ",m_chars[i].y_offset, m_chars[i].width);
-        Log->puts("height: %d orig_width: %d ", m_chars[i].height, m_chars[i].orig_width);
-        Log->puts("(%c%c)",(m_chars[i].code>>8 & 0xff),m_chars[i].code & 0xff);
+        Log->printf("code: %d x_off: %d ",m_chars[i].code, m_chars[i].x_offset);
+        Log->printf("y_offs: %d width: %d ",m_chars[i].y_offset, m_chars[i].width);
+        Log->printf("height: %d orig_width: %d ", m_chars[i].height, m_chars[i].orig_width);
+        Log->printf("(%c%c)",(m_chars[i].code>>8 & 0xff),m_chars[i].code & 0xff);
     }
 }
 
@@ -94,7 +94,7 @@ int CFont::GetGlyphId(unsigned int code){
         }
     }
     if(index==m_chars.size()){
-        Log->puts("CFont::GetGlyphId - Warning: symbol %d not found!\n",code);
+        Log->printf("CFont::GetGlyphId - Warning: symbol %d not found!\n",code);
     }
     return index;
 }
@@ -132,7 +132,7 @@ Vector3i CFont::ColorFromCode(const char *code){
         }else if(code[i]>96 && code [i]<103){
             h_c=code[i]-87; //(-97+10);
         }else{ // wrong color code
-            Log->puts("Wrong color code[%d]: %c",i*2,code[i*2]);
+            Log->printf("Wrong color code[%d]: %c",i*2,code[i*2]);
             color.r=255;
             color.g=255;
             color.b=255;
@@ -144,7 +144,7 @@ Vector3i CFont::ColorFromCode(const char *code){
         }else if(code[i+1]>96 && code [i+1]<103){
             l_c=code[i+1]-87; //(-97+10);
         }else{ // wrong color code
-            Log->puts("Wrong color code[%d]: %c",i*2+1,code[i*2+1]);
+            Log->printf("Wrong color code[%d]: %c",i*2+1,code[i*2+1]);
             color.r=255;
             color.g=255;
             color.b=255;
@@ -276,12 +276,12 @@ void CText::Free(void){
    // Log->puts("Delete display list %d",m_list_id);
    // Log->puts(" and text string (%d bytes)\n",sizeof(m_text));
     if(m_list_id){
-        Log->puts("delete Display list %d\n",m_list_id);
+        Log->printf("delete Display list %d\n",m_list_id);
         glDeleteLists(m_list_id,  1);
         m_list_id=0;
     }
     if(m_text!=NULL){
-        Log->puts("Free text string memory. %d bytes\n",strlen(m_text));
+        Log->printf("Free text string memory. %d bytes\n",strlen(m_text));
         free(m_text);
         m_text=NULL;
     }
@@ -300,7 +300,7 @@ void CText::SetText(const char *text, int max_width){
 // create display list for text rendering
 bool CText::CreateDisplayList(){
     m_list_id=glGenLists(1);
-    Log->puts("Generate display list %d\n",m_list_id);
+    Log->printf("Generate display list %d\n",m_list_id);
     glNewList(m_list_id,GL_COMPILE);
     m_width=m_font->RenderText(m_text, m_max_width);
     // render text

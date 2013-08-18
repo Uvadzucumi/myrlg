@@ -96,7 +96,7 @@ bool CInventory::SelectItemByKey(int key_code){
         BuildSelectedItemAtions();
         return true;
     };
-    Log->puts("Not found inventory item by key %c\n",key_code);
+    Log->printf("Not found inventory item by key %c\n",key_code);
     return false;
 }
 
@@ -108,7 +108,7 @@ bool CInventory::SelectItemById(int inv_id){
         BuildSelectedItemAtions();
         return true;
     };
-    Log->puts("Not found inventory item by index %d\n",inv_id);
+    Log->printf("Not found inventory item by index %d\n",inv_id);
     return false;
 }
 
@@ -122,7 +122,7 @@ int CInventory::SearchEmptyEqSlots(eEquipSlotNames slot_position){
         }
     }
     // not founded
-    Log->puts("Not found empty slot %d\n",slot_position);
+    Log->printf("Not found empty slot %d\n",slot_position);
     return -1;
 }
 
@@ -134,7 +134,7 @@ int CInventory::SearchFirstEqSlot(eEquipSlotNames slot_position){
         }
     }
     // not founded
-    Log->puts("Not found slot %d\n",slot_position);
+    Log->printf("Not found slot %d\n",slot_position);
     return -1;
 }
 
@@ -145,7 +145,7 @@ int CInventory::SearchSlotIdByInvItemId(int inv_id){
             return i;
         }
     }
-    Log->puts("Not found item inv_id=%d in slots list\n",inv_id);
+    Log->printf("Not found item inv_id=%d in slots list\n",inv_id);
     return -1;
 }
 

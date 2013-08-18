@@ -13,8 +13,8 @@ CTextBox::CTextBox(CFont *font){
     m_max_strings=50;
     m_text_height=0;
     m_vAlignTop=false;
-    Log->puts("CTextBox Viewport x: %d, y: %d",m_viewport.left, m_viewport.top);
-    Log->puts("w: %d, h: %d\n",m_viewport.width, m_viewport.height);
+    Log->printf("CTextBox Viewport x: %d, y: %d",m_viewport.left, m_viewport.top);
+    Log->printf("w: %d, h: %d\n",m_viewport.width, m_viewport.height);
 };
 
 CTextBox::~CTextBox(){
@@ -45,8 +45,8 @@ void CTextBox::SetViewPort(int left, int top, int width, int height){
     m_viewport.top=top;
     m_viewport.width=width;
     m_viewport.height=height;
-    Log->puts("CTextBox Viewport x: %d, y: %d",m_viewport.left, m_viewport.top);
-    Log->puts(" w: %d, h: %d\n",m_viewport.width, m_viewport.height);
+    Log->printf("CTextBox Viewport x: %d, y: %d",m_viewport.left, m_viewport.top);
+    Log->printf(" w: %d, h: %d\n",m_viewport.width, m_viewport.height);
 };
 
 // render text strings

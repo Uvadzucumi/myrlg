@@ -125,7 +125,7 @@ class CLevelMap{
                                 }
                                 break;
                             default:
-                                MyOGL::Log->puts("WARNING! not implementd delete *p_tile_data for tile_type %d!\n",m_Map[i][j].tile_type);
+                                MyOGL::Log->printf("WARNING! not implementd delete *p_tile_data for tile_type %d!\n",m_Map[i][j].tile_type);
                                 break;
                         }
                     }
@@ -166,7 +166,7 @@ class CLevelMap{
         bool CloseDoor(int x, int y);
         void SetViewed(int x, int y, bool flag){
             if(x<0 || y< 0 || x>=m_width || y>=m_height){
-                MyOGL::Log->puts("RANGE ERROR CLevelMap::SetViewed(): x: %d y: %d\n",x,y);
+                MyOGL::Log->printf("RANGE ERROR CLevelMap::SetViewed(): x: %d y: %d\n",x,y);
                 return;
             }
             m_Map[x][y].viewed=flag;

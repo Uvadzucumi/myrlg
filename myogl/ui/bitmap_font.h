@@ -10,6 +10,7 @@ namespace MyOGL{
     struct Glyph{
         unsigned int code;
         Vector2f text_coords[2];
+        Vector2i vertex_Coords[4];
         int width, height, orig_width;
         int x_offset, y_offset;
     };

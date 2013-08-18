@@ -15,8 +15,6 @@ class CLog{
     public:
         void Init(const char *file_name);
         void puts(const char *str);
-        void puts(const char *str, int num);
-        void puts(const char *str, int num, int num2);
         void puts(const char *str, Vector4f *color);
         void printf(const char *format, ...);
         bool open_file(void);

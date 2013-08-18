@@ -203,7 +203,7 @@ void CApplication::Events(SDL_Event *Event, double DeltaTime){
 void CApplication::Free(){
     // clear textures list
     Log->puts("Application::Free()\n");
-    Log->puts("textures count: %d\n",TexturesList.size());
+    Log->printf("textures count: %d\n",TexturesList.size());
     for(int i = TexturesList.size()-1; i >=0;i--){
         if(!TexturesList[i]) continue;
         delete TexturesList[i];
@@ -211,7 +211,7 @@ void CApplication::Free(){
     TexturesList.clear();
 
     // clear Entity list
-    Log->puts("entity count: %d\n",TexturesList.size());
+    Log->printf("entity count: %d\n",EntityList.size());
     for(int i = EntityList.size()-1;i >=0 ;i--) {
         if(!EntityList[i]) continue;
         delete EntityList[i];

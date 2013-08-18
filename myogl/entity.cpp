@@ -12,7 +12,7 @@ CEntity::CEntity() {
     AnimState = 0;
     m_animation=new CAnimation;
     EntityList.push_back(this);
-    Log->puts("created entity %d!\n",EntityList.size());
+    Log->printf("created entity %d!\n",EntityList.size());
 }
 
 CEntity::~CEntity() {
@@ -55,12 +55,12 @@ bool CEntity::OnCreate(CTexture* texture, int Width, int Height, int MaxFrames, 
             dy+=Height;
             if(dy>=texture->GetHeight() && i!=(MaxFrames-1)){
                 Log->puts("CEntity::OnCreate Error: Wrong MaxFrames  or Texture parameter. ");
-                Log->puts("(dx: %d dy: %d)\n", dx, dy);
+                Log->printf("(dx: %d dy: %d)\n", dx, dy);
                 return false;
             }
         }
     }
-    Log->puts("CEntity. Created %d frames\n",SpritesList.size());
+    Log->printf("CEntity. Created %d frames\n",SpritesList.size());
     return true;
 }
 
@@ -79,7 +79,7 @@ void CEntity::OnRender() {
             SpritesList[m_animation->GetCurrentFrame()]->SetPosition(X,Y);
             SpritesList[m_animation->GetCurrentFrame()]->Render();
         }else{
-            Log->puts("CEntity::OnRender() Error: Wrong Frame Number %d\n",m_animation->GetCurrentFrame());
+            Log->printf("CEntity::OnRender() Error: Wrong Frame Number %d\n",m_animation->GetCurrentFrame());
         }
     }
 }
