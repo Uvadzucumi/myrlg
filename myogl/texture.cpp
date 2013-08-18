@@ -145,6 +145,7 @@ int CTexture::LoadPNGImage(const char *file_name){
         m_width=w; m_height=h;
         m_texture_format=GL_RGBA;
         m_bytes_pp=GL_RGBA8;
+        m_alpha=true;
     }
     return error;
 }
