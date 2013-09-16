@@ -2,7 +2,8 @@
 #define RENDER_H_INCLUDED
 
 #include <stdio.h>
-#include <SDL/SDL.h>
+
+#include <SDL2/SDL.h>
 
 #ifdef __ANDROID_API__
     #define GL_GLEXT_PROTOTYPES
@@ -150,7 +151,8 @@ namespace MyOGL{
     class CRender{
             int m_width, m_height, m_bpp;
             bool m_full_screen;
-            SDL_Surface *Context;
+            SDL_Window *Window;
+            SDL_GLContext Context;
             Uint32 window_flags;
             char *gl_vendor;
             char *gl_version;
@@ -182,7 +184,7 @@ namespace MyOGL{
             int GetWidth(void){ return m_width;}
             int GetHeight(void){ return m_height;}
         // resize window
-            bool OnResize(int width, int height);
+            bool OnResize(int window_id, int width, int height);
         // Textures
             void BindTexture(GLuint TextureID, bool force=false);
             void SetBlendMode(MyGlBlendMode mode);

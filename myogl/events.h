@@ -1,7 +1,7 @@
 #ifndef EVENTS_H_INCLUDED
 #define EVENTS_H_INCLUDED
 
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 
 class CEvent {
     public:
@@ -15,9 +15,9 @@ class CEvent {
 
         virtual void OnInputBlur();
 
-        virtual void OnKeyDown(SDLKey sym, SDLMod mod, Uint16 unicode);
+        virtual void OnKeyDown(SDL_Scancode code);
 
-        virtual void OnKeyUp(SDLKey sym, SDLMod mod, Uint16 unicode);
+        virtual void OnKeyUp(SDL_Scancode code);
 
         virtual void OnMouseFocus();
 
@@ -53,7 +53,7 @@ class CEvent {
 
         virtual void OnRestore();
 
-        virtual void OnResize(int w,int h);
+        virtual void OnResize(int window_id, int w,int h);
 
         virtual void OnExpose();
 

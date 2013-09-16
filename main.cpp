@@ -95,28 +95,28 @@ void OnRender(double dt){
 void OnLoop(double DeltaTime){
 //    float speed=100;
     if(ActiveWindow==gwMain){
-        if(App->IsKeyPressed(SDLK_LEFT) || App->IsKeyPressed(SDLK_KP4)){
+        if(App->IsKeyPressed(SDLK_LEFT) || App->IsKeyPressed(SDLK_KP_4)){
             hero->Move(-1,0, dungeon);
         }
-        if(App->IsKeyPressed(SDLK_RIGHT)|| App->IsKeyPressed(SDLK_KP6)){
+        if(App->IsKeyPressed(SDLK_RIGHT)|| App->IsKeyPressed(SDLK_KP_6)){
             hero->Move(1,0, dungeon);
         }
-        if(App->IsKeyPressed(SDLK_UP)|| App->IsKeyPressed(SDLK_KP8)){
+        if(App->IsKeyPressed(SDLK_UP)|| App->IsKeyPressed(SDLK_KP_8)){
             hero->Move(0,-1, dungeon);
         }
-        if(App->IsKeyPressed(SDLK_DOWN)|| App->IsKeyPressed(SDLK_KP2)){
+        if(App->IsKeyPressed(SDLK_DOWN)|| App->IsKeyPressed(SDLK_KP_2)){
             hero->Move(0,1, dungeon);
         }
-        if(App->IsKeyPressed(SDLK_KP7)){
+        if(App->IsKeyPressed(SDLK_KP_7)){
             hero->Move(-1,-1, dungeon);
         }
-        if(App->IsKeyPressed(SDLK_KP9)){
+        if(App->IsKeyPressed(SDLK_KP_9)){
             hero->Move(1,-1, dungeon);
         }
-        if(App->IsKeyPressed(SDLK_KP1)){
+        if(App->IsKeyPressed(SDLK_KP_1)){
             hero->Move(-1,1, dungeon);
         }
-        if(App->IsKeyPressed(SDLK_KP3)){
+        if(App->IsKeyPressed(SDLK_KP_3)){
             hero->Move(1,1, dungeon);
         }
         if(App->IsKeyPressed(SDLK_i)){  // goto inventory window

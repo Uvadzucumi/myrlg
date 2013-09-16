@@ -1,10 +1,10 @@
 TODO LIST:
 
-- add diffuse Light
++ add diffuse Light
 - display normal field information (current showed debug info, view vector, light strength and etc.)
   display Tile info moved to separate module
 - add Animated Water tiles
 - add display Dungeon Map (may be using FBO)
 - add text world wrap in text render functions, add fast text render (without special symbols, wordwrap, etc...)
-- revrite inventory class
+- rewrite inventory class
 - add mobs (BIG FAT RATs)

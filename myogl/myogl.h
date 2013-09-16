@@ -35,7 +35,7 @@ namespace MyOGL{
             double DeltaTime;
             void Events(SDL_Event *Event,  double DeltaTime);  // parse application events
             bool Running;
-            bool KEYS[MYOGL_BUTTONS_COUNT];  // 322 is the number of SDLK_DOWN events
+            bool KEYS[SDL_NUM_SCANCODES];  // 322 is the number of SDLK_DOWN events
             MouseState MOUSE;
             char *user_home_dir;
         public:
@@ -95,10 +95,12 @@ namespace MyOGL{
 
             //void OnEvent(SDL_Event* Event);
             void OnExit() { Running = false; }
+            void OnResize(int window_id, int w,int h);
             // key pressed state
-            bool IsKeyPressed(unsigned int key_code){
-                if(key_code>321) return false;
-                return KEYS[key_code];
+            bool IsKeyPressed(SDL_Keycode key_code){
+                SDL_Scancode scan_code=SDL_GetScancodeFromKey(key_code);
+                if(scan_code>=SDL_NUM_SCANCODES) return false;
+                return KEYS[scan_code];
             }
     };
 

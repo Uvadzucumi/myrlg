@@ -9,37 +9,14 @@ CEvent::~CEvent() {
 
 void CEvent::OnEvent(SDL_Event* Event) {
     switch(Event->type) {
-        case SDL_ACTIVEEVENT: {
-            switch(Event->active.state) {
-                case SDL_APPMOUSEFOCUS: {
-                    if ( Event->active.gain )    OnMouseFocus();
-                    else                OnMouseBlur();
-
-                    break;
-                }
-                case SDL_APPINPUTFOCUS: {
-                    if ( Event->active.gain )    OnInputFocus();
-                    else                OnInputBlur();
-
-                    break;
-                }
-                case SDL_APPACTIVE:    {
-                    if ( Event->active.gain )    OnRestore();
-                    else                OnMinimize();
-
-                    break;
-                }
-            }
-            break;
-        }
 
         case SDL_KEYDOWN: {
-            OnKeyDown(Event->key.keysym.sym,Event->key.keysym.mod,Event->key.keysym.unicode);
+            OnKeyDown(Event->key.keysym.scancode);
             break;
         }
 
         case SDL_KEYUP: {
-            OnKeyUp(Event->key.keysym.sym,Event->key.keysym.mod,Event->key.keysym.unicode);
+            OnKeyUp(Event->key.keysym.scancode);
             break;
         }
 
@@ -118,15 +95,36 @@ void CEvent::OnEvent(SDL_Event* Event) {
             break;
         }
 
-        case SDL_VIDEORESIZE: {
-            OnResize(Event->resize.w,Event->resize.h);
+        case SDL_WINDOWEVENT:     // window events
+            switch (Event->window.event) {
+                case SDL_WINDOWEVENT_RESIZED:
+                    OnResize(Event->window.windowID, Event->window.data1, Event->window.data2);
+                    break;
+                case SDL_WINDOWEVENT_EXPOSED:   // required redraw
+                    OnExpose();
+                    break;
+                case SDL_WINDOWEVENT_ENTER: // mouse gained focus
+                    OnMouseFocus();
+                    break;
+                case SDL_WINDOWEVENT_LEAVE: // mouse lost focus
+                    OnMouseBlur();
+                    break;
+                case SDL_WINDOWEVENT_FOCUS_GAINED: // gained kyobord focus
+                    OnInputFocus();
+                    break;
+                case SDL_WINDOWEVENT_FOCUS_LOST: // lost keyboard focus
+                    OnInputBlur();
+                    break;
+                case SDL_WINDOWEVENT_MINIMIZED:
+                    OnMinimize();
+                    break;
+                case SDL_WINDOWEVENT_RESTORED:
+                    OnRestore();
+                    break;
+                default:
+                    break;
+            }
             break;
-        }
-
-        case SDL_VIDEOEXPOSE: {
-            OnExpose();
-            break;
-        }
 
         default: {
             OnUser(Event->user.type,Event->user.code,Event->user.data1,Event->user.data2);
@@ -143,11 +141,11 @@ void CEvent::OnInputBlur() {
     //Pure virtual, do nothing
 }
 
-void CEvent::OnKeyDown(SDLKey sym, SDLMod mod, Uint16 unicode) {
+void CEvent::OnKeyDown(SDL_Scancode code) {
     //Pure virtual, do nothing
 }
 
-void CEvent::OnKeyUp(SDLKey sym, SDLMod mod, Uint16 unicode) {
+void CEvent::OnKeyUp(SDL_Scancode code) {
     //Pure virtual, do nothing
 }
 
@@ -219,7 +217,7 @@ void CEvent::OnRestore() {
     //Pure virtual, do nothing
 }
 
-void CEvent::OnResize(int w,int h) {
+void CEvent::OnResize(int window_id, int w,int h) {
     //Pure virtual, do nothing
 }
 

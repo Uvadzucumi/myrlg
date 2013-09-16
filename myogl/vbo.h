@@ -20,7 +20,8 @@ namespace MyOGL{
                 m_Usage=Usage;
                 m_Target=Target;
             }
-            ~CVBOBuffer(){
+            virtual ~CVBOBuffer(){
+                Log->puts("Clear Buffer memery\n");
                 if(m_BufferId) glDeleteBuffersARB(1,&m_BufferId);
                 m_Buffer.clear();
             };

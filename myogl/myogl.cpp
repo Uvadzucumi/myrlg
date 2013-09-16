@@ -104,18 +104,14 @@ int CApplication::Run(void){
 // parse all SDL events
 void CApplication::Events(SDL_Event *Event, double DeltaTime){
     switch(Event->type) {
-        case SDL_VIDEORESIZE:     // window resize
-            if(Render->OnResize(Event->resize.w,Event->resize.h) && OnWindowResize){
-                OnWindowResize(Render->GetWidth(),Render->GetHeight());
-            }
-            break;
+
         case SDL_KEYDOWN:
-            KEYS[Event->key.keysym.sym] = true;
-                //Log->puts("Key %d pressed\n",Event->key.keysym.sym);
+            KEYS[Event->key.keysym.scancode] = true;
+                //Log->printf("Key %d pressed\n",Event->key.keysym.sym);
             break;
         case SDL_KEYUP:
-            KEYS[Event->key.keysym.sym] = false;
-                //Log->puts("Key %d unpressed\n",Event->key.keysym.sym);
+            KEYS[Event->key.keysym.scancode] = false;
+                //Log->printf("Key %d unpressed\n",Event->key.keysym.sym);
             break;
         case SDL_MOUSEMOTION:
             MOUSE.coords.x=Event->motion.x;
@@ -220,3 +216,9 @@ void CApplication::Free(){
     if(Render!=NULL) delete Render;
 }
 
+void CApplication::OnResize(int window_id, int width, int height){
+    Render->OnResize(window_id, width, height);
+    if(OnWindowResize){ // User defined event
+        OnWindowResize(width, height);
+    }
+}

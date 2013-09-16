@@ -4,8 +4,6 @@
 #include "vector_types.h"
 #include "render.h"
 
-#include <GL/gl.h>
-
 namespace MyOGL{
 
     enum  MyMaterialType{

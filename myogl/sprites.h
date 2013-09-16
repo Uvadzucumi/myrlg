@@ -45,7 +45,7 @@ namespace MyOGL{
             };
             ~CHudSprite(){
                 //Log->puts("Deleted HudSprite\n");
-            }
+            };
             void Rotate(float angle){ m_angle=angle; };
             void SetPosition(int left, int top);
             void SetSize(int width, int height);

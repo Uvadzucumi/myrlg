@@ -65,6 +65,9 @@ namespace MyOGL{
             GLuint GetTextureId(){
                 return m_texture->GetID();
             }
+            CTexture *GetTexture(){
+                return m_texture;
+            }
     };
 
 

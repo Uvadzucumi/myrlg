@@ -74,8 +74,6 @@ RenderStates MyOGL::GL;
 
 // constructor
 CRender::CRender(){
-    // Check OpenGL?
-    // nit variables
     // Window parameters
     m_width=0;
     m_height=0;
@@ -83,6 +81,7 @@ CRender::CRender(){
     m_full_screen=false;
     // render context
     Context=NULL;
+    Window=NULL;
     zNearPlane=0.1;
     zFarPlane=500;
 }
@@ -95,9 +94,13 @@ CRender::~CRender(){
 
 // clear all data
 void CRender::Free(){
-    if(Context!=NULL){
-        SDL_FreeSurface(Context);
+    if(!Context){
+        SDL_GL_DeleteContext(Context);
         Context=NULL;
+    }
+    if(!Window){
+        SDL_DestroyWindow(Window);
+        Window=NULL;
     }
 }
 
@@ -134,63 +137,52 @@ bool CRender::Init(int width, int height, int bpp, bool full_screen, const char 
     this->m_bpp=bpp;
     this->m_full_screen=full_screen;
 
-    if(SDL_Init(SDL_INIT_EVERYTHING) < 0) {
+    if( SDL_Init(SDL_INIT_VIDEO) < 0) {
         Log->puts("CRender::Init SDL_Init(): false\n");
         return false;
     }
-#ifdef __WIN32__
-    SDL_GL_SetAttribute(SDL_GL_RED_SIZE,            5);
-    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE,          5);
-    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE,           5);
-//    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE,          8);
 
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE,          16);
-//    SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE,         32);
-//    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS,  1);
-//    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES,  2);
-#endif
-    window_flags = SDL_HWSURFACE | SDL_OPENGL;
-    #ifdef __WIN32__
-        // Enable double buffering in windows (scip config.h MYOGL_DOUBLE_BUFFER parameter)
-        window_flags |= SDL_GL_DOUBLEBUFFER;
-        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    #else
+    // Set OpenGL Context Version
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 
-        #ifdef MYOGL_DOUBLE_BUFFER
-            window_flags |= SDL_GL_DOUBLEBUFFER;
-            SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-        #else
-            SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 0);
-        #endif
+    // Color Buffer
+    SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, this->m_bpp);
+    // Depth buffer 24bit
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-    #endif
-
-    #ifdef MYOGL_RESIZABLE_WINDOW
-        window_flags |= SDL_RESIZABLE;
-    #endif
-
+    window_flags = SDL_WINDOW_OPENGL;
     if(this->m_full_screen){
-        window_flags |= SDL_FULLSCREEN;
+        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+        window_flags |= SDL_WINDOW_FULLSCREEN;
+    }else{
+        window_flags |= SDL_WINDOW_RESIZABLE;
     }
-    // Set Caption
-    SetWinCaption(title);
-    // create render context
-    if((Context = SDL_SetVideoMode(width, height, bpp, window_flags)) == NULL) {
-        Log->puts("CRender::Init SDL_SetVideoMode(): false\n");
-        return false;
-    }
-    // Check double buffer
-    int tmp;
+    // create the sdl2 window
+    Window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED,
+            SDL_WINDOWPOS_CENTERED, this->m_width, this->m_height,
+            window_flags);
+//SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN
+    // create the opengl context
+    Context = SDL_GL_CreateContext(Window);
+
+    SDL_GL_SetSwapInterval(0); // Enable VSync
+
+    int tmp,tmp2;
     SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &tmp);
     printf("Double Buffering: %s\n",(tmp)?"Enabled":"Disabled");
+    SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &tmp);
+    SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &tmp2);
+    printf("OpenGL Version: %d.%d\n",tmp,tmp2);
     // show Opengl Info
     this->gl_vendor = (char *) glGetString(GL_VENDOR);
     Log->printf("OpenGL Vendor: %s\n",gl_vendor);
     gl_version = (char *) glGetString(GL_VERSION);
     Log->printf("OpenGL Version: %s\n",gl_version);
-    if(!strcmp(gl_vendor,"Microsoft Corporation")){
+
+    if(!strcmp(gl_vendor,"Microsoft Corporation")){ // 0 - HACK for Windows :(
        Log->puts("Need install Video Driver!\n");
-//        return false;
+        return false;
     }else{
 
         gl_extensions = (char *) glGetString(GL_EXTENSIONS);
@@ -202,7 +194,6 @@ bool CRender::Init(int width, int height, int bpp, bool full_screen, const char 
         Log->puts(gl_extensions);
 
     }
-    // For Windows need get next ogl functions
 #ifdef __WIN32__
     glBlendEquation = (PFNGLBLENDEQUATIONPROC)this->GetProcAddress("glBlendEquation");
 #endif // __WIN32__
@@ -211,7 +202,7 @@ bool CRender::Init(int width, int height, int bpp, bool full_screen, const char 
     m_vao=EnableVAOFunctions();
     m_shaders=EnableShadersFunctions();
     m_fbo=EnableFBOFunctions();
-    // Init OpenGL
+
     InitGL();   // start opengl states
 
     return true;
@@ -254,23 +245,23 @@ void CRender::ClearScreen(void){
 }
 // Swap render buffers
 void CRender::SwapBuffers(){
-    SDL_GL_SwapBuffers();
+    SDL_GL_SwapWindow(Window);
 }
 
 // Window functions
 void CRender::SetWinCaption(const char *title){
-   SDL_WM_SetCaption(title,NULL);
+   SDL_SetWindowTitle(Window, title);
 }
 
 bool CRender::SetWinIcon(const char *file_name){
-    SDL_Surface* surface;
+    SDL_Surface* icon;
 //Load Bitmap
-    if(!(surface = SDL_LoadBMP(file_name))) {
+    if(!(icon = SDL_LoadBMP(file_name))) {
         Log->printf("Error load icon file name: %s\n",file_name);
         return false;
     }
-    SDL_WM_SetIcon(surface, NULL);
-    SDL_FreeSurface(surface);
+    SDL_SetWindowIcon(Window, icon);
+    SDL_FreeSurface(icon);
     return true;
 }
 
@@ -309,19 +300,11 @@ void CRender::SetBlendMode(MyGlBlendMode mode){
 }
 
 // Resize Application Windows
-bool CRender::OnResize(int width, int height){
-    SDL_Surface *old_context;
-    old_context=Context;
-    if((Context = SDL_SetVideoMode(width, height, m_bpp, window_flags)) == NULL) {
-        Log->puts("CRender::Init SDL_SetVideoMode(): false\n");
-        Context=old_context;
-        return false;
-    }
-
+bool CRender::OnResize(int window_id, int width, int height){
     this->m_width=width;
     this->m_height=height;
-    SDL_FreeSurface(old_context);
-#ifdef __WIN32__
+/*
+// SDL 1.2 Recreate Context Resources (for Windows)
     Log->puts("for Windows need reinicialize OGL states and recreate texture!\n");
     InitGL();
     // recreate textures
@@ -352,8 +335,7 @@ bool CRender::OnResize(int width, int height){
         VAOList[i]->BuildVAO();
         Log->puts("CVAO object recreated\n");
     }
-#else
-    // in normal OS need only resize Viewport
+    */
     glViewport(0,0,this->m_width,this->m_height);
         // set projection - force reset viewport
     if(GL.mode3d){
@@ -361,7 +343,6 @@ bool CRender::OnResize(int width, int height){
     }else{
         Set2D(true);
     }
-#endif
     printf("window resized to %dx%d\n", width, height);
     return true;
 }
@@ -564,8 +545,11 @@ bool CRender::CheckError(void){
 
 void CRender::RenderScreenQuad(GLuint texture_id){
    // const GLuint target=GL_TEXTURE_2D;
+    glMatrixMode   ( GL_MODELVIEW );
+    glPushMatrix   ();
+    glLoadIdentity ();
     MyOGL::Render->Set2D();
-    glClear ( GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT );
+    //glClear ( GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT );
     GL.Enable(GL_TEXTURE_2D);
     MyOGL::Render->BindTexture(texture_id);
     glBegin( GL_QUADS );//glOrtho(0, this->m_width, this->m_height, 0, 1, -1);
@@ -574,7 +558,8 @@ void CRender::RenderScreenQuad(GLuint texture_id){
         glTexCoord2f ( 1, 1 ); glVertex2i( this->m_width, this->m_height );
         glTexCoord2f ( 0, 1 ); glVertex2i( 0, this->m_height );
     glEnd();
-
+    glMatrixMode ( GL_MODELVIEW );
+    glPopMatrix  ();
 /*
     glMatrixMode   ( GL_PROJECTION );
     glPushMatrix   ();

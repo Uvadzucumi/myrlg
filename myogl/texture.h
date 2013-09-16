@@ -1,9 +1,6 @@
 #ifndef TEXTURE_H_INCLUDED
 #define TEXTURE_H_INCLUDED
 
-#include <SDL/SDL.h>
-#include <GL/gl.h>
-
 #include <iostream>
 #include <fstream>
 #include <vector>

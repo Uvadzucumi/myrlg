@@ -60,11 +60,10 @@ namespace MyOGL{
                 // get last operation log
                 glGetInfoLogARB(Handle, sizeof(infoLog), &length, (GLcharARB *)infoLog);
                 if(glsl_ok!=GL_TRUE){
-                    Log->printf("glSLang error: %s", infoLog);
+                    Log->printf("glSLang error: %s\n", infoLog);
                     return true;
                 }
                 return false;
-
             };
 
             void Create(){
@@ -73,45 +72,72 @@ namespace MyOGL{
 
                 // Create Shader programm
                 m_program = glCreateProgramObjectARB();
+                if(!m_program){
+                    MyOGL::Log->puts("Error create ShaderProgram\n");
+                }else{
+                    MyOGL::Log->printf("Create Shader program: %d\n",m_program);
+                }
                 // Create Vertex shader
                 m_vs = glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
-                MyOGL::Render->CheckError();
+                if(MyOGL::Render->CheckError()){
+                    MyOGL::Log->puts("Error create VertexShader\n");
+                }
                 // Create Fragment Shader
                 m_fs = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
-                MyOGL::Render->CheckError();
+                if(MyOGL::Render->CheckError()){
+                    MyOGL::Log->puts("Error create FragmentShader\n");
+                };
                 // add vs, fs sources
                 len[0]=m_vs_src.size();
                 src[0]=&m_vs_src[0];
                 glShaderSourceARB(m_vs, 1, src, len);
-                MyOGL::Render->CheckError();
+                if(MyOGL::Render->CheckError()){
+                    MyOGL::Log->puts("Error: set source for VertexShader\n");
+                }
 
                 len[0]=m_fs_src.size();
                 src[0]=&m_fs_src[0];
                 glShaderSourceARB(m_fs, 1, src, len);
-                MyOGL::Render->CheckError();
+                if(MyOGL::Render->CheckError()){
+                    MyOGL::Log->puts("Error: set source for FragmentShader\n");
+                }
                 // compile shaders
                 glCompileShaderARB(m_vs);
-                IsGLSLError(m_vs, GL_OBJECT_COMPILE_STATUS_ARB);
+                if(IsGLSLError(m_vs, GL_OBJECT_COMPILE_STATUS_ARB)){
+                    MyOGL::Log->puts("Vertex Shader Compilation error\n");
+                }
                 glCompileShaderARB(m_fs);
-                IsGLSLError(m_fs, GL_OBJECT_COMPILE_STATUS_ARB);
+                if(IsGLSLError(m_fs, GL_OBJECT_COMPILE_STATUS_ARB)){
+                    MyOGL::Log->puts("Fragment Shader Compilation error\n");
+                }
                 // attach shaders to shader program
                 glAttachObjectARB(m_program, m_vs);
                 glAttachObjectARB(m_program, m_fs);
                 // link programs (varying from vs link to varying fs)
                 glLinkProgramARB(m_program);
-                IsGLSLError(m_program, GL_OBJECT_VALIDATE_STATUS_ARB);
+                if(IsGLSLError(m_program, GL_OBJECT_LINK_STATUS_ARB)){
+                    Log->puts("Shaders linking Error\n");
+                }
+                //glValidateProgramARB(m_program);
+                //IsGLSLError(m_program, GL_OBJECT_VALIDATE_STATUS_ARB);
             };
 
             void Bind(){
                 glUseProgramObjectARB(m_program);
             };
-
-            GLint GetUniformId(const unsigned char *VarName){
+            void UnBind(){
+                glUseProgramObjectARB(0);
+            };
+// Get Uniform variable ID
+            GLint GetUniformId(const char *VarName){
                 return glGetUniformLocationARB (m_program, (const GLcharARB *)VarName);
             };
-
+// Set uniform variable value by id
             void SetUniform1f(GLuint UniformId, GLfloat Value){
                 glUniform1fARB(UniformId, Value);
+            };
+            void SetUniform1i(GLuint UniformId, GLint Value){
+                glUniform1iARB(UniformId, Value);
             };
 
     };

@@ -18,9 +18,9 @@
 					<Add option="-D__LINUX__" />
 				</Compiler>
 				<Linker>
-					<Add library="SDL" />
 					<Add library="GL" />
 					<Add library="GLU" />
+					<Add library="SDL2" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -34,9 +34,9 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add library="SDL" />
 					<Add library="GL" />
 					<Add library="GLU" />
+					<Add library="SDL2" />
 				</Linker>
 			</Target>
 			<Target title="Windows - Debug">
@@ -52,8 +52,8 @@
 				<Linker>
 					<Add library="opengl32" />
 					<Add library="glu32" />
-					<Add library="SDL" />
 					<Add library="gdi32" />
+					<Add library="SDL2" />
 				</Linker>
 			</Target>
 			<Target title="Windows - Release">
@@ -70,8 +70,8 @@
 					<Add option="-s" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
-					<Add library="SDL" />
 					<Add library="gdi32" />
+					<Add library="SDL2" />
 				</Linker>
 			</Target>
 		</Build>
@@ -98,6 +98,8 @@
 		<Unit filename="myogl/3rd/picopng.cpp" />
 		<Unit filename="myogl/animation.cpp" />
 		<Unit filename="myogl/animation.h" />
+		<Unit filename="myogl/base_object.cpp" />
+		<Unit filename="myogl/base_object.h" />
 		<Unit filename="myogl/camera.cpp" />
 		<Unit filename="myogl/camera.h" />
 		<Unit filename="myogl/config.h" />
@@ -111,6 +113,7 @@
 		<Unit filename="myogl/fileformats/bmpimage.h" />
 		<Unit filename="myogl/frame_buffer.cpp" />
 		<Unit filename="myogl/frame_buffer.h" />
+		<Unit filename="myogl/light.h" />
 		<Unit filename="myogl/log.cpp" />
 		<Unit filename="myogl/log.h" />
 		<Unit filename="myogl/material.cpp" />
@@ -119,6 +122,7 @@
 		<Unit filename="myogl/myogl.h" />
 		<Unit filename="myogl/render.cpp" />
 		<Unit filename="myogl/render.h" />
+		<Unit filename="myogl/shaders.h" />
 		<Unit filename="myogl/sprites.cpp" />
 		<Unit filename="myogl/sprites.h" />
 		<Unit filename="myogl/texture.cpp" />
@@ -129,6 +133,8 @@
 		<Unit filename="myogl/ui/panel.h" />
 		<Unit filename="myogl/ui/text_box.cpp" />
 		<Unit filename="myogl/ui/text_box.h" />
+		<Unit filename="myogl/vbo.cpp" />
+		<Unit filename="myogl/vbo.h" />
 		<Unit filename="myogl/vector_types.h" />
 		<Unit filename="myrlg.conf" />
 		<Unit filename="tileset.cpp" />
@@ -138,6 +144,7 @@
 		<Extensions>
 			<code_completion />
 			<debugger />
+			<envvars />
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

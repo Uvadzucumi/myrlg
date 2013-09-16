@@ -1,8 +1,6 @@
 #ifndef ANIMATION_H_INCLUDED
 #define ANIMATION_H_INCLUDED
 
-#include <SDL/SDL.h>
-
 namespace MyOGL{
 
     class CAnimation {
