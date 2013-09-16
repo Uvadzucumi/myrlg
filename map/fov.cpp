@@ -153,7 +153,7 @@ void CFOV::Calculate(int x_pos, int y_pos, CLevelMap *m_Map, int set_distance){
 }
 
 // apply current visible field to map viewed
-void CFOV::ApplyOnMap(CLevelMap *map, bool only_light_visible){
+void CFOV::ApplyOnMap(CLevelMap *map, bool only_light_visible, CDungeonMinimap *minimap){
     int index;
     for(int y=m_left_top.y;  y<=m_right_bottom.y; y++ ){
         for(int x=m_left_top.x; x<=m_right_bottom.x; x++){
@@ -161,6 +161,9 @@ void CFOV::ApplyOnMap(CLevelMap *map, bool only_light_visible){
             if(m_fov_field[index].is_visible &&
               (!only_light_visible || (only_light_visible && m_fov_field[index].distance))){
                 map->SetViewed(x,y,true);
+                if(minimap){
+                    minimap->SetMapPoint(x,y,map->GetTileType(x,y));
+                }
             }
         }
     }

@@ -39,7 +39,7 @@ void CHudSprite::Render(CMaterial *material){
 	// Bottom-left vertex (corner)
         glTexCoord2f( TextCoords[0].u, TextCoords[1].v );
         glVertex3f( m_left, m_bottom, 0);
-        glEnd();
+    glEnd();
     if(m_angle){
         glPopMatrix();
     }

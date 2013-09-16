@@ -188,10 +188,14 @@ namespace MyOGL{
         // Textures
             void BindTexture(GLuint TextureID, bool force=false);
             void SetBlendMode(MyGlBlendMode mode);
-        // DrawColor
+        // Set DrawColor
             void SetColor(float r, float g, float b, float a=1.0, bool force=false);
             void SetColor(Vector4f color, bool force=false);
             void SetColor(Vector3i color, bool force=false);
+        // Draw primitives
+            void DrawPoint(int x, int y);
+            void DrawLine(int x1, int y1, int x2, int y2);
+            void DrawQuad(int left, int top, int width, int height);
 
             void SetClearColor(float r, float g, float b, float a=1.0);
             bool CheckError(void);

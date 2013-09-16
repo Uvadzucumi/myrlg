@@ -3,6 +3,7 @@
 
 #include "../myogl/vector_types.h"
 #include "../myogl/log.h"
+#include "minimap.h"
 
 class CLevelMap;
 
@@ -73,7 +74,7 @@ class CFOV{
 
         void Calculate(int x, int y, CLevelMap *map, int set_light_distane=0);
         void CalculateDiffuse(int depth);
-        void ApplyOnMap(CLevelMap *map, bool only_light_visible=true);    // apply vieved field on map array
+        void ApplyOnMap(CLevelMap *map, bool only_light_visible=true, CDungeonMinimap *minimap=NULL);    // apply vieved field on map array
 
         int GetDistance(int x, int y){
             if(IsInArea(x, y)){

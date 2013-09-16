@@ -15,22 +15,7 @@
 
 #include <math.h> // sqrt
 
-// tile types
-enum eTileTypes{
-    ttNone=0,
-    ttWall,
-    ttCoridor,
-    ttRoom,
-    ttDoor,/*
-    ttDoorClosed, // closed door
-    ttDoorOpened,
-    ttDoorBroken,
-    ttDoorHidden,
-    ttDoorLocked,*/
-    ttContainer,
-    ttStairs,
-    ttFire
-};
+#include "map_types.h"
 
 const char* GetTileNameByType(eTileTypes tile);
 

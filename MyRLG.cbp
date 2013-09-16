@@ -95,6 +95,8 @@
 		<Unit filename="map/level_map.h" />
 		<Unit filename="map/light_source.cpp" />
 		<Unit filename="map/light_source.h" />
+		<Unit filename="map/map_types.h" />
+		<Unit filename="map/minimap.h" />
 		<Unit filename="myogl/3rd/picopng.cpp" />
 		<Unit filename="myogl/animation.cpp" />
 		<Unit filename="myogl/animation.h" />

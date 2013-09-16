@@ -61,6 +61,20 @@ void OnRender(double dt){
     font_color.r=1; font_color.g=1,font_color.b=1;
     messages->Render(font_color);
 
+    minimap->Enable();
+    // render points
+        MyOGL::Render->Set2D();
+        MyOGL::Render->ClearScreen();
+        MyOGL::GL.Disable(GL_TEXTURE_2D);
+        MyOGL::Render->SetColor(255,255,255);
+        MyOGL::Render->DrawPoint(10,10);
+        MyOGL::Render->DrawPoint(11,11);
+        MyOGL::Render->DrawPoint(12,12);
+        MyOGL::Render->DrawPoint(13,11);
+        MyOGL::Render->DrawPoint(14,10);
+        MyOGL::Render->DrawQuad(10,10,5,5);
+    minimap->Disable();
+    MyOGL::GL.Enable(GL_TEXTURE_2D);
     // show selected tile
     if(mouse_on_tile && ActiveWindow==gwMain){
         int box_coord_x=mouse_on_tile_x*32, box_coord_y=mouse_on_tile_y*32;
@@ -88,6 +102,7 @@ void OnRender(double dt){
         ui_tile_info_panel->Render();
 
     }
+    MyOGL::Render->RenderScreenQuad(minimap->GetTextureId());
 
 }
 
@@ -380,6 +395,7 @@ int main(int argc, char **argv){
     delete hero_sprite;
     delete hero;
     delete ui_tile_info_panel;
+    delete minimap;
 
     printf("Normal Exit\n");
     return 0;

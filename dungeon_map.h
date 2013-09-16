@@ -5,6 +5,7 @@
 #include "myogl/vector_types.h"
 
 #include "map/level_map.h"
+#include "map/minimap.h"
 #include "map/grid_dungeon.h"
 
 // Dungeon level class
@@ -14,7 +15,9 @@ class CDungeonLevel{
         //std::vector <CMapDynamicTile> DynamicTilesLIst
         int m_map_width, m_map_height;
 
+
         CLevelMap *m_Map;
+        CDungeonMinimap *m_Minimap;
         CTileset *m_tileset;
         CFOV *m_fov;
 
@@ -40,6 +43,9 @@ class CDungeonLevel{
             m_global_light=0;
             m_light_changed=true;
             m_fov=new CFOV(18/2);
+
+            m_Minimap=NULL;
+            //m_Minimap=new CDungeonMinimap(m_map_width, m_map_height);
             // create LOS array
 //            LOS=new bool *[m_ViewPort.width];
 //            for(i=0;i<m_ViewPort.width;i++){
@@ -53,6 +59,7 @@ class CDungeonLevel{
 //            delete m_light_vp; // old fov
             delete m_fov;
             delete m_Map;
+            delete m_Minimap;
 //            for(unsigned int i=0;i<m_ViewPort.width;i++) delete LOS[i];
 //            delete LOS;
         };

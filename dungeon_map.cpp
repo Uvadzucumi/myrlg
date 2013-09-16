@@ -20,7 +20,7 @@ void CDungeonLevel::CalculateFOV(int x_pos, int y_pos, int distance){
         m_fov->CalculateDiffuse(1); // number of diffyse steps
     }
     // Apply Viewed fields from Hero FOV to Map Array
-    m_fov->ApplyOnMap(m_Map, m_see_only_with_light);
+    m_fov->ApplyOnMap(m_Map, m_see_only_with_light, m_Minimap);
 }
 
 // Update map. change animated tiles and etc.
@@ -67,4 +67,5 @@ void CDungeonLevel::Render(){
         glTranslatef(0,32,0);
     }
     glTranslatef(-pos_x,-pos_y,0);
+    //m_Minimap->Render();
 };

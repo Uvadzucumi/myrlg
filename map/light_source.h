@@ -3,6 +3,7 @@
 
 #include <math.h>
 #include "../myogl/vector_types.h"
+
 #include "fov.h"
 
 class CMapLightSource{

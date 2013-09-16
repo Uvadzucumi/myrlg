@@ -713,4 +713,33 @@ void RenderStates::Debug(void){
     Log->puts("----------------------------\n");
 }
 
+// Draw primitives
+void CRender::DrawPoint(int x, int y){
+    glBegin(GL_POINTS);
+        glVertex2i(x,y);
+    glEnd();
+}
+
+void CRender::DrawLine(int x1, int y1, int x2, int y2){
+    glBegin(GL_LINES);
+        glVertex2i( x1, y1 );
+        glVertex2i( x2, y2 );
+    glEnd();
+}
+
+void CRender::DrawQuad(int left, int top, int width, int height){
+    int right=left+width;
+    int bottom=top+height;
+    glBegin( GL_QUADS );
+	// Top-left vertex (corner)
+        glVertex2i( left, top);
+	// Top-right vertex (corner)
+        glVertex2i( right, top);
+	// Bottom-right vertex (corner)
+        glVertex2i( right, bottom);
+	// Bottom-left vertex (corner)
+        glVertex2i( left, bottom);
+    glEnd();
+}
+
 
