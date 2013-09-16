@@ -97,25 +97,48 @@ bool CTexture::CreateEmpty(int width, int height){
     return true;
 }
 
-// load image from  file filename,
-// save in data SDL surface
-// create texture in video memory
+eTextureFileFormat CTexture::TextureFileFormat(char *file_name){
+    char *s;
+// check PNG
+    s=strstr(file_name,".png");
+    printf("load_from_file='%s' (%d) length:%d\n",s,s-file_name+4,strlen(file_name));
+    if(s && ((size_t)(s-m_file_name+4)==strlen(file_name))){ // PNG extansion
+        return tffPNG;
+    }else{ // check bmp
+        s=strstr(m_file_name,".bmp");
+        if(s &&((size_t)(s-m_file_name+4)==strlen(file_name))){ // BMP extansion
+            return tffBMP;
+        }else{
+            return tffUnknown;
+        }
+    }
+}
+
+// load image from  file filename and create texture in video memory
 bool CTexture::LoadFromFile(const char *file_name){
     strcpy(m_file_name,file_name);
-#ifdef USE_PNG_IMAGE
-    if(!LoadPNGImage(m_file_name)){
-#else // locad bmp image
-    if( !LoadBitmapImage(m_file_name) ) {
-#endif
-        // create texture
+    eTextureFileFormat ff=TextureFileFormat(m_file_name);
+    bool error=false;
+    switch(ff){
+        case tffBMP:
+            error=LoadBitmapImage(m_file_name);
+            break;
+        case tffPNG:
+            error=LoadPNGImage(m_file_name);
+            break;
+        default:
+            Log->printf("CTexture::LoadFromFile(%s) - unknown file format\n",m_file_name);
+            break;
+    }
+    if(!error){
         CreateFromMemory();
-    } else {
+        Log->printf("Created Texture %d (%s)\n",TextureID, file_name);
+        TexturesList.push_back(this);
+        return true;
+    }else{
         Log->printf("CTexture::LoadFromFile() could not load image %s\n",file_name);
         return false;
     }
-    Log->printf("Created Texture %d (%s)\n",TextureID, file_name);
-    TexturesList.push_back(this);   // add to global texture ids list (for autoclean)
-    return true;
 }
 
 // load file to vector buffer
@@ -157,8 +180,10 @@ int CTexture::LoadBitmapImage(const char *file_name){
         m_height=image.GetHeight();
         m_bytes_pp=image.GetBytesPerPixel();
         m_texture_format=image.GetPixelFormat();
-        // create pixel data array and return pointer
         image.GetPixelData(m_image_data);
+        m_alpha=true;   // TODO: set true value
+        return 0;
+    }else{
+        return -1;
     }
-    return 0;
 }

@@ -243,7 +243,7 @@ void CLevelMap::CalculateAllLights(){
 void CLevelMap::CalculateNearesLights(){
 // update saved lights
     Log->printf("Nearest lights: %d\n",LightsNearFOV.size());
-    for(unsigned int i; i<LightsNearFOV.size(); i++){
+    for(unsigned int i=0; i<LightsNearFOV.size(); i++){
         MyOGL::Vector2i light_pos=LightSourcesList[LightsNearFOV[i]]->GetPosition();
         Log->printf("recalculate light in pos: %d, %d\n", light_pos.x, light_pos.y );
         LightSourcesList[LightsNearFOV[i]]->Calculate(this);
@@ -277,7 +277,7 @@ void CLevelMap::CalculateMapLight(CFOV *fov){
 
 }
 
-//#define NOT_VIEVEF_FILD_EMPTY
+#define NOT_VIEWED_FILD_EMPTY
 
 // return true if wall tile tupe (walls, doors, windows etc...)
 // if bool check_viewed=true - not viewed - empty field
@@ -286,7 +286,7 @@ bool CLevelMap::IsWall(int x, int y, bool check_viewed){
         return false;
     }
     if(check_viewed && !m_Map[x][y].viewed){ // map not viewed
-        #ifdef NOT_VIEVEF_FILD_EMPTY
+        #ifdef NOT_VIEWED_FILD_EMPTY
         return false;
         #else
         return true;

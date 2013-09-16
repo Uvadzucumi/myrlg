@@ -290,11 +290,8 @@ int main(int argc, char **argv){
 
     // load font textures
     font_texture = new MyOGL::CTexture();
-    #ifdef USE_PNG_IMAGE
+
     font_texture ->LoadFromFile("data/myfont.png");
-    #else
-    font_texture ->LoadFromFile("data/myfont.bmp");
-    #endif
 
     font=new MyOGL::CFont();
     font->LoadGlyphData("data/myfont.fnt",font_texture);
@@ -311,11 +308,7 @@ int main(int argc, char **argv){
 
     // CreateTileset
     tiles_texture=new MyOGL::CTexture();
-    #ifdef USE_PNG_IMAGE
     tiles_texture->LoadFromFile("data/tileset.png");
-    #else
-    tiles_texture->LoadFromFile("data/tileset.bmp");
-    #endif
     Tileset=new CTileset(tiles_texture);
 
     // Inicialize Items Database

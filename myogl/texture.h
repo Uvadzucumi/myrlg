@@ -7,7 +7,14 @@
 
 #include "render.h"
 
+
 namespace MyOGL{
+
+    enum eTextureFileFormat{
+        tffUnknown=0,
+        tffBMP,
+        tffPNG
+    };
 
     class CTexture{
             GLuint TextureID;
@@ -41,6 +48,7 @@ namespace MyOGL{
             bool IsAlpha(){ return m_alpha; }
             GLuint GetID(){ return TextureID; }
             char *GetFileName(){ return m_file_name;}
+            eTextureFileFormat TextureFileFormat(char *file_name);
     };
 
     extern std::vector<CTexture*>  TexturesList;

@@ -150,23 +150,28 @@ bool CRender::Init(int width, int height, int bpp, bool full_screen, const char 
     SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, this->m_bpp);
     // Depth buffer 24bit
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-
+    #ifdef MYOGL_DOUBLE_BUFFER
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    #endif
     window_flags = SDL_WINDOW_OPENGL;
     if(this->m_full_screen){
-        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
         window_flags |= SDL_WINDOW_FULLSCREEN;
     }else{
+    #ifdef MYOGL_RESIZABLE_WINDOW
         window_flags |= SDL_WINDOW_RESIZABLE;
+    #endif
     }
     // create the sdl2 window
     Window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED,
             SDL_WINDOWPOS_CENTERED, this->m_width, this->m_height,
             window_flags);
-//SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN
     // create the opengl context
     Context = SDL_GL_CreateContext(Window);
-
-    SDL_GL_SetSwapInterval(0); // Enable VSync
+    #ifdef MYOGL_VSYNC
+        SDL_GL_SetSwapInterval(1); // Enable VSync
+    #else
+        SDL_GL_SetSwapInterval(0); // Discable VSync
+    #endif
 
     int tmp,tmp2;
     SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &tmp);
