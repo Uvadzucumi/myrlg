@@ -3,7 +3,6 @@
 #include <math.h>
 #include "game.h"
 
-#include<SDL/SDL.h>
 
 void CDungeonLevel::NewGridDungeon(int grid_w, int grid_h, int rooms){
     CDungeonGeneration dlg(grid_w, grid_h, rooms);   // grid_w, grid_h, rooms
@@ -33,6 +32,7 @@ void CDungeonLevel::Render(){
     int pos_x, pos_y;
     pos_y=0, pos_x=0;
     unsigned int tile_light;
+    MyOGL::GL.Enable(GL_TEXTURE_2D);
     for(dy=m_ViewPort.top; dy<m_ViewPort.top+m_ViewPort.height; dy++, pos_y+=32){
         glTranslatef(-pos_x,0,0);
         for(dx=m_ViewPort.left, pos_x=0;dx<m_ViewPort.left+m_ViewPort.width;dx++,pos_x+=32){
@@ -67,5 +67,19 @@ void CDungeonLevel::Render(){
         glTranslatef(0,32,0);
     }
     glTranslatef(-pos_x,-pos_y,0);
-    //m_Minimap->Render();
+    // Render Hero
+    glPushMatrix();
+    glTranslatef((hero->GetPosX()-dungeon->GetViewportLeft())*32,(hero->GetPosY()-dungeon->GetViewportTop())*32,0);
+    hero->Render();
+    glPopMatrix();
+    // Set MiniMap Matherial
+    LightMaterials[0].Apply();
+    m_Minimap->Render();
+    // Render Hero Point on the map
+    MyOGL::Render->SetColor(0,255,0);
+    //MyOGL::Render->DrawQuad(600+hero->GetPosX(),hero->GetPosY(),3,3);
+    MyOGL::Render->SetBlendMode(blNone);
+    MyOGL::GL.Disable(GL_TEXTURE_2D);
+    MyOGL::Render->DrawQuad(m_Minimap->GetX()+hero->GetPosX()-1,hero->GetPosY()-1,3,3);
+    MyOGL::GL.Enable(GL_TEXTURE_2D);
 };

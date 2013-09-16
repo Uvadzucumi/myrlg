@@ -214,12 +214,22 @@ bool CRender::Init(int width, int height, int bpp, bool full_screen, const char 
 }
 
 // Set Orthogonal projection
-void CRender::Set2D(bool force){
+// width, height - need for FBO
+void CRender::Set2D(bool force, int width, int height){
+    int new_w, new_h;
+    if(width!=0 && height!=0){
+        force=true;
+        new_w=width;
+        new_h=height;
+    }else{
+        new_w=this->m_width;
+        new_h=this->m_height;
+    }
     if(force || GL.mode3d){
-        glViewport (0, 0, this->m_width, this->m_height);
+        glViewport (0, 0, new_w, new_h);
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glOrtho(0, this->m_width, this->m_height, 0, 1, -1);
+        glOrtho(0, new_w, new_h, 0, 1, -1);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
         GL.mode3d=false;

@@ -95,10 +95,10 @@ bool CBitMapImage::LoadFromFile(const char *file_name){
 
     // check compression
     if(
-       (m_info_header.compression==BI_RLE4 && m_info_header.bpp!=4) ||
-       (m_info_header.compression==BI_RLE8 && m_info_header.bpp!=8) ||
-       (m_info_header.compression==BI_BITFIELDS && ( m_info_header.bpp!=16 && m_info_header.bpp!=32)) ||
-       (m_info_header.compression!=BI_RGB && m_info_header.compression!=BI_RLE4 && m_info_header.compression!=BI_RLE8 && m_info_header.compression!=BI_BITFIELDS)
+       (m_info_header.compression==bcBI_RLE4 && m_info_header.bpp!=4) ||
+       (m_info_header.compression==bcBI_RLE8 && m_info_header.bpp!=8) ||
+       (m_info_header.compression==bcBI_BITFIELDS && ( m_info_header.bpp!=16 && m_info_header.bpp!=32)) ||
+       (m_info_header.compression!=bcBI_RGB && m_info_header.compression!=bcBI_RLE4 && m_info_header.compression!=bcBI_RLE8 && m_info_header.compression!=bcBI_BITFIELDS)
        ){ // bad compression
         Log->printf("ERROR: CBitMapImage::LoadFromFile(\"%s\") Bad BMP Compression method %d!\n", file_name, m_info_header.compression);
         fclose(fp);
@@ -106,13 +106,13 @@ bool CBitMapImage::LoadFromFile(const char *file_name){
     }
     m_top_down=(m_info_header.height < 0);
     m_info_header.height=abs(m_info_header.height);
-    if(m_top_down && (m_info_header.compression != BI_RGB || m_info_header.compression != BI_BITFIELDS)){
+    if(m_top_down && (m_info_header.compression != bcBI_RGB || m_info_header.compression != bcBI_BITFIELDS)){
         Log->printf("ERROR: CBitMapImage::LoadFromFile(\"%s\") top down bmp cannot be compressed!\n",m_file_name);
         fclose(fp);
         return false;
     }
 
-    if(m_info_header.compression == BI_RGB && m_info_header.bpp==16){ // 5 bits per channel, fixed mask
+    if(m_info_header.compression == bcBI_RGB && m_info_header.bpp==16){ // 5 bits per channel, fixed mask
         Log->puts("DEBUG: Fixed map BMP image (5 bits)\n");
         m_RedMask = 0x7C00;
         m_RedShift = 7;
@@ -120,7 +120,7 @@ bool CBitMapImage::LoadFromFile(const char *file_name){
         m_GreenShift = 2;
         m_BlueMask = 0x001F;
         m_BlueShift = -3;
-    }else if(m_info_header.compression == BI_BITFIELDS && (m_info_header.bpp == 16 || m_info_header.bpp == 32)){ // arbitrary mask
+    }else if(m_info_header.compression == bcBI_BITFIELDS && (m_info_header.bpp == 16 || m_info_header.bpp == 32)){ // arbitrary mask
         Log->puts("DEBUG: Arbitrary map BMP image\n");
         // read mask from file
         fread(&m_RedMask,1,4,fp);
@@ -177,7 +177,7 @@ bool CBitMapImage::LoadFromFile(const char *file_name){
             };
             //memcpy(&m_pixel_data[row*scanline_size], read_buffer, scanline_size);
         }
-        if(m_info_header.compression==BI_BITFIELDS){ // need convert to BGRA
+        if(m_info_header.compression==bcBI_BITFIELDS){ // need convert to BGRA
             for(int row=0;row<m_info_header.height;row++){
                 for(int pix=0;pix<m_info_header.width;pix++){
                     ConvertToBGRA((long int *)(&m_pixel_data[row*scanline_size+pix*4]));

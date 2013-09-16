@@ -10,7 +10,7 @@
     #include <GLES2/gl2.h>
     #include <GLES2/gl2ext.h>
 #else
-    //#include <SDL/SDL_opengl.h>
+    #include <SDL2/SDL_opengl.h>
     #include <GL/gl.h>
     #include <GL/glu.h>
     #include <GL/glext.h>
@@ -173,7 +173,7 @@ namespace MyOGL{
         // execute application
             void Run(void);
         // set 2D/3D Projection
-            void Set2D(bool force=false);
+            void Set2D(bool force=false, int width=0, int height=0);
             void Set3D(bool force=false);
             void ClearScreen(void);
         // swap render buffers (if needed)

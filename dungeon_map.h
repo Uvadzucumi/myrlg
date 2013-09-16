@@ -44,8 +44,9 @@ class CDungeonLevel{
             m_light_changed=true;
             m_fov=new CFOV(18/2);
 
-            m_Minimap=NULL;
-            //m_Minimap=new CDungeonMinimap(m_map_width, m_map_height);
+            //m_Minimap=NULL;
+            m_Minimap=new CDungeonMinimap(m_map_width, m_map_height);
+            m_Minimap->SetPosition(32*m_ViewPort.width,0);
             // create LOS array
 //            LOS=new bool *[m_ViewPort.width];
 //            for(i=0;i<m_ViewPort.width;i++){
@@ -79,6 +80,7 @@ class CDungeonLevel{
         }
         void SetViewportSize(unsigned int width, unsigned int height){
             m_ViewPort.width=width; m_ViewPort.height=height; m_light_changed=true;
+            m_Minimap->SetPosition(32*m_ViewPort.width,0);
             // recreate light intensivity array
 //            delete m_light_vp;
 //            m_light_vp=new sMapFovField[m_ViewPort.width * m_ViewPort.height];
@@ -115,7 +117,7 @@ class CDungeonLevel{
         //int GetRoomIdByCoords(unsigned int x, unsigned int y);
         void SetGlobalLight(unsigned int light_index){ m_global_light=light_index;m_light_changed=true;};
         unsigned int GetGlobalLight(void){ return m_global_light;};
-        void Render(void);
+        void Render();
         void CalculateFOV(int x, int y, int distance=0);
         unsigned int GetWidth(){ return m_map_width;};
         unsigned int GetHeight(){ return m_map_height;};

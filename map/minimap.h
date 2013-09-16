@@ -16,15 +16,20 @@ class CDungeonMinimap{
     public:
         CDungeonMinimap(int width, int height){
             m_position.Set(0,0);
-            fbo=new MyOGL::CFBO(width, height);
-            fbo->Enable();
-                glClear(GL_COLOR | GL_DEPTH);
-            fbo->Disable();
             m_width=width;
             m_height=height;
+            fbo=new MyOGL::CFBO(width, height);
+            fbo->Enable();
+                MyOGL::Render->Set2D(true, m_width, m_height);
+                MyOGL::Render->SetClearColor(0,0,0,0);
+                MyOGL::Render->ClearScreen();
+            fbo->Disable();
             m_blend=MyOGL::blNone; // Without Alpha
         };
 
+        void Position(int x, int y){
+            m_position.Set(x,y);
+        }
         // return color by map tile
         MyOGL::Vector3i ColorByTile(eTileTypes tile_type){
             MyOGL::Vector3i color;
@@ -51,13 +56,14 @@ class CDungeonMinimap{
             // color by tile type
             MyOGL::Vector3i tile_color=ColorByTile(tile_type);
             fbo->Enable();
-                MyOGL::Render->Set2D();
+                MyOGL::Render->Set2D(true, m_width, m_height);
                 MyOGL::Render->SetColor(tile_color);
                 MyOGL::GL.Disable(GL_TEXTURE_2D);
             // Set Blend mode
                 //MyOGL::Render->SetBlendMode(MyOGL::blNone);
                 MyOGL::Render->DrawPoint(x,y);
             fbo->Disable();
+            MyOGL::Render->Set2D(true);
             MyOGL::GL.Enable(GL_TEXTURE_2D);
         };
 
@@ -67,27 +73,31 @@ class CDungeonMinimap{
 
         void Render(){
             MyOGL::GL.Enable(GL_TEXTURE_2D);
+            MyOGL::GL.Disable(GL_LIGHTING);
             MyOGL::Render->BindTexture(fbo->GetTextureId());
             int m_left, m_right, m_top, m_bottom;
             m_left=m_position.x;
-            m_top=m_position.x;
+            m_top=m_position.y;
             m_right=m_left+m_width;
             m_bottom=m_top+m_height;
+            MyOGL::Render->SetBlendMode(MyOGL::blSource);
             glBegin( GL_QUADS );
 	// Top-left vertex (corner)
-                glTexCoord2f( 0, 0 );
+                glTexCoord2f( 0, 1 );
                 glVertex3f( m_left, m_top, 0);
 	// Top-right vertex (corner)
-                glTexCoord2f( 1, 0 );
+                glTexCoord2f( 1, 1 );
                 glVertex3f( m_right, m_top, 0 );
 	// Bottom-right vertex (corner)
-                glTexCoord2f( 1, 1 );
+                glTexCoord2f( 1, 0 );
                 glVertex3f( m_right, m_bottom, 0 );
 	// Bottom-left vertex (corner)
-                glTexCoord2f( 0, 1 );
+                glTexCoord2f( 0, 0 );
                 glVertex3f( m_left, m_bottom, 0);
             glEnd();
         };
+
+        int GetX(){return m_position.x;};
 
         ~CDungeonMinimap(){
             delete fbo;

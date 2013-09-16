@@ -10,13 +10,13 @@
 namespace MyOGL{
 
     enum enBmpCompression{
-        BI_RGB=0,
-        BI_RLE4=1,
-        BI_RLE8=2,
-        BI_BITFIELDS=3,
-        BI_JPEG=4,
-        BI_PNG=5,
-        BI_ALPHABITFIELDS=6
+        bcBI_RGB=0,
+        bcBI_RLE4=1,
+        bcBI_RLE8=2,
+        bcBI_BITFIELDS=3,
+        bcBI_JPEG=4,
+        bcBI_PNG=5,
+        bcBI_ALPHABITFIELDS=6
     };
 
     struct sBitMapFileHeader{

@@ -16,8 +16,6 @@
 #include "myogl/ui/text_box.h"
 #include "uiwin/cell_info.h"
 
-#include "myogl/frame_buffer.h"
-
 CFBO *minimap;
 
 CHudSprite *hero_sprite;
@@ -35,14 +33,8 @@ void OnRender(double dt){
     glLoadIdentity();
 // set default viewport
     Render->Set2D();
-
+// render dungeon, hero & minimap
     dungeon->Render();
-    //
-    // herro render
-    glPushMatrix();
-    glTranslatef((hero->GetPosX()-dungeon->GetViewportLeft())*32,(hero->GetPosY()-dungeon->GetViewportTop())*32,0);
-    hero->Render();
-    glPopMatrix();
 
     if(ActiveWindow==gwInventory){
         hero->inventory->Render();
@@ -61,21 +53,8 @@ void OnRender(double dt){
     font_color.r=1; font_color.g=1,font_color.b=1;
     messages->Render(font_color);
 
-    minimap->Enable();
-    // render points
-        MyOGL::Render->Set2D();
-        MyOGL::Render->ClearScreen();
-        MyOGL::GL.Disable(GL_TEXTURE_2D);
-        MyOGL::Render->SetColor(255,255,255);
-        MyOGL::Render->DrawPoint(10,10);
-        MyOGL::Render->DrawPoint(11,11);
-        MyOGL::Render->DrawPoint(12,12);
-        MyOGL::Render->DrawPoint(13,11);
-        MyOGL::Render->DrawPoint(14,10);
-        MyOGL::Render->DrawQuad(10,10,5,5);
-    minimap->Disable();
-    MyOGL::GL.Enable(GL_TEXTURE_2D);
     // show selected tile
+
     if(mouse_on_tile && ActiveWindow==gwMain){
         int box_coord_x=mouse_on_tile_x*32, box_coord_y=mouse_on_tile_y*32;
         MyOGL::GL.Disable(GL_TEXTURE_2D);
@@ -102,8 +81,16 @@ void OnRender(double dt){
         ui_tile_info_panel->Render();
 
     }
-    MyOGL::Render->RenderScreenQuad(minimap->GetTextureId());
-
+    minimap->Enable();
+    //    MyOGL::Render->SetBlendMode(blNone);
+    // render points
+        MyOGL::Render->Set2D(true,200,200);
+        //MyOGL::Render->ClearScreen();
+        MyOGL::GL.Disable(GL_TEXTURE_2D);
+        MyOGL::Render->DrawLine(30,30,100,100);
+    minimap->Disable();
+    MyOGL::Render->Set2D(true);
+    //MyOGL::Render->RenderScreenQuad(minimap->GetTextureId());
 }
 
 // Update objects
@@ -379,7 +366,21 @@ int main(int argc, char **argv){
 
     // create minimap
     minimap=new CFBO(200,200);
-
+    minimap->Enable();
+        MyOGL::Render->SetBlendMode(blNone);
+    // render points
+        MyOGL::Render->Set2D(200,200);
+        MyOGL::Render->ClearScreen();
+        MyOGL::GL.Disable(GL_TEXTURE_2D);
+        MyOGL::Render->SetColor(255,255,255);
+        MyOGL::Render->DrawPoint(10,10);
+        MyOGL::Render->DrawPoint(11,11);
+        MyOGL::Render->DrawPoint(12,12);
+        MyOGL::Render->DrawPoint(13,11);
+        MyOGL::Render->DrawPoint(14,10);
+        MyOGL::Render->DrawQuad(10,10,5,5);
+        MyOGL::GL.Enable(GL_TEXTURE_2D);
+    minimap->Disable();
     ActiveWindow=gwMain;
 
     App->Run();
