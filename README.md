@@ -1,7 +1,7 @@
 MyRLG
 -----
 
-Sandbox for creation opengl roguelike games 
+Sandbox for creation opengl roguelike games. SDL2.0 OpenGL
 
 ![screenshot](https://raw.github.com/Uvadzucumi/myrlg/master/data/scr/scr09.png)
 
