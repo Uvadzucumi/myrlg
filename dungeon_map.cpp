@@ -5,8 +5,9 @@
 
 
 void CDungeonLevel::NewGridDungeon(int grid_w, int grid_h, int rooms){
-    CDungeonGeneration dlg(grid_w, grid_h, rooms);   // grid_w, grid_h, rooms
-    dlg.Generate(m_Map);
+    CDungeonGeneration *dmg=new CDungeonGeneration(grid_w, grid_h, rooms);   // grid_w, grid_h, rooms
+    dmg->Generate(m_Map);
+    delete dmg;
 };
 
 void CDungeonLevel::CalculateFOV(int x_pos, int y_pos, int distance){

@@ -20,12 +20,10 @@ bool CApplication::Init(int width, int height, int bpp, bool full_screen, const 
 //    uid_t user_id = getuid();
 //    user = getpwuid(user_id);
 //    printf("home dir: %s\n", user->pw_dir);
-    user_home_dir=new char[strlen(getenv("HOME")+1)];
-    strcpy(user_home_dir,getenv("HOME"));
+    user_home_dir=getenv("HOME");
 #else
     // Win: %HOMEPATH%, %USERPROFILE%
-    user_home_dir=new char[strlen(getenv("USERPROFILE")+1)];
-    strcpy(user_home_dir,getenv("USERPROFILE"));
+    user_home_dir=getenv("USERPROFILE");
 #endif
     Log=new CLog();
     Log->Init("log.txt");

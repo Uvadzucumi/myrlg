@@ -6,7 +6,7 @@
 
 std::vector <sItemDescription> ItemsDB;
 
-char LetterButtonsList[]={"abcdefghijklmnopqrstuvwxyz\0"};
+static char LetterButtonsList[]={"abcdefghijklmnopqrstuvwxyz\0"};
 
 #define ADD_ITEM(item_id, item_type, item_name, item_description, item_sprite_id, dice_count, dice_name, dice_delta, item_weight, item_equip_pos) \
     tmp_item.id=item_id; \
@@ -57,8 +57,8 @@ void InitItemsDB(){
 void DeleteItemsDB(){
     MyOGL::Log->puts("Clear items database\n");
     for(unsigned int i=0;i<ItemsDB.size();i++){
-       delete ItemsDB[i].name;
-       delete ItemsDB[i].description;
+       delete [] ItemsDB[i].name;
+       delete [] ItemsDB[i].description;
     }
     ItemsDB.clear();
 }

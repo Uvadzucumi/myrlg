@@ -115,7 +115,7 @@ class CLevelMap{
                         }
                     }
                 }
-                delete m_Map[i];
+                delete [] m_Map[i];
             }
             // clear lights sources
             for(unsigned int i=0;i<LightSourcesList.size();i++){

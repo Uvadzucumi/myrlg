@@ -39,12 +39,12 @@ class CFOV{
 
         ~CFOV(){
             MyOGL::Log->puts("Free FOV array\n");
-            delete m_fov_field;
+            delete [] m_fov_field;
         };
 
         void Resize(int distance){
             m_distance=distance;
-            delete m_fov_field;
+            delete [] m_fov_field;
             m_fov_size=m_distance*2+1;  // width & height
             MyOGL::Log->printf("Resize FOV array for %d tiles\n", m_fov_size*m_fov_size);
             m_fov_field=new sMapFovField[m_fov_size*m_fov_size];

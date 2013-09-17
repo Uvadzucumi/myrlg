@@ -52,10 +52,12 @@ class CDungeonGeneration{
 
         ~CDungeonGeneration(){
             // clear grid array
-            for(int i=0;i<m_grid_w;i++) delete m_grid[i];
-            delete m_grid;
+            for(int i=0;i<m_grid_w;i++){
+                delete [] m_grid[i];
+            }
+            delete [] m_grid;
             // clear room array
-            delete m_rooms;
+            delete [] m_rooms;
         };
 
         void Generate(CLevelMap *Map);

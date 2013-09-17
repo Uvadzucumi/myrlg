@@ -41,7 +41,7 @@ class CInventory{
             m_item_tileset=NULL;
             m_items.clear();
             for(unsigned i=0;i<m_slots.size();i++){
-                delete m_slots[i].displayed_name;
+                delete [] m_slots[i].displayed_name;
             }
             m_slots.clear();
         }

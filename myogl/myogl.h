@@ -66,9 +66,6 @@ namespace MyOGL{
                 MOUSE.button_m=false;
             };
             ~CApplication(){
-                if(user_home_dir){
-                    delete user_home_dir;
-                }
             }
             // create window and render context
             bool Init(int width=800, int height=600, int bpp=32, bool full_screen=false, const char *title=NULL);
