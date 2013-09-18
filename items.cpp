@@ -6,7 +6,10 @@
 
 std::vector <sItemDescription> ItemsDB;
 
-static char LetterButtonsList[]={"abcdefghijklmnopqrstuvwxyz\0"};
+#define LETTER_BUTTON_COUNT 26
+
+//char LetterButtonsList[LETTER_BUTTON_COUNT]={"abcdefghijklmnopqrstuvwxyz"};
+char LetterButtonsList[LETTER_BUTTON_COUNT]={'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
 
 #define ADD_ITEM(item_id, item_type, item_name, item_description, item_sprite_id, dice_count, dice_name, dice_delta, item_weight, item_equip_pos) \
     tmp_item.id=item_id; \
@@ -137,7 +140,7 @@ char CItemsContainer::GetFirstFreeButton(){
     int button_index;
     bool founded=true;
     Node *node;
-    for(button_index=0;button_index<(int)strlen(LetterButtonsList);button_index++){
+    for(button_index=0;button_index<LETTER_BUTTON_COUNT;button_index++){
         node=head;
         while(node!=NULL){
             // check current button

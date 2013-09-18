@@ -91,7 +91,7 @@ class CItemsContainer{
                 int amount;
 //                eEquipSlotNames eq_slot;
                 Node *next;
-                Node(){next=NULL;}
+                Node(){next=NULL; button=0;}
              //   Node *prev;
         };
         Node *head;
