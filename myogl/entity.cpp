@@ -73,7 +73,7 @@ void CEntity::OnRender() {
         if(m_material!=NULL){
             m_material->Apply();
         }else{
-            MyOGL::Render->SetColor(1,1,1);
+            MyOGL::Render->SetColor(1.0f,1.0f,1.0f);
         }
         if((int)SpritesList.size() > m_animation->GetCurrentFrame()){
             SpritesList[m_animation->GetCurrentFrame()]->SetPosition(X,Y);

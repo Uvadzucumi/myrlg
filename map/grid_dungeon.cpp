@@ -1,4 +1,4 @@
-
+#include <stdlib.h> // for rand
 #include "grid_dungeon.h"
 
 // return random door type

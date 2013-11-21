@@ -217,7 +217,7 @@ bool CInventory::Equip(int inv_id){
 void CInventory::Render(){
     // black quad
 
-    MyOGL::Render->SetColor(0,0,0,0.8);
+    MyOGL::Render->SetColor(0.0f,0.0f,0.0f,0.8f);
     MyOGL::GL.Disable(GL_TEXTURE_2D);
     MyOGL::Render->SetBlendMode(blSource);
 
@@ -228,7 +228,7 @@ void CInventory::Render(){
     glVertex2i(10,10+34*2+34*m_items.size());
     glEnd();
     MyOGL::Render->SetBlendMode(blNone);
-    MyOGL::Render->SetColor(1,1,1,1);
+    MyOGL::Render->SetColor(1.0f,1.0f,1.0f,1.0f);
     glBegin(GL_LINE_LOOP);
     glVertex2i(10,10);
     glVertex2i(500,10);
@@ -240,7 +240,7 @@ void CInventory::Render(){
     // show items list
     glTranslatef(12,20,0);
     int dy=0;
-    MyOGL::Render->SetColor(0.5,0.5,0.5,1);
+    MyOGL::Render->SetColor(0.5f,0.5f,0.5f,1.0f);
 
     char tmp[100];
     sItemDescription *item;
@@ -270,7 +270,7 @@ void CInventory::Render(){
         sprintf(tmp,"%c)", m_items.ButtonByIndex(i));
         m_font->Print(tmp); // White color
         glTranslatef(20,0,0);
-        MyOGL::Render->SetColor(1.0,1.0,0.0,1.0);   // Yellow
+        MyOGL::Render->SetColor(1.0f,1.0f,0.0f,1.0f);   // Yellow
         m_font->Print(item->name);
         glTranslatef(280,0,0);
         sprintf(tmp,"%d", m_items.AmountByIndex(i));
@@ -287,7 +287,7 @@ void CInventory::Render(){
     }
     // Help string
     glTranslated(10,0,0);
-    MyOGL::Render->SetColor(1.0,1.0,1.0,1.0,true);   // White
+    MyOGL::Render->SetColor(1.0f,1.0f,1.0f,1.0f,true);   // White
     m_font->Print("ESC - выход");
     glTranslatef(-22,-20-dy,0);
 }
@@ -300,7 +300,7 @@ void CInventory::RenderItemDetail(void){
 
     // black quad
 
-    MyOGL::Render->SetColor(0,0,0,0.8);
+    MyOGL::Render->SetColor(0.0f,0.0f,0.0f,0.8f);
     MyOGL::GL.Disable(GL_TEXTURE_2D);
     MyOGL::Render->SetBlendMode(blSource);
 
@@ -311,7 +311,7 @@ void CInventory::RenderItemDetail(void){
     glVertex2i(10,10+34*2+34*m_items.size());
     glEnd();
     MyOGL::Render->SetBlendMode(blNone);
-    MyOGL::Render->SetColor(1,1,1,1);
+    MyOGL::Render->SetColor(1.0f,1.0f,1.0f,1.0f);
     glBegin(GL_LINE_LOOP);
     glVertex2i(10,10);
     glVertex2i(500,10);
@@ -322,15 +322,15 @@ void CInventory::RenderItemDetail(void){
 
     // Item Name
     glTranslatef(50,15,0);
-    MyOGL::Render->SetColor(1.0,1.0,1.0,1.0);   // White
+    MyOGL::Render->SetColor(1.0f,1.0f,1.0f,1.0f);   // White
     m_font->Print(item->name);
     glTranslatef(-30,25,0);
-    MyOGL::Render->SetColor(1.0,1.0,0.0,1.0);   // Yellow
+    MyOGL::Render->SetColor(1.0f,1.0f,0.0f,1.0f);   // Yellow
     m_font->Print(item->description,470);
     Vector2i size=m_font->GetLastSizes();
 
     glTranslatef(0,size.height+10,0);
-    MyOGL::Render->SetColor(1.0,1.0,1.0,1.0);   // White
+    MyOGL::Render->SetColor(1.0f,1.0f,1.0f,1.0f);   // White
     // TODO: show equip only for equipment items
     int dx=0, w=0;
     if(m_sel_item_actions.equip){

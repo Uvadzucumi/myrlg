@@ -7,8 +7,9 @@ void CHudSprite::Render(CMaterial *material){
         Log->puts("CHudSprite::Render() Warning: TextureID=0\n");
     }
     MyOGL::Render->Set2D();
-    MyOGL::Render->BindTexture(m_texture->GetID());
     MyOGL::Render->SetBlendMode(this->BlendMode);
+    MyOGL::GL.Enable(GL_TEXTURE_2D);
+    MyOGL::Render->BindTexture(m_texture->GetID());
     // material (only color material)
     if(material!=NULL){
         material->Apply();
@@ -16,7 +17,7 @@ void CHudSprite::Render(CMaterial *material){
         m_material->Apply();
     }else{ // show only texture - disable material
         GL.Disable(GL_COLOR_MATERIAL);
-        MyOGL::Render->SetColor(1, 1, 1);
+        MyOGL::Render->SetColor(1.0f, 1.0f, 1.0f);
     }
     if(m_angle){
         float center_x=m_left+(m_right-m_left)/2;

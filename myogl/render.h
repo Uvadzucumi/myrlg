@@ -190,6 +190,7 @@ namespace MyOGL{
             void SetBlendMode(MyGlBlendMode mode);
         // Set DrawColor
             void SetColor(float r, float g, float b, float a=1.0, bool force=false);
+            void SetColor(int r, int g, int b, bool force=false);
             void SetColor(Vector4f color, bool force=false);
             void SetColor(Vector3i color, bool force=false);
         // Draw primitives

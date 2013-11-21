@@ -1,7 +1,7 @@
 #ifndef ITEMS_H_INCLUDED
 #define ITEMS_H_INCLUDED
 
-#include "tileset.h"
+#include "tiles_descr.h"
 #include "myogl/ui/bitmap_font.h"
 #include <vector>
 

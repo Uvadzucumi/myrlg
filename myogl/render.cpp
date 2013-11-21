@@ -380,6 +380,12 @@ void CRender::SetColor(Vector4f color, bool force){
 void CRender::SetColor(Vector3i color, bool force){
     this->SetColor(((float)color.r)/255,((float)color.g)/255,((float)color.b)/255,1.0, force);
 }
+// Set Inc color
+void CRender::SetColor(int r, int g, int b, bool force){
+    this->SetColor(((float)r)/255,((float)g)/255,((float)b)/255,1.0, force);
+}
+
+
 // Set Paper color
 void CRender::SetClearColor(float r, float g, float b, float a){
     if(GL.ClearColor.r==r && GL.ClearColor.g==g && GL.ClearColor.b == b && GL.ClearColor.a==a){

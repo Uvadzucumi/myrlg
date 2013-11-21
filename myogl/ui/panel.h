@@ -15,14 +15,14 @@ namespace MyOGL{
             CUIPanel():CUIBase(0,0,10,10){ // defaul constructor
                 m_border=true;
                 m_background=true;
-                m_border_color.Set(1,1,0,1);  // yellow
-                m_bg_color.Set(0,0,0,0.8);    // black with 80% alfa
+                m_border_color.Set(1.0f,1.0f,0.0f,1.0f);  // yellow
+                m_bg_color.Set(0.0f,0.0f,0.0f,0.8f);    // black with 80% alfa
             };
             CUIPanel(int x, int y, int w, int h):CUIBase(x,y,w,h){
                 m_border=true;
                 m_background=true;
-                m_border_color.Set(1,1,0,1);  // yellow
-                m_bg_color.Set(0,0,0,0.8);    // black with 80% alfa
+                m_border_color.Set(1.0f,1.0f,0.0f,1.0f);  // yellow
+                m_bg_color.Set(0.0f,0.0f,0.0f,0.8f);    // black with 80% alfa
             };
             void SetBorderColor(Vector4f color){
                 m_border_color.Set(color.r, color.g, color.b, color.a);

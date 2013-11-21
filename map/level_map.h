@@ -6,7 +6,7 @@
 #include "../myogl/animation.h"
 
 //#include <stdlib.h> // NULL, rand
-#include "../tileset.h" // tile names - for addTile
+#include "../tiles_descr.h" // tile names - for addTile
 
 #include "../items.h"
 

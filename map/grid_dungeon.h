@@ -1,7 +1,7 @@
 #ifndef DUNGEON_H_INCLUDED
 #define DUNGEON_H_INCLUDED
 
-#include "../tileset.h"
+#include "../tiles_descr.h"
 #include "../myogl/animation.h"
 #include "level_map.h"
 

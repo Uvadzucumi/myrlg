@@ -1,4 +1,4 @@
-
+#include <stdlib.h> // for abs
 #include "level_map.h"
 
 const char* GetTileNameByType(eTileTypes tile){

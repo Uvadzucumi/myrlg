@@ -1,7 +1,7 @@
 #ifndef DUNGEON_MAP_H_INCLUDED
 #define DUNGEON_MAP_H_INCLUDED
 
-#include "tileset.h"
+#include "tiles_descr.h"
 #include "myogl/vector_types.h"
 
 #include "map/level_map.h"

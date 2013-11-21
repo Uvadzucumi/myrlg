@@ -130,6 +130,8 @@
 		<Unit filename="myogl/sprites.h" />
 		<Unit filename="myogl/texture.cpp" />
 		<Unit filename="myogl/texture.h" />
+		<Unit filename="myogl/tileset.cpp" />
+		<Unit filename="myogl/tileset.h" />
 		<Unit filename="myogl/ui/base_ui_class.h" />
 		<Unit filename="myogl/ui/bitmap_font.cpp" />
 		<Unit filename="myogl/ui/bitmap_font.h" />
@@ -140,8 +142,7 @@
 		<Unit filename="myogl/vbo.h" />
 		<Unit filename="myogl/vector_types.h" />
 		<Unit filename="myrlg.conf" />
-		<Unit filename="tileset.cpp" />
-		<Unit filename="tileset.h" />
+		<Unit filename="tiles_descr.h" />
 		<Unit filename="uiwin/cell_info.cpp" />
 		<Unit filename="uiwin/cell_info.h" />
 		<Extensions>
