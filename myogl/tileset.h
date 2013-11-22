@@ -10,6 +10,8 @@ namespace MyOGL{
 class CTileset{
         CTexture *m_tileset_texture;
         std::vector<CHudSprite*> m_tiles;
+        int m_tile_width, m_tile_height;
+        int m_dec_width, m_dec_height; // tile decrease in pixels
     public:
         CTileset(CTexture *texture, int tile_x_size=32, int tile_y_size=32);
         ~CTileset();
@@ -24,7 +26,11 @@ class CTileset{
         };
         void RenderAt(int x, int y, int tile_id, CMaterial *material=NULL);
         void Render(int tile_id, CMaterial *material=NULL);
+        void setTileDecrease(int dec_width, int dec_height);
+        const int getTileDecreaseW(){ return m_dec_width; }
+        const int getTileDecreaseH(){ return m_dec_height; }
 };
+
 
 }
 

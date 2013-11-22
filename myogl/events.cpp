@@ -61,6 +61,11 @@ void CEvent::OnEvent(SDL_Event* Event) {
             break;
         }
 
+        case SDL_MOUSEWHEEL: {
+            OnMouseWheel(Event->wheel.x, Event->wheel.y);
+            break;
+        }
+
         case SDL_JOYAXISMOTION: {
             OnJoyAxis(Event->jaxis.which,Event->jaxis.axis,Event->jaxis.value);
             break;
@@ -161,11 +166,11 @@ void CEvent::OnMouseMove(int mX, int mY, int relX, int relY, bool Left,bool Righ
     //Pure virtual, do nothing
 }
 
-void CEvent::OnMouseWheel(bool Up, bool Down) {
+void CEvent::OnMouseWheel(int mX, int mY){
     //Pure virtual, do nothing
 }
 
-void CEvent::OnLButtonDown(int mX, int mY) {
+void CEvent::OnLButtonDown(int scrollX, int scrollY) {
     //Pure virtual, do nothing
 }
 

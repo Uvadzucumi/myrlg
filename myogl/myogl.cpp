@@ -183,6 +183,12 @@ void CApplication::Events(SDL_Event *Event, double DeltaTime){
                 }
             }
             break;
+            case SDL_MOUSEWHEEL:{
+                if(OnMouseWheel){
+                    OnMouseWheel(Event->wheel.x, Event->wheel.y);
+                }
+                break;
+            }
     }
     // mouse events
     // check gui

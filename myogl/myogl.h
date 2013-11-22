@@ -88,6 +88,7 @@ namespace MyOGL{
             void( *OnLButtonUp)(int x, int y);
             void( *OnRButtonUp)(int x, int y);
             void( *OnMButtonUp)(int x, int y);
+            void( *OnMouseWheel)(int scrollX, int scrollY);
             void( *OnMouseMove)(int x, int y, int xrel, int yrel, bool l_button, bool r_button, bool m_button);
 
             //void OnEvent(SDL_Event* Event);
