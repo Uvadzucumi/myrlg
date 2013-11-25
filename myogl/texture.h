@@ -49,6 +49,7 @@ namespace MyOGL{
             GLuint GetID(){ return TextureID; }
             char *GetFileName(){ return m_file_name;}
             eTextureFileFormat TextureFileFormat(char *file_name);
+            unsigned char* imageData(){ return &m_image_data[0];}
     };
 
     extern std::vector<CTexture*>  TexturesList;

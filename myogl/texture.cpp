@@ -58,8 +58,10 @@ bool CTexture::CreateFromMemory(void){
     }
 
 	// Have OpenGL generate a texture object handle for us
-    glGenTextures( 1, &TextureID );
-    Log->printf("Gen texture ID=%d\n",TextureID);
+    if(!TextureID){
+        glGenTextures( 1, &TextureID );
+        Log->printf("Gen texture ID=%d\n",TextureID);
+    }
 
 	// force bind the texture object
     Render->BindTexture(TextureID,true);
@@ -76,6 +78,9 @@ bool CTexture::CreateFromMemory(void){
 
 // create empty texture, (for attach to FBO)
 bool CTexture::CreateEmpty(int width, int height){
+    // create empty texture memory data
+    m_image_data.resize(width*height*4); // 4 - for RGBA
+
     m_width=width;
     m_height=height;
     m_texture_format=GL_RGBA;
@@ -89,8 +94,8 @@ bool CTexture::CreateEmpty(int width, int height){
 
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, this->minFilter );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, this->magFilter );
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	// Create 2D texture
     glTexImage2D(GL_TEXTURE_2D, 0, m_bytes_pp, m_width, m_height, 0, m_texture_format, GL_UNSIGNED_BYTE, NULL);
     Render->CheckError();
